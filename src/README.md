@@ -30,6 +30,11 @@ Order of doings:
 - close all
     
     
+check branch: 								git branch
+if not develop try switch to develop: 		git checkout develop
+get all tags: 								git tag
+for each tag get ref:						git rev-parse --short $TAG
+    
     
 repo_1
 repo_2

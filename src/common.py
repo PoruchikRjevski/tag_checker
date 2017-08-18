@@ -3,6 +3,7 @@
 __doc__ = "First argument it is the path to config.ini"
 
 CHECKER = "checker"
+CMD_WRAP = "cmd_wrap"
 
 EXIT_NORMAL     = 0             # all ok
 EXIT_GNT        = 1             # git not installed

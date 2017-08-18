@@ -4,20 +4,17 @@ import os
 import sys
 import getopt
 import string
-import subprocess
 
 import common
 import logger
-
-import configparser
+import cfg_loader
+import web_creator
+import cmd_wrap
 
 def isGitInstalled():
-    proc = subprocess.Popen(["git --version"],
-                            stdout=subprocess.PIPE,
-                            shell=True)
-    (out, err) = proc.communicate()
+    out = cmd_wrap.runCmd("git --version")
     
-    if not str(out).__contains__("version"):
+    if str(out).__contains__("version"):
         return True
     
     return False
@@ -44,7 +41,7 @@ def main():
             sys.exit(common.EXIT_NORMAL)
     
     if not isConfFileExist(args[0]):
-        logger.outMsg(common.CHECKER, common.E_GNT_STR)
+        logger.outMsg(common.CHECKER, common.E_CFNE_STR)
         sys.exit(common.EXIT_CFNE)
     
     # check environment
@@ -53,6 +50,8 @@ def main():
         sys.exit(common.EXIT_GNT)    
 
     # start work    
+    cfgLoader = cfg_loader.CfgLoader()
+    webCreator = web_creator.WebCreator()
 
 if __name__ == "__main__":
     main()
@@ -62,22 +61,22 @@ if __name__ == "__main__":
 # tests 
 # 
 
-config = configparser.ConfigParser()
-config.read('src/config.ini')
+#config = configparser.ConfigParser()
+#config.read('src/config.ini')
 
-departments = config.sections()
+#departments = config.sections()
 
-deps = list()
+#deps = list()
 
-for i in departments:
-    repos = config.get(i, 'repos').split(", ") 
-    for j in repos:
-        print (j)
-    deps.append((i, repos))
+#for i in departments:
+    #repos = config.get(i, 'repos').split(", ") 
+    #for j in repos:
+        #print (j)
+    #deps.append((i, repos))
 
-for i in deps:
+#for i in deps:
     #for j in i[1]
-    print (i)
+    #print (i)
 
 
 
