@@ -29,7 +29,8 @@ Order of doings:
 - configurate web pages for each department
 - close all
     
-    
+
+Git commands:
 check branch: 								git branch
 if not develop try switch to develop: 		git checkout develop
 get all tags: 								git tag
