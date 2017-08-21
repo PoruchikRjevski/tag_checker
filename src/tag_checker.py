@@ -9,6 +9,8 @@ import common
 from cmd_wrap import runCmd
 from logger import outMsg
 from cfg_loader import CfgLoader
+from tag_model import TagModel
+from git_man import GitMan
 
 def isGitInstalled():
     out = runCmd("git --version")
@@ -42,7 +44,9 @@ def checkOptions(parser):
     if parser.update:
         # TODO do update
         print ("update")
-    
+def checkUpdateOpt(opts):
+    return opts.update
+
 def main():
     # check options
     optParser = OptionParser()
@@ -71,9 +75,20 @@ def main():
        outMsg(common.CHECKER, common.E_GNT_STR)
        sys.exit(common.EXIT_GNT)
 
-    # start work    
+    # work
+    tagModel = TagModel()
+
     cfgLoader = CfgLoader()
-    cfgLoader.loadCfg(path)
+    cfgLoader.loadCfg(path, tagModel)
+
+    tagModel.show()
+
+    repoMan = GitMan()
+    repoMan.setUpdate(checkUpdateOpt(opts))
+    repoMan.doDirtyJob(tagModel)
+
+    tagModel.show()
+
     #webCreator = web_creator.WebCreator()
 
 if __name__ == "__main__":

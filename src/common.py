@@ -12,7 +12,11 @@ E_GNT_STR       = "Git not installed"
 E_CFNE_STR      = "Config file does not exist"
 E_WA_STR        = "Wrong arguments"
 FOR_HELP        = "For help use --help"
-E_MANY_OPT      = "Too many options"
-E_MANY_ARG      = "Too many arguments"
-E_FEW_OPT       = "Too few options"
-E_FEW_ARG       = "Too few arguments"
+
+# git answers
+BR_DEV          = "develop"
+
+# git commands
+CUR_BRANCH      = "git branch" # get current branch
+SW_BRANCH       = "git checkout " # switch to develop
+CD_TO           = "cd " # cd to TODO for win
