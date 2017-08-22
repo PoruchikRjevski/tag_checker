@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-
-#import getopt
 import os
 import sys
 from optparse import OptionParser
@@ -9,6 +7,7 @@ import common
 from cmd_wrap import runCmd
 from logger import outLog
 from logger import outErr
+from logger import initLog
 from cfg_loader import CfgLoader
 from tag_model import TagModel
 from git_man import GitMan
@@ -48,6 +47,12 @@ def main():
     if opts.quiet:
         common.QUIET = True
 
+    # check platform
+    common.CUR_PLATFORM = sys.platform
+
+    # init logger
+    initLog()
+
     if len(args) != 1:
         outErr(common.TAG_CHECKER, common.E_WA_STR)
         outErr(common.TAG_CHECKER, common.FOR_HELP)
@@ -71,45 +76,13 @@ def main():
     cfgLoader = CfgLoader()
     cfgLoader.loadCfg(path, tagModel)
 
-    tagModel.show()
-
     repoMan = GitMan()
     repoMan.setUpdate(opts.update)
     repoMan.doDirtyJob(tagModel)
-
-    tagModel.show()
 
     #webCreator = web_creator.WebCreator()
 
 if __name__ == "__main__":
     main()
-
-# check arguments
-# check config file exist
-# tests 
-# 
-
-#config = configparser.ConfigParser()
-#config.read('src/config.ini')
-
-#departments = config.sections()
-
-#deps = list()
-
-#for i in departments:
-    #repos = config.get(i, 'repos').split(", ") 
-    #for j in repos:
-        #print (j)
-    #deps.append((i, repos))
-
-#for i in deps:
-    #for j in i[1]
-    #print (i)
-
-
-
-#print ('suka')
-
-#print config.get('140', 'repo_lnk', 0)
 
 

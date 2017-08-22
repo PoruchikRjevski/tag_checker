@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import os
 
 import common
@@ -62,6 +60,8 @@ class GitMan:
 
         if curDir[-1:] == "\/":
             curDir = curDir[:-1]
+        if link[-1:] == "\/":
+            link = link[:-1]
 
         outLog(self.__class__.__name__, "cur dir: " + curDir)
 

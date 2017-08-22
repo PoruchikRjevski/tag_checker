@@ -42,9 +42,10 @@ history         - list      - (tag, ...)
 
 
 Order of doings:
-- check if git installed
-- read config file to model
-- update repos by links in config
+- init logger
++ check if git installed
++ read config file to model
++ update repos by links in config
 - get tags from develop branches
 - configurate web pages for each department
 - close all

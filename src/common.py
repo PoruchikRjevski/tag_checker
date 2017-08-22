@@ -1,7 +1,4 @@
 # constants for checker
-
-import inspect
-
 TAG_CHECKER     = "tag_checker"
 
 EXIT_NORMAL     = 0                                         # all ok
@@ -25,9 +22,16 @@ SW_BRANCH       = "git checkout "                           # switch branch to
 UPD_REPO        = "git pull"                                # update repo
 
 QUIET           = False                                     # global flag for out or not log and err messages
+CUR_PLATFORM    = "None"
+CUR_PATH        = "None"
 
 LOG_T           = "LOG"
 ERR_T           = "ERR"
 
-def whoami():
-    return inspect.stack()[3][3]
+# platforms
+
+WINDOWS_P       = "windows"
+LINUX_P         = "linux"
+
+WIN_PATH        = "./log/"
+LIN_PATH        = "/tmp/tag_checker_log/"

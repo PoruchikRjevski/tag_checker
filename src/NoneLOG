@@ -1,0 +1,6 @@
+[LOG] : [GitMan:doDirtyJob()        ] : [2017-08-22 13:22:24.123009] : [140][LOG] : [GitMan:goToDir()           ] : [2017-08-22 13:22:24.123345] : [go to dir: /home/kozlov_vn/Projects/tag_checker/example/repos/repo_140_1/][LOG] : [GitMan:doDirtyJob()        ] : [2017-08-22 13:24:41.825035] : [140][LOG] : [GitMan:goToDir()           ] : [2017-08-22 13:24:41.825352] : [go to dir: /home/kozlov_vn/Projects/tag_checker/example/repos/repo_140_1/][LOG] : [logger:initLog()           ] : [2017-08-22 13:25:37.315654] : [path: /tmp/tag_checker_log/][LOG] : [logger:initLog()           ] : [2017-08-22 13:25:58.046884] : [path: /tmp/tag_checker_log/][LOG] : [logger:initLog()           ] : [2017-08-22 13:26:34.125715] : [path: /tmp/tag_checker_log/]
+[LOG] : [logger:initLog()           ] : [2017-08-22 13:29:41.300935] : [path: /tmp/tag_checker_log/]
+[LOG] : [logger:initLog()           ] : [2017-08-22 13:30:29.296525] : [path: /tmp/tag_checker_log/]
+[LOG] : [logger:initLog()           ] : [2017-08-22 13:31:02.630820] : [path: /tmp/tag_checker_log/]
+[LOG] : [logger:initLog()           ] : [2017-08-22 13:31:34.982811] : [path: /tmp/tag_checker_log/]
+[LOG] : [logger:initLog()           ] : [2017-08-22 13:31:45.006713] : [path: /tmp/tag_checker_log/]
