@@ -42,7 +42,7 @@ history         - list      - (tag, ...)
 
 
 Order of doings:
-- init logger
++ init logger
 + check if git installed
 + read config file to model
 + update repos by links in config

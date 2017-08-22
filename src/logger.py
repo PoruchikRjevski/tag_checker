@@ -4,10 +4,6 @@ import os
 
 import common
 
-# TODO logs to
-# linux: /tmp/tag_checker_log/
-# windows: $CUR_DIR/log/
-
 def initLog():
     path = common.WIN_PATH
 

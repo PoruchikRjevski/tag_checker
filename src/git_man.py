@@ -58,10 +58,10 @@ class GitMan:
     def checkDir(self, link):
         curDir = os.getcwd()
 
-        if curDir[-1:] == "\/":
+        if link[-1:] == "/" and not curDir[-1:] == "/":
+            curDir = curDir + "/"
+        elif not link[-1:] == "/" and curDir[-1:] == "/":
             curDir = curDir[:-1]
-        if link[-1:] == "\/":
-            link = link[:-1]
 
         outLog(self.__class__.__name__, "cur dir: " + curDir)
 
