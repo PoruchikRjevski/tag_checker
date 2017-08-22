@@ -1,8 +1,8 @@
 HEAD   = "<html>" \
               "<body>" \
-              "<table border=\"1\" width=\"100%\">" \
+              "<table border=\"1\" bgcolor=\"#aaaaaa\" cellpadding=\"10%\" width=\"100%\" style=\"font-family:arial;font-size:13\">" \
                      "<tr bgcolor=\"#cccccc\">" \
-                            "<th colspan=\"6\"><h3><br>Actual firmwares on devices.</h3></th>" \
+                            "<th colspan=\"6\"><h3>Actual firmwares on devices.</h3></th>" \
                      "</tr>" \
                      "<tr bgcolor=\"#cccccc\">" \
                             "<th rowspan=\"2\">Department</th>" \
@@ -26,3 +26,4 @@ FOOT    =      "</table>" \
          "</html>"
 
 SUPA    = "rowspan=\"%s\""
+LINK    = ""

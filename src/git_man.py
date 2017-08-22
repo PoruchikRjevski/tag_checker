@@ -87,10 +87,11 @@ class GitMan:
 
         parts = tagStr.split("/")
 
-        tag.setOrderNum(parts[0])
-        tag.setItemName(parts[1])
-        tag.setItemNum(parts[2])
-        tag.setDate(parts[3])
+        if len(parts) >= 4:
+            tag.setOrderNum(parts[0])
+            tag.setItemName(parts[1])
+            tag.setItemNum(parts[2])
+            tag.setDate(parts[3])
 
         tag.setShortHash(self.getSHash(tagStr))
 
@@ -129,7 +130,17 @@ class GitMan:
 
                     if tags:
                         for tag in tags.split("\n"):
-                            repo.history.append(self.createTag(tag))
+                            tagN = self.createTag(tag)
+                            if tagN:
+                                repo.history.append(tagN)
+
+                        repo.history = sorted(repo.history, key=lambda tag: tag.date, reverse=True)
+
+                        # separate last tags
+                        lastDate = repo.history[0].date
+                        for tag in repo.history:
+                            if tag.date == lastDate:
+                                repo.last.append(tag)
 
                     # return last branch if need
                     if self.needReturnBranch:

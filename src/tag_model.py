@@ -51,7 +51,7 @@ class Tag:
 
 class Repo:
     def __init__(self):
-        self.last = Tag()
+        self.last = []
         self.history = []
         self.link = " "
 

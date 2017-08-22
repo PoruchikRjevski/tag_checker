@@ -47,8 +47,8 @@ Order of doings:
 + read config file to model
 + update repos by links in config
 + get tags from develop branches
-- configurate web pages for each department
-- close all
++ configurate web pages for each department
++ close all
     
 
 Git commands:
