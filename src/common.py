@@ -20,6 +20,8 @@ GIT_VER         = "git --version"                           # get git ver
 CUR_BRANCH      = "git rev-parse --abbrev-ref HEAD"         # get current branch
 SW_BRANCH       = "git checkout "                           # switch branch to
 UPD_REPO        = "git pull"                                # update repo
+GET_TAGS        = "git tag"                                 # get all tags for cur branch
+GET_TAG_SSHA    = "git rev-parse --short "                  # get short SHA1 for tagged commit
 
 QUIET           = False                                     # global flag for out or not log and err messages
 CUR_PLATFORM    = "None"
@@ -35,3 +37,9 @@ LINUX_P         = "linux"
 
 WIN_PATH        = "./log/"
 LIN_PATH        = "/tmp/tag_checker_log/"
+
+# tag descr
+
+ORDER           = "PROD"
+DEVICE          = "APP"
+ITEM            = "ITEM"

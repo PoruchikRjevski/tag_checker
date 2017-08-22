@@ -46,7 +46,7 @@ Order of doings:
 + check if git installed
 + read config file to model
 + update repos by links in config
-- get tags from develop branches
++ get tags from develop branches
 - configurate web pages for each department
 - close all
     
@@ -54,7 +54,7 @@ Order of doings:
 Git commands:
 check branch: 								git branch
 if not develop try switch to develop: 		git checkout develop
-update repo:                                git update ... TODO
+update repo:                                git pull
 get all tags: 								git tag
 for each tag get ref:						git rev-parse --short $TAG
     

@@ -70,6 +70,43 @@ class GitMan:
             return False
         return True
 
+    def getTags(self):
+        outLog(self.__class__.__name__, "get tags")
+
+        (out, err) = runCmd(common.GET_TAGS)
+
+        if err:
+            outErr(self.__class__.__name__, err)
+
+        return out
+
+    def createTag(self, tagStr):
+        outLog(self.__class__.__name__, "cur tag create from: " + tagStr)
+
+        tag = Tag()
+
+        parts = tagStr.split("/")
+
+        tag.setOrderNum(parts[0])
+        tag.setItemName(parts[1])
+        tag.setItemNum(parts[2])
+        tag.setDate(parts[3])
+
+        tag.setShortHash(self.getSHash(tagStr))
+
+        return tag
+
+    def getSHash(self, tagStr):
+        outLog(self.__class__.__name__, "get short hash")
+
+        (out, err) = runCmd(common.GET_TAG_SSHA + tagStr)
+
+        if err:
+            outErr(self.__class__.__name__, err)
+
+        return out
+
+
     def doDirtyJob(self, model):
         deps = model.getDepsKeys()
 
@@ -88,13 +125,12 @@ class GitMan:
                         self.updateRepo()
 
                     # do dirty work
+                    tags = self.getTags()
+
+                    if tags:
+                        for tag in tags.split("\n"):
+                            repo.history.append(self.createTag(tag))
 
                     # return last branch if need
                     if self.needReturnBranch:
                         self.returnBranch()
-
-        # for even dep
-        # for even repo
-        # update or not
-        # get all tags
-        # fill tags

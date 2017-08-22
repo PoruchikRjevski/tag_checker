@@ -80,6 +80,8 @@ def main():
     repoMan.setUpdate(opts.update)
     repoMan.doDirtyJob(tagModel)
 
+    tagModel.show()
+
     #webCreator = web_creator.WebCreator()
 
 if __name__ == "__main__":
