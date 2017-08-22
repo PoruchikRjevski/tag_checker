@@ -19,11 +19,12 @@ class CfgLoader:
         depDict = {}
 
         for i in deps:
-            repos = self.cfg.get(i, REPOS).split(", ")
+            repos = self.cfg.get(i, REPOS).split("\n")
 
             depDict[i] = []
 
             for j in repos:
+
                 repo = Repo()
                 repo.setLink(j)
                 depDict[i].append(repo)

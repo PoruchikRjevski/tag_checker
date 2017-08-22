@@ -7,13 +7,14 @@ from optparse import OptionParser
 
 import common
 from cmd_wrap import runCmd
-from logger import outMsg
+from logger import outLog
+from logger import outErr
 from cfg_loader import CfgLoader
 from tag_model import TagModel
 from git_man import GitMan
 
 def isGitInstalled():
-    out = runCmd("git --version")
+    out = runCmd(common.GIT_VER)
     
     if str(out).__contains__("version"):
         return True
@@ -37,16 +38,6 @@ def setOptions(parser):
                       default=False,
                       help="don't print status messages to stdout")
 
-def checkOptions(parser):
-    if parser.quiet:
-        # TODO do it quiet
-        print ("quiet")
-    if parser.update:
-        # TODO do update
-        print ("update")
-def checkUpdateOpt(opts):
-    return opts.update
-
 def main():
     # check options
     optParser = OptionParser()
@@ -55,24 +46,23 @@ def main():
     (opts, args) = optParser.parse_args()
 
     if opts.quiet:
-        # TODO do it quiet
-        print ("quiet")
+        common.QUIET = True
 
     if len(args) != 1:
-        outMsg(common.CHECKER, common.E_WA_STR)
-        outMsg(common.CHECKER, common.FOR_HELP)
+        outErr(common.TAG_CHECKER, common.E_WA_STR)
+        outErr(common.TAG_CHECKER, common.FOR_HELP)
         sys.exit(common.EXIT_WA)
 
     path = args[0]
 
     # check is config file was existed
     if not isConfFileExist(path):
-       outMsg(common.CHECKER, common.E_CFNE_STR)
+       outErr(common.TAG_CHECKER, common.E_CFNE_STR)
        sys.exit(common.EXIT_CFNE)
     
     # check environment
     if not isGitInstalled():
-       outMsg(common.CHECKER, common.E_GNT_STR)
+       outErr(common.TAG_CHECKER, common.E_GNT_STR)
        sys.exit(common.EXIT_GNT)
 
     # work
@@ -84,7 +74,7 @@ def main():
     tagModel.show()
 
     repoMan = GitMan()
-    repoMan.setUpdate(checkUpdateOpt(opts))
+    repoMan.setUpdate(opts.update)
     repoMan.doDirtyJob(tagModel)
 
     tagModel.show()

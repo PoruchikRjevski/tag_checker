@@ -1,19 +1,15 @@
+#!/usr/bin/env python3
+
 import subprocess
 
-import common
-from logger import outMsg
-
 def runCmd(cmd):
-    proc = subprocess.Popen([cmd],
+    proc = subprocess.Popen([cmd + '\n'],
                             stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
                             shell=True)
     (out, err) = proc.communicate()
-    
-    if err:
-        outMsg(common.CMD_WRAP, err)
-        # to log
-    
-    return out
+
+    return (out.decode("utf-8").strip(), err.decode("utf-8").strip())
 
 def main():
     print ("do nothing from there")

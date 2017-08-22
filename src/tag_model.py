@@ -36,4 +36,4 @@ class Repo:
         return self.link
 
     def show(self):
-        print (self.link)
+        print ("-", self.link)
