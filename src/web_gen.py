@@ -24,9 +24,52 @@ class WebGenerator:
             return
 
         self.writeHead(indexF)
+
+        self.writeMain(model, indexF)
+
         self.writeFoot(indexF)
 
         indexF.close()
+
+    def writeMain(self, model, file):
+        deps = model.getDepsKeys()
+        for dep, repos in deps.items():
+            firstDep = True
+            allTags = 0
+            for repo in repos:
+                allTags = allTags + len(repo.history)
+
+            for repo in repos:
+                firstDev = True
+                for tag in repo.history:
+                    self.writeOpenTr(file)
+
+                    if firstDep:
+                        firstDep = False
+                        self.writeTd(file, dep, web_gen_def.SUPA % allTags)
+
+                    if firstDev:
+                        firstDev = False
+                        self.writeTd(file, tag.itemName, web_gen_def.SUPA % len(repo.history))
+
+                    self.writeTd(file, tag.itemNum, "")
+                    self.writeTd(file, tag.orderNum, "")
+                    self.writeTd(file, tag.date, "")
+                    self.writeTd(file, tag.sHash, "")
+
+                    self.writeCloseTr(file)
+
+    def writeTd(self, file, field, supa):
+        file.write(web_gen_def.TD_HD % supa)
+        file.write(field)
+        file.write(web_gen_def.TD_FT)
+
+    def writeOpenTr(self, file):
+        file.write(web_gen_def.TR_HD)
+
+    def writeCloseTr(self, file):
+        file.write(web_gen_def.TR_FT)
+
 
     def writeHead(self, file):
         outLog(self.__class__.__name__, "write head")
