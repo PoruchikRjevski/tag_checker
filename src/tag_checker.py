@@ -11,6 +11,7 @@ from logger import initLog
 from cfg_loader import CfgLoader
 from tag_model import TagModel
 from git_man import GitMan
+from web_gen import WebGenerator
 
 def isGitInstalled():
     out = runCmd(common.GIT_VER)
@@ -80,9 +81,8 @@ def main():
     repoMan.setUpdate(opts.update)
     repoMan.doDirtyJob(tagModel)
 
-    tagModel.show()
-
-    #webCreator = web_creator.WebCreator()
+    webGen = WebGenerator()
+    webGen.generateIndex(tagModel)
 
 if __name__ == "__main__":
     main()

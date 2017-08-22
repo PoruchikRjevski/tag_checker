@@ -5,7 +5,9 @@ import os
 import common
 
 def initLog():
-    path = common.WIN_PATH
+    os.chdir(os.path.dirname(os.path.realpath(__file__)))
+
+    path = os.getcwd() + "/" + common.WIN_PATH
 
     if common.CUR_PLATFORM == common.LINUX_P:
         path = common.LIN_PATH

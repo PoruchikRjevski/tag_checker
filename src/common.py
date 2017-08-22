@@ -1,6 +1,7 @@
 # constants for checker
 TAG_CHECKER     = "tag_checker"
 
+# exit codes and outputs
 EXIT_NORMAL     = 0                                         # all ok
 EXIT_GNT        = 1                                         # git not installed
 EXIT_WA         = 2                                         # wron arguments
@@ -31,15 +32,17 @@ LOG_T           = "LOG"
 ERR_T           = "ERR"
 
 # platforms
-
 WINDOWS_P       = "windows"
 LINUX_P         = "linux"
 
-WIN_PATH        = "./log/"
+WIN_PATH        = "../log/"
 LIN_PATH        = "/tmp/tag_checker_log/"
 
 # tag descr
-
 ORDER           = "PROD"
 DEVICE          = "APP"
 ITEM            = "ITEM"
+
+# web generator
+INDEX_PATH      = "../out/"
+INDEX_NAME      = "index.html"
