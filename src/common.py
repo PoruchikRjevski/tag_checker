@@ -1,5 +1,6 @@
 # constants for checker
 TAG_CHECKER     = "tag_checker"
+REPOS           = "repos"
 
 # tag model
 PROD            = ("PROD", "ROD")

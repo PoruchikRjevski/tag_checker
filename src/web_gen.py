@@ -35,7 +35,14 @@ class WebGenerator:
 
     def genMainContent(self, model, file):
         deps = model.getDepsKeys()
-        for dep, repos in deps.items():
+        depsSort = model.getDepsSortedNames()
+
+        # for dep, repos in deps.items():
+        #for dep, repos in deps.items():
+
+        for dep in depsSort:
+            repos = deps.get(dep)
+
             firstDep = True
             allNotes = 0
 

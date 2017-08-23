@@ -77,11 +77,14 @@ def main():
     cfgLoader = CfgLoader()
     cfgLoader.loadCfg(path, tagModel)
 
+
+    tagModel.show()
+
     repoMan = GitMan()
     repoMan.setUpdate(opts.update)
     repoMan.doDirtyJob(tagModel)
 
-    # tagModel.show()
+    tagModel.show()
     webGen = WebGenerator()
     webGen.generateWeb(tagModel)
 

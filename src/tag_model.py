@@ -3,6 +3,13 @@ import common
 class TagModel:
     def __init__(self):
         self.deps = {}
+        self.list = []
+
+    def setDeps(self, deps):
+        self.deps = deps
+
+    def setSortedList(self, list):
+        self.list = list
 
     def addDeps(self, deps):
         self.deps.update(deps)
@@ -10,17 +17,21 @@ class TagModel:
     def getDepsKeys(self):
         return self.deps
 
+    def getDepsSortedNames(self):
+        return self.list
+
+
     # test method
     def show(self):
         print ("----- SOME SHIT -----")
         for dep, repos in self.deps.items():
             print (dep)
-            for repo in repos:
-                repo.show()
-                for name, dev in repo.devices.items():
-                    print (name)
-                    for note in dev.last:
-                        print (note.name)
+            # for repo in repos:
+            #     repo.show()
+                # for name, dev in repo.devices.items():
+                #     print (name)
+                #     for note in dev.last:
+                #         print (note.name)
 
 class Device:
     def __init__(self):
@@ -40,45 +51,8 @@ class Note:
         self.commDate = -1
         self.valid = False
 
-
-class Tag:
-    def __init__(self):
-        self.itemName = ""
-        self.itemNum = -1
-        self.orderNum = -1
-        self.date = -1
-        self.sHash = -1
-        self.valid = False
-
-    def setItemName(self, name):
-        self.itemName = name
-
-    def setItemNum(self, num):
-        self.itemNum = num
-
-    def setOrderNum(self, num):
-        self.orderNum = num
-
-    def setDate(self, date):
-        self.date = date
-
-    def setShortHash(self, hash):
-        self.sHash = hash
-
-    def setValid(self, validity):
-        self.valid = validity
-
-    def show(self):
-        print ("itName: ", self.itemName)
-        print ("itNum: ", self.itemNum)
-        print ("ordNum: ", self.orderNum)
-        print ("date: ", self.date)
-        print ("sHash: ", self.sHash)
-
 class Repo:
     def __init__(self):
-        self.last = [] # depr
-        self.history = [] # depr
         self.devices = {}
         self.link = " "
 

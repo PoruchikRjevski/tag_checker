@@ -2,7 +2,6 @@ import os
 
 import common
 from tag_model import TagModel
-from tag_model import Tag
 from tag_model import Repo
 from tag_model import Note
 from tag_model import Device
@@ -174,8 +173,12 @@ class GitMan:
 
     def doDirtyJob(self, model):
         deps = model.getDepsKeys()
+        depsSort = model.getDepsSortedNames()
 
-        for dep, repos in deps.items():
+        #for dep, repos in deps.items():
+        for dep in depsSort:
+            repos = deps.get(dep)
+
             outLog(self.__class__.__name__, dep)
             for repo in repos:
                 link = repo.getLink()
@@ -200,7 +203,7 @@ class GitMan:
                                 if note.valid:
                                     if not note.name in repo.devices:
                                         dev = Device()
-                                        dev.history.append(note)
+                                        dev.addNote(note)
                                         repo.devices[note.name] = dev
                                     else:
                                         repo.devices[note.name].addNote(note)
@@ -213,22 +216,6 @@ class GitMan:
                             for note in dev.history:
                                 if note.date == lastDate:
                                     dev.last.append(note)
-
-
-
-                    # if tags:
-                    #     for tag in tags.split("\n"):
-                    #         tagN = self.createTag(tag)
-                    #         if tagN.valid:
-                    #             repo.history.append(tagN)
-                    #
-                    #     repo.history = sorted(repo.history, key=lambda tag: tag.date, reverse=True)
-                    #
-                    #     # separate last tags
-                    #     lastDate = repo.history[0].date
-                    #     for tag in repo.history:
-                    #         if tag.date == lastDate:
-                    #             repo.last.append(tag)
 
                     # return last branch if need
                     if self.needReturnBranch:
