@@ -46,3 +46,18 @@ ITEM            = "ITEM"
 # web generator
 INDEX_PATH      = "../out/"
 INDEX_NAME      = "index.html"
+
+BORDER_WIDTH    = "1"
+TABLE_WIDTH     = "100%"
+TABLE_COLOR     = "#aaaaaa"
+CELLPADDING     = "10%"
+FONT_FAM        = "arial"
+FONT_SZ         = "13"
+ALIGN           = "center"
+
+DOC_CODE        = "utf-8"
+
+TABLE_HD_COL    = "#cccccc"
+MAIN_TABLE_COLS = "5"
+MID_ROWS        = "2"
+BTM_ROWS        = "1"

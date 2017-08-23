@@ -26,6 +26,7 @@ class Tag:
         self.orderNum = -1
         self.date = -1
         self.sHash = -1
+        self.valid = False
 
     def setItemName(self, name):
         self.itemName = name
@@ -41,6 +42,9 @@ class Tag:
 
     def setShortHash(self, hash):
         self.sHash = hash
+
+    def setValid(self, validity):
+        self.valid = validity
 
     def show(self):
         print ("itName: ", self.itemName)

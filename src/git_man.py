@@ -92,6 +92,7 @@ class GitMan:
             tag.setItemName(parts[1])
             tag.setItemNum(parts[2])
             tag.setDate(parts[3])
+            tag.setValid(True)
 
         tag.setShortHash(self.getSHash(tagStr))
 
@@ -131,7 +132,7 @@ class GitMan:
                     if tags:
                         for tag in tags.split("\n"):
                             tagN = self.createTag(tag)
-                            if tagN:
+                            if tagN.valid:
                                 repo.history.append(tagN)
 
                         repo.history = sorted(repo.history, key=lambda tag: tag.date, reverse=True)
