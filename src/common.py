@@ -67,7 +67,26 @@ ALIGN           = "center"
 DOC_CODE        = "utf-8"
 
 TABLE_HD_COL    = "#cccccc"
-TABLE_TR_COL    = "#eeeeee"
+TABLE_TR_COL_1  = "#eeeeee"
+TABLE_TR_COL_2  = "#dddddd"
 MAIN_TABLE_COLS = "5"
 MID_ROWS        = "2"
 BTM_ROWS        = "1"
+
+# page table header
+MAIN_HEAD       = "Актуальные прошивки"
+DEPARTMENT      = "Отдел"
+DEVICE          = "Устройство"
+ITEM            = "№"
+LAST_SET        = "Последняя установка"
+DATE            = "Дата установки"
+HASH            = "Хэш-сумма коммита(дата)"
+HISTORY         = "История прошивок для устройства - "
+
+# page table content
+FOR_ALL         = "для всех"
+ITEM_NUM        = "Зав. № "
+ORDER_NUM       = "Заказ "
+
+# back link
+BACK            = "Назад"

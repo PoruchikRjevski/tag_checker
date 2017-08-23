@@ -51,9 +51,10 @@ class WebGenerator:
                     # generate content for main page
                     firstDev = True
                     for note in dev.last:
+
                         file.writeTag(html_defs.T_TR_O,
                                       html_defs.A_ALIGN.format(common.ALIGN) +
-                                      html_defs.A_BGCOLOR.format(common.TABLE_TR_COL))
+                                      html_defs.A_BGCOLOR.format(common.TABLE_TR_COL_1))
 
                         if firstDep:
                             firstDep = False
@@ -67,17 +68,22 @@ class WebGenerator:
                             file.writeTag(html_defs.T_A_C)
                             file.writeTag(html_defs.T_TD_C)
 
-                        if common.TYPE_ALL in note.type:
-                            self.genTd(file, "для всех")
-                        elif common.TYPE_ITEM in note.type:
-                            self.genTd(file, "Зав. № " + str(note.num))
-                        elif common.TYPE_ORDER in note.type:
-                            self.genTd(file, "Заказ  " + str(note.num))
+                        self.genTd(file, self.getNumByType(note.type, note.num))
 
                         self.genTd(file, str(note.date))
                         self.genTd(file, note.sHash + "(" + note.commDate + ")")
 
                         file.writeTag(html_defs.T_TR_C)
+
+    def getNumByType(self, type, num):
+        res = ""
+        if common.TYPE_ALL in type:
+            res = common.FOR_ALL
+        elif common.TYPE_ITEM in type:
+            res = common.ITEM_NUM + str(num)
+        elif common.TYPE_ORDER in type:
+            res = common.ORDER_NUM + str(num)
+        return res
 
     def genDevicePage(self, device, name):
         page = HtmlGen(common.INDEX_PATH, name + common.FILE_EXT)
@@ -94,18 +100,28 @@ class WebGenerator:
 
         page.close()
 
+    def changeColor(self, color):
+        if color == common.TABLE_TR_COL_1:
+            color = common.TABLE_TR_COL_2
+        elif color == common.TABLE_TR_COL_2:
+            color = common.TABLE_TR_COL_1
+
+        return color
+
     def genDeviceContent(self, device, file):
+        date = device.history[0].date
+        color = common.TABLE_TR_COL_1
+
         for note in device.history:
+            if date != note.date:
+                date = note.date
+                color = self.changeColor(color)
+
             file.writeTag(html_defs.T_TR_O,
                           html_defs.A_ALIGN.format(common.ALIGN) +
-                          html_defs.A_BGCOLOR.format(common.TABLE_TR_COL))
+                          html_defs.A_BGCOLOR.format(color))
 
-            if common.TYPE_ALL in note.type:
-                self.genTd(file, "для всех")
-            elif common.TYPE_ITEM in note.type:
-                self.genTd(file, "Зав. № " + str(note.num))
-            elif common.TYPE_ORDER in note.type:
-                self.genTd(file, "Заказ  " + str(note.num))
+            self.genTd(file, self.getNumByType(note.type, note.num))
 
             self.genTd(file, str(note.date))
             self.genTd(file, note.sHash + "(" + note.commDate + ")")
@@ -152,56 +168,58 @@ class WebGenerator:
         gen.writeTag(html_defs.T_TH_C)
         gen.writeTag(html_defs.T_TR_C)
 
-    def genMidMainTableHead(self, gen):
-        gen.writeTag(html_defs.T_TR_O, html_defs.A_BGCOLOR.format(common.TABLE_HD_COL))
+    def genMidCommonTableBody(self, gen):
         gen.writeTag(html_defs.T_TH_O, html_defs.A_ROWSPAN.format(common.MID_ROWS))
-        gen.writeTag("Отдел")
-        gen.writeTag(html_defs.T_TH_C)
-        gen.writeTag(html_defs.T_TH_O, html_defs.A_ROWSPAN.format(common.MID_ROWS))
-        gen.writeTag("Прибор")
-        gen.writeTag(html_defs.T_TH_C)
-        gen.writeTag(html_defs.T_TH_O, html_defs.A_ROWSPAN.format(common.MID_ROWS))
-        gen.writeTag("№")
+        gen.writeTag(common.ITEM)
         gen.writeTag(html_defs.T_TH_C)
         gen.writeTag(html_defs.T_TH_O, html_defs.A_COLSPAN.format(common.MID_ROWS))
-        gen.writeTag("Последняя установка")
+        gen.writeTag(common.LAST_SET)
         gen.writeTag(html_defs.T_TH_C)
+
+    def genMidMainTableBody(self, gen):
+        gen.writeTag(html_defs.T_TH_O, html_defs.A_ROWSPAN.format(common.MID_ROWS))
+        gen.writeTag(common.DEPARTMENT)
+        gen.writeTag(html_defs.T_TH_C)
+        gen.writeTag(html_defs.T_TH_O, html_defs.A_ROWSPAN.format(common.MID_ROWS))
+        gen.writeTag(common.DEVICE)
+        gen.writeTag(html_defs.T_TH_C)
+
+    def genMidTableHead(self, gen):
+        gen.writeTag(html_defs.T_TR_O, html_defs.A_BGCOLOR.format(common.TABLE_HD_COL))
+
+    def genMidTableFoot(self, gen):
         gen.writeTag(html_defs.T_TR_C)
 
-    def genMidItemTableHead(self, gen):
-        gen.writeTag(html_defs.T_TR_O, html_defs.A_BGCOLOR.format(common.TABLE_HD_COL))
-        gen.writeTag(html_defs.T_TH_O, html_defs.A_ROWSPAN.format(common.MID_ROWS))
-        gen.writeTag("№")
-        gen.writeTag(html_defs.T_TH_C)
-        gen.writeTag(html_defs.T_TH_O, html_defs.A_COLSPAN.format(common.MID_ROWS))
-        gen.writeTag("Последняя установка")
-        gen.writeTag(html_defs.T_TH_C)
-        gen.writeTag(html_defs.T_TR_C)
 
     def genBtmTableHead(self, gen):
         gen.writeTag(html_defs.T_TR_O, html_defs.A_BGCOLOR.format(common.TABLE_HD_COL))
         gen.writeTag(html_defs.T_TH_O, html_defs.A_ROWSPAN.format(common.BTM_ROWS))
-        gen.writeTag("Дата")
+        gen.writeTag(common.DATE)
         gen.writeTag(html_defs.T_TH_C, html_defs.A_ROWSPAN.format(common.BTM_ROWS))
         gen.writeTag(html_defs.T_TH_O)
-        gen.writeTag("Хэш-сумма")
+        gen.writeTag(common.HASH)
         gen.writeTag(html_defs.T_TH_C, html_defs.A_ROWSPAN.format(common.BTM_ROWS))
         gen.writeTag(html_defs.T_TR_C)
 
     def genMainTableHead(self, gen):
-        self.genTopTableHead(gen, "Актуальные прошивки")
-        self.genMidMainTableHead(gen)
+        self.genTopTableHead(gen, common.MAIN_HEAD)
+        self.genMidTableHead(gen)
+        self.genMidMainTableBody(gen)
+        self.genMidCommonTableBody(gen)
+        self.genMidTableFoot(gen)
         self.genBtmTableHead(gen)
 
     def genItemTableHead(self, gen, text):
-        self.genTopTableHead(gen, "История установки прошивок для устойства: " + text)
-        self.genMidItemTableHead(gen)
+        self.genTopTableHead(gen, common.HISTORY + text)
+        self.genMidTableHead(gen)
+        self.genMidCommonTableBody(gen)
+        self.genMidTableFoot(gen)
         self.genBtmTableHead(gen)
 
     def genBackLink(self, gen):
         gen.writeTag(html_defs.T_P_O, html_defs.A_ALIGN.format(common.ALIGN))
         gen.writeTag(html_defs.T_A_O, html_defs.A_HREF.format(common.INDEX_NAME))
-        gen.writeTag("Назад")
+        gen.writeTag(common.BACK)
         gen.writeTag(html_defs.T_A_C)
         gen.writeTag(html_defs.T_P_C)
 

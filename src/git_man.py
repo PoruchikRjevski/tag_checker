@@ -141,7 +141,7 @@ class GitMan:
         if len(parts) == 3:
             date = self.repairDate(parts[2])
         elif len(parts) == 4:
-            note.type = parts[2].split("-")[:-1]
+            note.type = parts[2].split("-")[:-1][0]
             note.num = int(parts[2].split("-")[-1:][0])
             date = self.repairDate(parts[3])
 
