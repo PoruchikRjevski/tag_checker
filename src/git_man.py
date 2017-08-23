@@ -202,7 +202,8 @@ class GitMan:
                                         dev = Device()
                                         dev.history.append(note)
                                         repo.devices[note.name] = dev
-                                    repo.devices[note.name].addNote(note)
+                                    else:
+                                        repo.devices[note.name].addNote(note)
 
                         # sort notes for devices and separate last updates
                         for name, dev in repo.devices.items():

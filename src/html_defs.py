@@ -78,4 +78,6 @@ A_ST_FONT_SZ        = "font-size:{0!s};"
 A_CHARSET           = "charset=\"{0!s}\""
 A_HREF              = "href=\"{0!s}\""
 
+HTML_HEAD           = "<!DOCTYPE html>"
+
 

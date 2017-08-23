@@ -15,16 +15,6 @@ class WebGenerator:
         # cycle main
         self.genPages(model)
 
-
-        # self.genMainTableHead(index)
-        # self.genItemTableHead(index)
-        # self.genTableFoot(index)
-        # self.genBackLink(index)
-        #
-        # self.genPageFoot(index)
-        #
-        # index.close()
-
         outLog(self.__class__.__name__, "finish gen web")
 
 
@@ -55,6 +45,10 @@ class WebGenerator:
 
             for repo in repos:
                 for name, dev in repo.devices.items():
+                    # generate device's own page
+                    self.genDevicePage(dev, name)
+
+                    # generate content for main page
                     firstDev = True
                     for note in dev.last:
                         file.writeTag(html_defs.T_TR_O,
@@ -67,7 +61,11 @@ class WebGenerator:
 
                         if firstDev:
                             firstDev = False
-                            self.genTd(file, note.name, html_defs.A_ROWSPAN.format(len(dev.last)))
+                            file.writeTag(html_defs.T_TD_O, html_defs.A_ROWSPAN.format(len(dev.last)))
+                            file.writeTag(html_defs.T_A_O, html_defs.A_HREF.format(note.name + common.FILE_EXT))
+                            file.writeTag(note.name)
+                            file.writeTag(html_defs.T_A_C)
+                            file.writeTag(html_defs.T_TD_C)
 
                         if common.TYPE_ALL in note.type:
                             self.genTd(file, "для всех")
@@ -81,33 +79,38 @@ class WebGenerator:
 
                         file.writeTag(html_defs.T_TR_C)
 
+    def genDevicePage(self, device, name):
+        page = HtmlGen(common.INDEX_PATH, name + common.FILE_EXT)
 
+        self.genPageHead(page)
+        self.genTableHead(page)
+        self.genItemTableHead(page, name)
 
-            # firstDep = True
-            # allTags = 0
-            # for repo in repos:
-            #     allTags = allTags + len(repo.history)
-            #
-            # for repo in repos:
-            #     firstDev = True
-            #
-            #     for tag in repo.history:
-            #         self.writeOpenTr()
-            #
-            #         if firstDep:
-            #             firstDep = False
-            #             self.writeTd(dep, html_defs.SUPA % allTags)
-            #
-            #         if firstDev:
-            #             firstDev = False
-            #             self.writeTd(tag.itemName, html_defs.SUPA % len(repo.history))
-            #
-            #         self.writeTd(tag.itemNum, "")
-            #         self.writeTd(tag.orderNum, "")
-            #         self.writeTd(tag.date, "")
-            #         self.writeTd(tag.sHash, "")
-            #
-            #         self.writeCloseTr()
+        self.genDeviceContent(device, page)
+
+        self.genTableFoot(page)
+        self.genBackLink(page)
+        self.genPageFoot(page)
+
+        page.close()
+
+    def genDeviceContent(self, device, file):
+        for note in device.history:
+            file.writeTag(html_defs.T_TR_O,
+                          html_defs.A_ALIGN.format(common.ALIGN) +
+                          html_defs.A_BGCOLOR.format(common.TABLE_TR_COL))
+
+            if common.TYPE_ALL in note.type:
+                self.genTd(file, "для всех")
+            elif common.TYPE_ITEM in note.type:
+                self.genTd(file, "Зав. № " + str(note.num))
+            elif common.TYPE_ORDER in note.type:
+                self.genTd(file, "Заказ  " + str(note.num))
+
+            self.genTd(file, str(note.date))
+            self.genTd(file, note.sHash + "(" + note.commDate + ")")
+
+            file.writeTag(html_defs.T_TR_C)
 
     # 0 - gen, 1 - text, 2 - adding
     def genTd(self, *args):
@@ -123,6 +126,7 @@ class WebGenerator:
         args[0].writeTag(html_defs.T_TH_C)
 
     def genPageHead(self, gen):
+        gen.writeTag(html_defs.HTML_HEAD)
         gen.writeTag(html_defs.T_HTML_O)
         gen.writeTag(html_defs.T_BODY_O)
         gen.writeTag(html_defs.T_META_O, html_defs.A_CHARSET.format(common.DOC_CODE))
@@ -189,8 +193,8 @@ class WebGenerator:
         self.genMidMainTableHead(gen)
         self.genBtmTableHead(gen)
 
-    def genItemTableHead(self, gen):
-        self.genTopTableHead(gen, "ASW-1")
+    def genItemTableHead(self, gen, text):
+        self.genTopTableHead(gen, "История установки прошивок для устойства: " + text)
         self.genMidItemTableHead(gen)
         self.genBtmTableHead(gen)
 

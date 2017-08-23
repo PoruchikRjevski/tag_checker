@@ -54,6 +54,7 @@ ITEM            = "ITEM"
 # web generator
 INDEX_PATH      = "../out/"
 INDEX_NAME      = "index.html"
+FILE_EXT        = ".html"
 
 BORDER_WIDTH    = "1"
 TABLE_WIDTH     = "100%"
