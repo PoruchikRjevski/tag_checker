@@ -12,26 +12,115 @@ class WebGenerator:
     def generateWeb(self, model):
         outLog(self.__class__.__name__, "start gen web")
 
-        index = HtmlGen(common.INDEX_PATH, common.INDEX_NAME)
+        # cycle main
+        self.genPages(model)
 
-        self.genPageHead(index)
-
-        self.genTableHead(index)
 
         # self.genMainTableHead(index)
-        self.genItemTableHead(index)
-
-        self.genTableFoot(index)
-
-        self.genBackLink(index)
-
-        self.genPageFoot(index)
-
-        index.close()
+        # self.genItemTableHead(index)
+        # self.genTableFoot(index)
+        # self.genBackLink(index)
+        #
+        # self.genPageFoot(index)
+        #
+        # index.close()
 
         outLog(self.__class__.__name__, "finish gen web")
 
 
+    def genPages(self, model):
+        index = HtmlGen(common.INDEX_PATH, common.INDEX_NAME)
+
+        self.genPageHead(index)
+        self.genTableHead(index)
+
+        self.genMainTableHead(index)
+
+        self.genMainContent(model, index)
+
+        self.genTableFoot(index)
+        self.genPageFoot(index)
+
+        index.close()
+
+    def genMainContent(self, model, file):
+        deps = model.getDepsKeys()
+        for dep, repos in deps.items():
+            firstDep = True
+            allNotes = 0
+
+            for repo in repos:
+                for name, dev in repo.devices.items():
+                    allNotes += len(dev.last)
+
+            for repo in repos:
+                for name, dev in repo.devices.items():
+                    firstDev = True
+                    for note in dev.last:
+                        file.writeTag(html_defs.T_TR_O,
+                                      html_defs.A_ALIGN.format(common.ALIGN) +
+                                      html_defs.A_BGCOLOR.format(common.TABLE_TR_COL))
+
+                        if firstDep:
+                            firstDep = False
+                            self.genTd(file, dep, html_defs.A_ROWSPAN.format(allNotes))
+
+                        if firstDev:
+                            firstDev = False
+                            self.genTd(file, note.name, html_defs.A_ROWSPAN.format(len(dev.last)))
+
+                        if common.TYPE_ALL in note.type:
+                            self.genTd(file, "для всех")
+                        elif common.TYPE_ITEM in note.type:
+                            self.genTd(file, "Зав. № " + str(note.num))
+                        elif common.TYPE_ORDER in note.type:
+                            self.genTd(file, "Заказ  " + str(note.num))
+
+                        self.genTd(file, str(note.date))
+                        self.genTd(file, note.sHash + "(" + note.commDate + ")")
+
+                        file.writeTag(html_defs.T_TR_C)
+
+
+
+            # firstDep = True
+            # allTags = 0
+            # for repo in repos:
+            #     allTags = allTags + len(repo.history)
+            #
+            # for repo in repos:
+            #     firstDev = True
+            #
+            #     for tag in repo.history:
+            #         self.writeOpenTr()
+            #
+            #         if firstDep:
+            #             firstDep = False
+            #             self.writeTd(dep, html_defs.SUPA % allTags)
+            #
+            #         if firstDev:
+            #             firstDev = False
+            #             self.writeTd(tag.itemName, html_defs.SUPA % len(repo.history))
+            #
+            #         self.writeTd(tag.itemNum, "")
+            #         self.writeTd(tag.orderNum, "")
+            #         self.writeTd(tag.date, "")
+            #         self.writeTd(tag.sHash, "")
+            #
+            #         self.writeCloseTr()
+
+    # 0 - gen, 1 - text, 2 - adding
+    def genTd(self, *args):
+        if len(args) < 2:
+            return
+
+        if len(args) == 3:
+            args[0].writeTag(html_defs.T_TD_O, args[2])
+        else:
+            args[0].writeTag(html_defs.T_TD_O)
+
+        args[0].writeTag(args[1])
+        args[0].writeTag(html_defs.T_TH_C)
 
     def genPageHead(self, gen):
         gen.writeTag(html_defs.T_HTML_O)
@@ -117,7 +206,7 @@ class WebGenerator:
         gen.writeTag(html_defs.T_HTML_C)
 
 
-    # -------------- OLD SHIT MAZAFAKA -----------------------
+# -------------- OLD SHIT MAZAFAKA --------------------------------------------
     def generateIndex(self, model):
         outLog(self.__class__.__name__, "start gen index")
 

@@ -81,9 +81,9 @@ def main():
     repoMan.setUpdate(opts.update)
     repoMan.doDirtyJob(tagModel)
 
+    # tagModel.show()
     webGen = WebGenerator()
     webGen.generateWeb(tagModel)
-    #webGen.generateIndex(tagModel)
 
 if __name__ == "__main__":
     main()

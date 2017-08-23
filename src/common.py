@@ -1,6 +1,13 @@
 # constants for checker
 TAG_CHECKER     = "tag_checker"
 
+# tag model
+PROD            = ("PROD", "ROD")
+
+TYPE_ITEM       = "ITEM"
+TYPE_ORDER      = "ORDER"
+TYPE_ALL        = "ALL"
+
 # exit codes and outputs
 EXIT_NORMAL     = 0                                         # all ok
 EXIT_GNT        = 1                                         # git not installed
@@ -23,6 +30,7 @@ SW_BRANCH       = "git checkout "                           # switch branch to
 UPD_REPO        = "git pull"                                # update repo
 GET_TAGS        = "git tag"                                 # get all tags for cur branch
 GET_TAG_SSHA    = "git rev-parse --short "                  # get short SHA1 for tagged commit
+GET_COMM_DATE   = "git show -s --format=%ci "               # get commit date by hash
 
 QUIET           = False                                     # global flag for out or not log and err messages
 CUR_PLATFORM    = "None"
@@ -58,6 +66,7 @@ ALIGN           = "center"
 DOC_CODE        = "utf-8"
 
 TABLE_HD_COL    = "#cccccc"
+TABLE_TR_COL    = "#eeeeee"
 MAIN_TABLE_COLS = "5"
 MID_ROWS        = "2"
 BTM_ROWS        = "1"

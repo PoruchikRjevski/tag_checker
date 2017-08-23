@@ -4,6 +4,8 @@ import common
 from tag_model import TagModel
 from tag_model import Tag
 from tag_model import Repo
+from tag_model import Note
+from tag_model import Device
 from cmd_wrap import runCmd
 from logger import outLog
 from logger import outErr
@@ -108,6 +110,67 @@ class GitMan:
 
         return out
 
+    def getCommDateBySHash(self, hash):
+        outLog(self.__class__.__name__, "get comm date")
+
+        (out, err) = runCmd(common.GET_COMM_DATE + hash)
+
+        if err:
+            outErr(self.__class__.__name__, err)
+
+        return out
+
+    def isTagValid(self, tag):
+        for inc in common.PROD:
+            if inc in tag:
+                return True
+
+        return False
+
+    def genNoteByTag(self, tag):
+        parts = tag.split("/")
+
+        note = Note()
+
+        if len(parts) < 3:
+            return note
+
+        note.name = parts[1]
+
+        date = ""
+        if len(parts) == 3:
+            date = self.repairDate(parts[2])
+        elif len(parts) == 4:
+            note.type = parts[2].split("-")[:-1]
+            note.num = int(parts[2].split("-")[-1:][0])
+            date = self.repairDate(parts[3])
+
+        if not date:
+            outErr(self.__class__.__name__, "Bad tag: " + tag)
+            return note
+        elif date:
+            note.date = date
+
+        note.sHash = self.getSHash(tag)
+
+        note.commDate = self.getCommDateBySHash(note.sHash)
+
+        note.valid = True
+
+        return note
+
+    def repairDate(self, date):
+        temp = date.split("-")
+
+        res = ""
+
+        try:
+            res += temp[2] + "-" + temp[1] + "-" + temp[0] + " "
+            res += temp[3][0] + temp[3][1] + ":" + temp[3][2] + temp[3][3]
+        except Exception:
+            outErr(self.__class__.__name__, "Bad date: " + date)
+
+        return res
 
     def doDirtyJob(self, model):
         deps = model.getDepsKeys()
@@ -131,17 +194,40 @@ class GitMan:
 
                     if tags:
                         for tag in tags.split("\n"):
-                            tagN = self.createTag(tag)
-                            if tagN.valid:
-                                repo.history.append(tagN)
+                            if self.isTagValid(tag):
+                                note = self.genNoteByTag(tag)
 
-                        repo.history = sorted(repo.history, key=lambda tag: tag.date, reverse=True)
+                                if note.valid:
+                                    if not note.name in repo.devices:
+                                        dev = Device()
+                                        dev.history.append(note)
+                                        repo.devices[note.name] = dev
+                                    repo.devices[note.name].addNote(note)
 
-                        # separate last tags
-                        lastDate = repo.history[0].date
-                        for tag in repo.history:
-                            if tag.date == lastDate:
-                                repo.last.append(tag)
+                        # sort notes for devices and separate last updates
+                        for name, dev in repo.devices.items():
+                            dev.history = sorted(dev.history, key=lambda note: note.date, reverse=True)
+
+                            lastDate = dev.history[0].date
+                            for note in dev.history:
+                                if note.date == lastDate:
+                                    dev.last.append(note)
+
+
+
+                    # if tags:
+                    #     for tag in tags.split("\n"):
+                    #         tagN = self.createTag(tag)
+                    #         if tagN.valid:
+                    #             repo.history.append(tagN)
+                    #
+                    #     repo.history = sorted(repo.history, key=lambda tag: tag.date, reverse=True)
+                    #
+                    #     # separate last tags
+                    #     lastDate = repo.history[0].date
+                    #     for tag in repo.history:
+                    #         if tag.date == lastDate:
+                    #             repo.last.append(tag)
 
                     # return last branch if need
                     if self.needReturnBranch:
