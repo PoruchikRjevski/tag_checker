@@ -82,4 +82,5 @@ class Note:
         self.date = -1
         self.sHash = -1
         self.commDate = -1
+        self.author = ""
         self.valid = False

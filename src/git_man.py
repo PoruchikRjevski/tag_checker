@@ -135,9 +135,19 @@ class GitMan:
 
         note.tag = tag
 
+        note.author = self.getCommAuthorByHash(note.sHash)
+
         note.valid = True
 
         return note
+
+    def getCommAuthorByHash(self, hash):
+        (out, err) = runCmd(common.GET_COMM_AUTH + hash)
+
+        if err:
+            outErr(self.__class__.__name__, err)
+
+        return out
 
     def doRepairDate(self, date):
         temp = date.split("-")

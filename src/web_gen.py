@@ -57,8 +57,8 @@ class WebGenerator:
             for repo in repos:
                 for name, dev in repo.getDevices().items():
                     # generate device's own page
-                    self.genDevicePage(dev, name)
-                    self.genOrdersPages(dev, name)
+                    self.genDevicePage(dev, name, repo.getLink())
+                    self.genOrdersPages(dev, name, repo.getLink())
 
                     # generate content for main page
                     firstDev = True
@@ -94,11 +94,18 @@ class WebGenerator:
                         if firstType:
                             firstType = False
                             self.genNoteDate(file, note.date, rowsType)
-                            self.genNoteHashWithCommDate(file, note.sHash, note.commDate, rowsType)
+                            self.genNoteHashWithCommDate(file,
+                                                         note.sHash,
+                                                         note.commDate,
+                                                         rowsType,
+                                                         self.getTitleForCommit(repo.getLink(), note.author))
                             # self.genNoteDate(file, note.date, len(dev.getLast()))
                             # self.genNoteHashWithCommDate(file, note.sHash, note.commDate, len(dev.getLast()))
 
                         file.writeTag(html_defs.T_TR_C)
+
+    def getTitleForCommit(self, repo, author):
+        return "Repo: " + repo + "\n" + "Author: " + author
 
     def genDeviceName(self, file, name, span):
         self.genTd(file,
@@ -117,10 +124,10 @@ class WebGenerator:
                    str(date),
                    html_defs.A_ROWSPAN.format(nums))
 
-    def genNoteHashWithCommDate(self, file, hash, commDate, nums):
+    def genNoteHashWithCommDate(self, file, hash, commDate, nums, title):
         self.genTd(file,
                    hash + " (" + commDate + ")",
-                   html_defs.A_ROWSPAN.format(nums))
+                   html_defs.A_ROWSPAN.format(nums) + html_defs.A_TITLE.format(title))
 
     def getNumByType(self, type, num):
         res = ""
@@ -132,7 +139,7 @@ class WebGenerator:
             res = common.ORDER_NUM + str(num)
         return res
 
-    def genDevicePage(self, device, name):
+    def genDevicePage(self, device, name, repoLink):
         outLog(self.__class__.__name__, "start gen device page: " + name)
         page = HtmlGen(common.DEVICE_PATH, self.getDeviceFileName(name))
 
@@ -140,7 +147,7 @@ class WebGenerator:
         self.genTableHead(page)
         self.genDeviceTableHead(page, name)
 
-        self.genDeviceContent(device, page, name)
+        self.genDeviceContent(device, page, name, repoLink)
 
         self.genTableFoot(page)
         self.genBackLink(page, common.LEVEL_UP)
@@ -149,7 +156,7 @@ class WebGenerator:
         page.close()
         outLog(self.__class__.__name__, "finish gen device page: " + name)
 
-    def genOrdersPages(self, device, name):
+    def genOrdersPages(self, device, name, repoLink):
         outLog(self.__class__.__name__, "start gen items pages for device: " + name)
 
         used = []
@@ -173,8 +180,12 @@ class WebGenerator:
                                       html_defs.A_ALIGN.format(common.ALIGN) +
                                       html_defs.A_BGCOLOR.format(color))
 
-                        self.genNoteDate(page, j.date, 1)
-                        self.genNoteHashWithCommDate(page, j.sHash, j.commDate, 1)
+                        self.genNoteDate(page, j.date, common.BTM_ROWS)
+                        self.genNoteHashWithCommDate(page,
+                                                     j.sHash,
+                                                     j.commDate,
+                                                     common.BTM_ROWS,
+                                                     self.getTitleForCommit(repoLink, j.author))
 
                         page.writeTag(html_defs.T_TR_C)
 
@@ -216,7 +227,7 @@ class WebGenerator:
 
         return color
 
-    def genDeviceContent(self, device, file, name):
+    def genDeviceContent(self, device, file, name, repoLink):
         outLog(self.__class__.__name__, "gen device content")
         date = device.getHistory()[0].date
         color = common.TABLE_TR_COL_1
@@ -252,7 +263,11 @@ class WebGenerator:
                 firstDate = False
 
                 self.genNoteDate(file, note.date, notesByDate)
-                self.genNoteHashWithCommDate(file, note.sHash, note.commDate, notesByDate)
+                self.genNoteHashWithCommDate(file,
+                                             note.sHash,
+                                             note.commDate,
+                                             notesByDate,
+                                             self.getTitleForCommit(repoLink, note.author))
 
             file.writeTag(html_defs.T_TR_C)
 
