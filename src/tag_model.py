@@ -63,6 +63,7 @@ class Device:
 class Note:
     def __init__(self):
         self.type = common.TYPE_ALL
+        self.tag = ""
         self.name = ""
         self.num = -1
         self.date = -1

@@ -1,3 +1,5 @@
+import datetime
+
 import common
 import html_defs
 
@@ -59,6 +61,7 @@ class WebGenerator:
 
                     # generate content for main page
                     firstDev = True
+                    firstDate = True
                     for note in dev.getLast():
 
                         file.writeTag(html_defs.T_TR_O,
@@ -77,10 +80,16 @@ class WebGenerator:
                             file.writeTag(html_defs.T_A_C)
                             file.writeTag(html_defs.T_TD_C)
 
-                        self.genTd(file, self.getNumByType(note.type, note.num))
+                        self.genTd(file, self.getNumByType(note.type, note.num), html_defs.A_TITLE.format(note.tag))
 
-                        self.genTd(file, str(note.date))
-                        self.genTd(file, note.sHash + "(" + note.commDate + ")")
+                        if firstDate:
+                            firstDate = False
+                            self.genTd(file,
+                                       str(note.date),
+                                       html_defs.A_ROWSPAN.format(len(dev.getLast())))
+                            self.genTd(file,
+                                       note.sHash + "(" + note.commDate + ")",
+                                       html_defs.A_ROWSPAN.format(len(dev.getLast())))
 
                         file.writeTag(html_defs.T_TR_C)
 
@@ -124,19 +133,38 @@ class WebGenerator:
         date = device.getHistory()[0].date
         color = common.TABLE_TR_COL_1
 
+        firstDate = True
+        notesByDate = 0
+
+        for note in device.getHistory():
+            if note.date == date:
+                notesByDate += 1
+
         for note in device.getHistory():
             if date != note.date:
+                notesByDate = 0
+                firstDate = True
                 date = note.date
                 color = self.changeColor(color)
+
+                for note in device.getHistory():
+                    if note.date == date:
+                        notesByDate += 1
 
             file.writeTag(html_defs.T_TR_O,
                           html_defs.A_ALIGN.format(common.ALIGN) +
                           html_defs.A_BGCOLOR.format(color))
 
-            self.genTd(file, self.getNumByType(note.type, note.num))
+            self.genTd(file, self.getNumByType(note.type, note.num), html_defs.A_TITLE.format(note.tag))
 
-            self.genTd(file, str(note.date))
-            self.genTd(file, note.sHash + "(" + note.commDate + ")")
+            if firstDate:
+                firstDate = False
+                self.genTd(file,
+                           str(note.date),
+                           html_defs.A_ROWSPAN.format(notesByDate))
+                self.genTd(file,
+                           note.sHash + "(" + note.commDate + ")",
+                           html_defs.A_ROWSPAN.format(notesByDate))
 
             file.writeTag(html_defs.T_TR_C)
 
@@ -235,5 +263,18 @@ class WebGenerator:
         gen.writeTag(html_defs.T_P_C)
 
     def genPageFoot(self, gen):
+        gen.writeTag(html_defs.T_H_O, "6")
+        gen.writeTag(html_defs.T_P_O,
+                     html_defs.A_ALIGN.format(common.ALIGN))
+        gen.writeTag(common.LAST_UPD + datetime.datetime.now().strftime("%Y-%m-%d %I:%M"))
+        gen.writeTag(html_defs.T_P_C)
+        gen.writeTag(html_defs.T_H_C, "6")
+
+        gen.writeTag(html_defs.T_H_O, "6")
+        gen.writeTag(html_defs.T_P_O, html_defs.A_ALIGN.format(common.ALIGN))
+        gen.writeTag(common.AUTHOR)
+        gen.writeTag(html_defs.T_P_C)
+        gen.writeTag(html_defs.T_H_C, "6")
+
         gen.writeTag(html_defs.T_BODY_C)
         gen.writeTag(html_defs.T_HTML_C)

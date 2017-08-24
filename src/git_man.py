@@ -133,6 +133,8 @@ class GitMan:
 
         note.commDate = self.getCommDateBySHash(note.sHash)
 
+        note.tag = tag
+
         note.valid = True
 
         return note
@@ -143,7 +145,7 @@ class GitMan:
         res = ""
 
         try:
-            res += temp[2] + "-" + temp[1] + "-" + temp[0] + " "
+            res += temp[0] + "-" + temp[1] + "-" + temp[2] + " "
             res += temp[3][0] + temp[3][1] + ":" + temp[3][2] + temp[3][3]
         except Exception:
             outErr(self.__class__.__name__, "Bad date: " + date)

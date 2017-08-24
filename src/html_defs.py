@@ -56,6 +56,9 @@ T_LNK_C             = "</a>"
 T_H3_O              = "<h3>"
 T_H3_C              = "</h3>"
 
+T_H_O               = "<h{0!s}>"
+T_H_C               = "</h{0!s}>"
+
 T_A_O               = "<a {0!s}>"
 T_A_C               = "</a>"
 
@@ -77,6 +80,7 @@ A_ST_FONT_FAM       = "font-family:{0!s};"
 A_ST_FONT_SZ        = "font-size:{0!s};"
 A_CHARSET           = "charset=\"{0!s}\""
 A_HREF              = "href=\"{0!s}\""
+A_TITLE             = "title=\"{0!s}\""
 
 HTML_HEAD           = "<!DOCTYPE html>"
 

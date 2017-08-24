@@ -1,6 +1,8 @@
 # constants for checker
 TAG_CHECKER     = "tag_checker"
 REPOS           = "repos"
+CONFIG          = "config"
+WHO_S           = "verantwortlicher"
 
 # tag model
 PROD            = ("PROD", "ROD")
@@ -92,3 +94,7 @@ ORDER_NUM       = "Заказ "
 
 # back link
 BACK            = "Назад"
+
+# footer
+LAST_UPD        = "Последнее обновление: "
+AUTHOR          = "140 отдел. Буревестник."

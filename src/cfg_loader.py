@@ -1,4 +1,5 @@
 import configparser
+import  codecs
 
 import common
 
@@ -16,6 +17,12 @@ class CfgLoader:
         deps = self.cfg.sections()
 
         for i in deps:
+            # if i == common.CONFIG:
+            #     common.AUTHOR = self.cfg.get(i, common.WHO_S)
+            #
+            #     print (common.AUTHOR)
+            #     continue
+
             reposLinks = self.cfg.get(i, common.REPOS).split("\n")
 
             reposList = []
