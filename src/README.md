@@ -62,4 +62,9 @@ for each tag get ref:						git rev-parse --short $TAG
 repo_1
 repo_2
 repo_3
-    
+
+    file:///home/kozlov_vn/Projects/tag_checker/out/index.html
+
+javascript:(function(){var loc=location.href;loc=loc.replace('www.govno.rub','www.ya.ru'); location.replace(loc)})()
+
+javascript:(function(){var loc=location.href;loc=loc.replace('file:///home/kozlov_vn/Projects/tag_checker/out/index.html','www.ya.ru'); location.replace(loc)})()

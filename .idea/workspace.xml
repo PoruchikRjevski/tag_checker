@@ -2,12 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2c8eb497-6da4-44ad-8163-64862edfca81" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/NoneLOG" afterPath="$PROJECT_DIR$/src/NoneLOG" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/common.py" afterPath="$PROJECT_DIR$/src/common.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/git_man.py" afterPath="$PROJECT_DIR$/src/git_man.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/html_defs.py" afterPath="$PROJECT_DIR$/src/html_defs.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/html_gen.py" afterPath="$PROJECT_DIR$/src/html_gen.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/web_gen.py" afterPath="$PROJECT_DIR$/src/web_gen.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/README.md" afterPath="$PROJECT_DIR$/src/README.md" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -18,19 +13,7 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="tag_checker.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/tag_checker.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="85">
-              <caret line="74" column="18" lean-forward="false" selection-start-line="74" selection-start-column="18" selection-end-line="74" selection-end-column="18" />
-              <folding>
-                <element signature="e#23#32#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="web_gen.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="web_gen.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/web_gen.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="417">
@@ -158,6 +141,16 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/README.md">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="255">
+              <caret line="54" column="54" lean-forward="true" selection-start-line="54" selection-start-column="54" selection-end-line="54" selection-end-column="54" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="translate" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/translate">
           <provider selected="true" editor-type-id="text-editor">
@@ -188,7 +181,6 @@
         <option value="$PROJECT_DIR$/src/model.py" />
         <option value="$PROJECT_DIR$/src/repo_man.py" />
         <option value="$PROJECT_DIR$/src/cmd_wrap.py" />
-        <option value="$PROJECT_DIR$/src/README.md" />
         <option value="$PROJECT_DIR$/src/web_gen_def.py" />
         <option value="$PROJECT_DIR$/src/logger.py" />
         <option value="$PROJECT_DIR$/src/tag_checker.py" />
@@ -202,6 +194,7 @@
         <option value="$PROJECT_DIR$/src/html_defs.py" />
         <option value="$PROJECT_DIR$/src/common.py" />
         <option value="$PROJECT_DIR$/src/web_gen.py" />
+        <option value="$PROJECT_DIR$/src/README.md" />
       </list>
     </option>
   </component>
@@ -702,14 +695,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/README.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="442">
-          <caret line="65" column="0" lean-forward="false" selection-start-line="65" selection-start-column="0" selection-end-line="65" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/logger.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -853,6 +838,14 @@
             <element signature="e#14338#14488#0" expanded="false" />
             <element signature="e#14538#14808#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/README.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="54" column="54" lean-forward="true" selection-start-line="54" selection-start-column="54" selection-end-line="54" selection-end-column="54" />
+          <folding />
         </state>
       </provider>
     </entry>
