@@ -17,11 +17,11 @@ class CfgLoader:
         deps = self.cfg.sections()
 
         for i in deps:
-            # if i == common.CONFIG:
-            #     common.AUTHOR = self.cfg.get(i, common.WHO_S)
-            #
-            #     print (common.AUTHOR)
-            #     continue
+            if i == common.CONFIG:
+                common.INDEX_PATH = self.cfg.get(i, common.OUT)
+
+                print (common.AUTHOR)
+                continue
 
             reposLinks = self.cfg.get(i, common.REPOS).split("\n")
 

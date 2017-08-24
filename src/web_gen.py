@@ -58,6 +58,7 @@ class WebGenerator:
                 for name, dev in repo.getDevices().items():
                     # generate device's own page
                     self.genDevicePage(dev, name)
+                    self.genOrdersPages(dev, name)
 
                     # generate content for main page
                     firstDev = True
@@ -83,12 +84,12 @@ class WebGenerator:
 
                         if firstDev:
                             firstDev = False
-                            self.genTd(file,
-                                       note.name,
-                                       html_defs.A_ROWSPAN.format(len(dev.getLast())),
-                                       note.name)
+                            self.genDeviceName(file, note.name, len(dev.getLast()))
 
-                        self.genItemNum(file, self.getNumByType(note.type, note.num), note.tag)
+                        self.genOrderNum(file,
+                                         self.getNumByType(note.type, note.num),
+                                         note.tag,
+                                         common.ORDERS_PATH + self.getOrderFileName(name, note.num))
 
                         if firstType:
                             firstType = False
@@ -99,8 +100,14 @@ class WebGenerator:
 
                         file.writeTag(html_defs.T_TR_C)
 
-    def genItemNum(self, file, num, tag):
-        self.genTd(file, num, html_defs.A_TITLE.format(tag))
+    def genDeviceName(self, file, name, span):
+        self.genTd(file,
+                   name,
+                   html_defs.A_ROWSPAN.format(span),
+                   common.DEVICE_DIR + self.getDeviceFileName(name))
+
+    def genOrderNum(self, file, num, tag, link):
+        self.genTd(file, num, html_defs.A_TITLE.format(tag), link)
 
     def genDepartment(self, file, dep, nums):
         self.genTd(file, dep, html_defs.A_ROWSPAN.format(nums))
@@ -127,20 +134,68 @@ class WebGenerator:
 
     def genDevicePage(self, device, name):
         outLog(self.__class__.__name__, "start gen device page: " + name)
-        page = HtmlGen(common.INDEX_PATH, name + common.FILE_EXT)
+        page = HtmlGen(common.DEVICE_PATH, self.getDeviceFileName(name))
 
         self.genPageHead(page)
         self.genTableHead(page)
-        self.genItemTableHead(page, name)
+        self.genDeviceTableHead(page, name)
 
-        self.genDeviceContent(device, page)
+        self.genDeviceContent(device, page, name)
 
         self.genTableFoot(page)
-        self.genBackLink(page)
+        self.genBackLink(page, common.LEVEL_UP)
         self.genPageFoot(page)
 
         page.close()
         outLog(self.__class__.__name__, "finish gen device page: " + name)
+
+    def genOrdersPages(self, device, name):
+        outLog(self.__class__.__name__, "start gen items pages for device: " + name)
+
+        used = []
+
+        for note in device.getHistory():
+            if not note.num in used:
+                page = HtmlGen(common.ORDERS_PATH, self.getOrderFileName(name, note.num))
+
+                self.genPageHead(page)
+                self.genTableHead(page)
+                self.genOrderTableHead(page, name + " - " + self.getNumByType(note.type, note.num))
+
+                for j in device.getHistory():
+                    if note.num == j.num:
+                        print(note.name)
+                        print(note.num)
+
+                self.genTableFoot(page)
+                self.genBackLink(page, common.LEVEL_UP + common.LEVEL_UP)
+                self.genPageFoot(page)
+
+                page.close()
+
+            used.append(note.num)
+
+
+        # page = HtmlGen(common.INDEX_PATH, name + common.FILE_EXT)
+        #
+        # self.genPageHead(page)
+        # self.genTableHead(page)
+        # self.genItemTableHead(page, name)
+        #
+        # self.genDeviceContent(device, page)
+        #
+        # self.genTableFoot(page)
+        # self.genBackLink(page)
+        # self.genPageFoot(page)
+        #
+        # page.close()
+        outLog(self.__class__.__name__, "finish gen items pages for device: " + name)
+
+    def getDeviceFileName(self, name):
+        return name + common.FILE_EXT
+
+    def getOrderFileName(self, name, num):
+        return name + "_" + str(num) + common.FILE_EXT
 
     def changeColor(self, color):
         if color == common.TABLE_TR_COL_1:
@@ -150,7 +205,7 @@ class WebGenerator:
 
         return color
 
-    def genDeviceContent(self, device, file):
+    def genDeviceContent(self, device, file, name):
         outLog(self.__class__.__name__, "gen device content")
         date = device.getHistory()[0].date
         color = common.TABLE_TR_COL_1
@@ -177,7 +232,10 @@ class WebGenerator:
                           html_defs.A_ALIGN.format(common.ALIGN) +
                           html_defs.A_BGCOLOR.format(color))
 
-            self.genItemNum(file, self.getNumByType(note.type, note.num), note.tag)
+            self.genOrderNum(file,
+                             self.getNumByType(note.type, note.num),
+                             note.tag,
+                             common.LEVEL_UP + common.ORDERS_PATH + self.getOrderFileName(name, note.num))
 
             if firstDate:
                 firstDate = False
@@ -198,7 +256,7 @@ class WebGenerator:
             args[0].writeTag(html_defs.T_TD_O)
 
         if len(args) == 4:
-            args[0].writeTag(html_defs.T_A_O, html_defs.A_HREF.format(args[3] + common.FILE_EXT))
+            args[0].writeTag(html_defs.T_A_O, html_defs.A_HREF.format(args[3]))
 
         args[0].writeTag(args[1])
 
@@ -238,9 +296,6 @@ class WebGenerator:
         gen.writeTag(html_defs.T_TH_O, html_defs.A_ROWSPAN.format(common.MID_ROWS))
         gen.writeTag(common.ITEM)
         gen.writeTag(html_defs.T_TH_C)
-        gen.writeTag(html_defs.T_TH_O, html_defs.A_COLSPAN.format(common.MID_ROWS))
-        gen.writeTag(common.LAST_SET)
-        gen.writeTag(html_defs.T_TH_C)
 
     def genMidMainTableBody(self, gen):
         gen.writeTag(html_defs.T_TH_O, html_defs.A_ROWSPAN.format(common.MID_ROWS))
@@ -254,6 +309,9 @@ class WebGenerator:
         gen.writeTag(html_defs.T_TR_O, html_defs.A_BGCOLOR.format(common.TABLE_HD_COL))
 
     def genMidTableFoot(self, gen):
+        gen.writeTag(html_defs.T_TH_O, html_defs.A_COLSPAN.format(common.MID_ROWS))
+        gen.writeTag(common.LAST_SET)
+        gen.writeTag(html_defs.T_TH_C)
         gen.writeTag(html_defs.T_TR_C)
 
     def genBtmTableHead(self, gen):
@@ -274,16 +332,22 @@ class WebGenerator:
         self.genMidTableFoot(gen)
         self.genBtmTableHead(gen)
 
-    def genItemTableHead(self, gen, text):
+    def genDeviceTableHead(self, gen, text):
         self.genTopTableHead(gen, common.HISTORY + text)
         self.genMidTableHead(gen)
         self.genMidCommonTableBody(gen)
         self.genMidTableFoot(gen)
         self.genBtmTableHead(gen)
 
-    def genBackLink(self, gen):
+    def genOrderTableHead(self, gen, text):
+        self.genTopTableHead(gen, common.HISTORY + text)
+        self.genMidTableHead(gen)
+        self.genMidTableFoot(gen)
+        self.genBtmTableHead(gen)
+
+    def genBackLink(self, gen, levels):
         gen.writeTag(html_defs.T_P_O, html_defs.A_ALIGN.format(common.ALIGN))
-        gen.writeTag(html_defs.T_A_O, html_defs.A_HREF.format(common.INDEX_NAME))
+        gen.writeTag(html_defs.T_A_O, html_defs.A_HREF.format(levels + common.INDEX_NAME))
         gen.writeTag(common.BACK)
         gen.writeTag(html_defs.T_A_C)
         gen.writeTag(html_defs.T_P_C)
@@ -293,7 +357,7 @@ class WebGenerator:
                      html_defs.A_ALIGN.format(common.ALIGN))
         gen.writeTag(html_defs.T_FONT_O,
                      html_defs.A_SIZE.format("1"))
-        gen.writeTag(common.LAST_UPD + datetime.datetime.now().strftime("%Y-%m-%d %I:%M"))
+        gen.writeTag(common.LAST_UPD + datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
         gen.writeTag(html_defs.T_FONT_C)
         gen.writeTag(html_defs.T_P_C)
 

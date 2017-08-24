@@ -1,8 +1,8 @@
 # constants for checker
 TAG_CHECKER     = "tag_checker"
 REPOS           = "repos"
-CONFIG          = "config"
-WHO_S           = "verantwortlicher"
+CONFIG          = "CONFIG"
+OUT             = "out"
 
 # tag model
 PROD            = ("PROD", "ROD")
@@ -60,7 +60,12 @@ ITEM            = "ITEM"
 # web generator
 INDEX_PATH      = "../out/"
 INDEX_NAME      = "index.html"
+DEVICE_DIR      = "devices/"
+DEVICE_PATH     = INDEX_PATH + DEVICE_DIR
+ORDERS_DIR      = "orders/"
+ORDERS_PATH     = DEVICE_PATH + ORDERS_DIR
 FILE_EXT        = ".html"
+LEVEL_UP        = "../"
 
 BORDER_WIDTH    = "1"
 TABLE_WIDTH     = "100%"
@@ -95,7 +100,7 @@ ITEM_NUM        = "Зав. № "
 ORDER_NUM       = "Заказ "
 
 # back link
-BACK            = "Назад"
+BACK            = "На главную"
 
 # footer
 LAST_UPD        = "Последнее обновление: "
