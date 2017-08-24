@@ -37,7 +37,12 @@ UPD_REPO        = "git pull"                                # update repo
 GET_TAGS        = "git tag"                                 # get all tags for cur branch
 GET_TAG_SSHA    = "git rev-parse --short "                  # get short SHA1 for tagged commit
 GET_COMM_DATE   = "git show -s --format=%cd --date=short "  # get commit date by hash
-GET_COMM_AUTH   = "git log -1 --format='%ae' "              # get commit author
+GET_COMM_INFO   = "git log -{0!s} --format='{1!s}' "        # get commit info
+FORM_AUTHOR     = "%ae"                                     # author
+FORM_PAR_SHASH  = "%p"                                      # parents hash
+
+GIT_PAR_SH_NEST = 10
+GIT_AUTHOR_NEST = 1
 
 QUIET           = False                                     # global flag for out or not log and err messages
 LOGGING         = False                                     # global flag for out or not log and err to files
@@ -76,10 +81,13 @@ CELLPADDING     = "5%"
 FONT_FAM        = "arial"
 FONT_SZ         = "12"
 ALIGN           = "center"
+BLACK           = "black"
+WHITE           = "white"
 
 DOC_CODE        = "utf-8"
 
-TABLE_HD_COL    = "#cccccc"
+MAIN_T_HD_COL   = "#333333"
+TABLE_HD_COL    = "#555555"
 TABLE_TR_COL_1  = "#eeeeee"
 TABLE_TR_COL_2  = "#dddddd"
 MAIN_TABLE_COLS = "5"

@@ -35,7 +35,10 @@ LINK    = ""
 T_HTML_O            = "<html>"
 T_HTML_C            = "</html>"
 
-T_BODY_O            = "<body>"
+T_HEAD_O            = "<head {0!s}>"
+T_HEAD_C            = "</head>"
+
+T_BODY_O            = "<body {0!s}>"
 T_BODY_C            = "</body>"
 
 T_TABLE_O           = "<table {0!s}>"
@@ -85,6 +88,11 @@ A_CHARSET           = "charset=\"{0!s}\""
 A_HREF              = "href=\"{0!s}\""
 A_TITLE             = "title=\"{0!s}\""
 A_SIZE              = "size=\"{0!s}\""
+A_COLOR             = "color=\"{0!s}\""
+
+A_LINK              = "link=\"{0!s}\""
+A_ALINK             = "alink=\"{0!s}\""
+A_VLINK             = "vlink=\"{0!s}\""
 
 HTML_HEAD           = "<!DOCTYPE html>"
 

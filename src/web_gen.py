@@ -277,11 +277,27 @@ class WebGenerator:
 
         args[0].writeTag(html_defs.T_TD_C)
 
+    # 0 -gen, 1 - text, 2- adding
+    def genFont(self, *args):
+        if len(args) < 2:
+            return
+
+        if len(args) >= 3:
+            args[0].writeTag(html_defs.T_FONT_O, args[2])
+        else:
+            args[0].writeTag(html_defs.T_FONT_O)
+
+        args[0].writeTag(args[1])
+
+        args[0].writeTag(html_defs.T_FONT_C)
+
     def genPageHead(self, gen):
         gen.writeTag(html_defs.HTML_HEAD)
         gen.writeTag(html_defs.T_HTML_O)
-        gen.writeTag(html_defs.T_BODY_O)
+        gen.writeTag(html_defs.T_HEAD_O)
         gen.writeTag(html_defs.T_META_O, html_defs.A_CHARSET.format(common.DOC_CODE))
+        gen.writeTag(html_defs.T_HEAD_C)
+        gen.writeTag(html_defs.T_BODY_O, html_defs.A_LINK.format(common.BLACK) + html_defs.A_VLINK.format(common.BLACK))
 
     def genTableHead(self, gen):
         gen.writeTag(html_defs.T_TABLE_O,
@@ -296,25 +312,25 @@ class WebGenerator:
         gen.writeTag(html_defs.T_TABLE_C)
 
     def genTopTableHead(self, gen, text):
-        gen.writeTag(html_defs.T_TR_O, html_defs.A_BGCOLOR.format(common.TABLE_HD_COL))
+        gen.writeTag(html_defs.T_TR_O, html_defs.A_BGCOLOR.format(common.MAIN_T_HD_COL)) #TABLE_HD_COL
         gen.writeTag(html_defs.T_TH_O, html_defs.A_COLSPAN.format(common.MAIN_TABLE_COLS))
         gen.writeTag(html_defs.T_H3_O)
-        gen.writeTag(text)
+        self.genFont(gen, text, html_defs.A_COLOR.format(common.WHITE))
         gen.writeTag(html_defs.T_H3_C)
         gen.writeTag(html_defs.T_TH_C)
         gen.writeTag(html_defs.T_TR_C)
 
     def genMidCommonTableBody(self, gen):
         gen.writeTag(html_defs.T_TH_O, html_defs.A_ROWSPAN.format(common.MID_ROWS))
-        gen.writeTag(common.ITEM)
+        self.genFont(gen, common.ITEM, html_defs.A_COLOR.format(common.WHITE))
         gen.writeTag(html_defs.T_TH_C)
 
     def genMidMainTableBody(self, gen):
         gen.writeTag(html_defs.T_TH_O, html_defs.A_ROWSPAN.format(common.MID_ROWS))
-        gen.writeTag(common.DEPARTMENT)
+        self.genFont(gen, common.DEPARTMENT, html_defs.A_COLOR.format(common.WHITE))
         gen.writeTag(html_defs.T_TH_C)
         gen.writeTag(html_defs.T_TH_O, html_defs.A_ROWSPAN.format(common.MID_ROWS))
-        gen.writeTag(common.DEVICE)
+        self.genFont(gen, common.DEVICE, html_defs.A_COLOR.format(common.WHITE))
         gen.writeTag(html_defs.T_TH_C)
 
     def genMidTableHead(self, gen):
@@ -322,17 +338,17 @@ class WebGenerator:
 
     def genMidTableFoot(self, gen):
         gen.writeTag(html_defs.T_TH_O, html_defs.A_COLSPAN.format(common.MID_ROWS))
-        gen.writeTag(common.LAST_SET)
+        self.genFont(gen, common.LAST_SET, html_defs.A_COLOR.format(common.WHITE))
         gen.writeTag(html_defs.T_TH_C)
         gen.writeTag(html_defs.T_TR_C)
 
     def genBtmTableHead(self, gen):
         gen.writeTag(html_defs.T_TR_O, html_defs.A_BGCOLOR.format(common.TABLE_HD_COL))
         gen.writeTag(html_defs.T_TH_O, html_defs.A_ROWSPAN.format(common.BTM_ROWS))
-        gen.writeTag(common.DATE)
+        self.genFont(gen, common.DATE, html_defs.A_COLOR.format(common.WHITE))
         gen.writeTag(html_defs.T_TH_C, html_defs.A_ROWSPAN.format(common.BTM_ROWS))
         gen.writeTag(html_defs.T_TH_O)
-        gen.writeTag(common.HASH)
+        self.genFont(gen, common.HASH, html_defs.A_COLOR.format(common.WHITE))
         gen.writeTag(html_defs.T_TH_C, html_defs.A_ROWSPAN.format(common.BTM_ROWS))
         gen.writeTag(html_defs.T_TR_C)
 

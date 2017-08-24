@@ -142,7 +142,7 @@ class GitMan:
         return note
 
     def getCommAuthorByHash(self, hash):
-        (out, err) = runCmd(common.GET_COMM_AUTH + hash)
+        (out, err) = runCmd(common.GET_COMM_INFO.format(common.GIT_AUTHOR_NEST, common.FORM_AUTHOR) + hash)
 
         if err:
             outErr(self.__class__.__name__, err)
