@@ -49,28 +49,29 @@ class Device:
         self.history = sorted(self.history, key=lambda note: note.date, reverse=True)
 
     def fillLast(self):
-        # for type in common.TYPES_L:
-        #     first = True
-        #     lastDate = 0
-        #     for note in self.history:
-        #         if note.type == type:
-        #             if first:
-        #                 first = False
-        #                 lastDate = note.date
-        #
-        #             if note.date == lastDate:
-        #                 self.addToLast(note)
-
-        lastDate = self.history[0].date
-        for note in self.history:
-            if note.date == lastDate:
-                self.addToLast(note)
+        for type in common.TYPES_L:
+            first = True
+            lastDate = 0
+            for note in self.history:
+                if note.type == type:
+                    if first:
+                        first = False
+                        lastDate = note.date
+                    if note.date == lastDate:
+                        self.addToLast(note)
 
     def addToLast(self, note):
         self.last.append(note)
 
     def getLast(self):
         return self.last
+
+    def getLastNumByType(self, type):
+        res = 0
+        for note in self.last:
+            if type == note.type:
+                res += 1
+        return res
 
 class Note:
     def __init__(self):

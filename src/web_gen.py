@@ -61,8 +61,17 @@ class WebGenerator:
 
                     # generate content for main page
                     firstDev = True
-                    firstDate = True
+                    firstType = True
+
+                    if not dev.getLast():
+                        continue
+                    curType = dev.getLast()[0].type
+                    rowsType = dev.getLastNumByType(curType)
                     for note in dev.getLast():
+                        if curType != note.type:
+                            firstType = True
+                            curType = note.type
+                            rowsType = dev.getLastNumByType(curType)
 
                         file.writeTag(html_defs.T_TR_O,
                                       html_defs.A_ALIGN.format(common.ALIGN) +
@@ -74,7 +83,6 @@ class WebGenerator:
 
                         if firstDev:
                             firstDev = False
-
                             self.genTd(file,
                                        note.name,
                                        html_defs.A_ROWSPAN.format(len(dev.getLast())),
@@ -82,10 +90,12 @@ class WebGenerator:
 
                         self.genItemNum(file, self.getNumByType(note.type, note.num), note.tag)
 
-                        if firstDate:
-                            firstDate = False
-                            self.genNoteDate(file, note.date, len(dev.getLast()))
-                            self.genNoteHashWithCommDate(file, note.sHash, note.commDate, len(dev.getLast()))
+                        if firstType:
+                            firstType = False
+                            self.genNoteDate(file, note.date, rowsType)
+                            self.genNoteHashWithCommDate(file, note.sHash, note.commDate, rowsType)
+                            # self.genNoteDate(file, note.date, len(dev.getLast()))
+                            # self.genNoteHashWithCommDate(file, note.sHash, note.commDate, len(dev.getLast()))
 
                         file.writeTag(html_defs.T_TR_C)
 

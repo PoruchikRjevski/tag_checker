@@ -35,7 +35,7 @@ SW_BRANCH       = "git checkout "                           # switch branch to
 UPD_REPO        = "git pull"                                # update repo
 GET_TAGS        = "git tag"                                 # get all tags for cur branch
 GET_TAG_SSHA    = "git rev-parse --short "                  # get short SHA1 for tagged commit
-GET_COMM_DATE   = "git show -s --format=%ci "               # get commit date by hash
+GET_COMM_DATE   = "git show -s --format=%cd --date=short "               # get commit date by hash
 
 QUIET           = False                                     # global flag for out or not log and err messages
 LOGGING         = False                                     # global flag for out or not log and err to files
@@ -87,7 +87,7 @@ ITEM            = "№"
 LAST_SET        = "Последняя установка"
 DATE            = "Дата установки"
 HASH            = "Хэш-сумма коммита(дата)"
-HISTORY         = "История прошивок для устройства - "
+HISTORY         = "История прошивок для устройства "
 
 # page table content
 FOR_ALL         = "для всех"
