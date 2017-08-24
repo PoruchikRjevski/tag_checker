@@ -162,10 +162,21 @@ class WebGenerator:
                 self.genTableHead(page)
                 self.genOrderTableHead(page, name + " - " + self.getNumByType(note.type, note.num))
 
+                color = common.TABLE_TR_COL_1
+                date = note.date
                 for j in device.getHistory():
                     if note.num == j.num:
-                        print(note.name)
-                        print(note.num)
+                        if date != j.date:
+                            date = j.date
+                            color = self.changeColor(color)
+                        page.writeTag(html_defs.T_TR_O,
+                                      html_defs.A_ALIGN.format(common.ALIGN) +
+                                      html_defs.A_BGCOLOR.format(color))
+
+                        self.genNoteDate(page, j.date, 1)
+                        self.genNoteHashWithCommDate(page, j.sHash, j.commDate, 1)
+
+                        page.writeTag(html_defs.T_TR_C)
 
                 self.genTableFoot(page)
                 self.genBackLink(page, common.LEVEL_UP + common.LEVEL_UP)
