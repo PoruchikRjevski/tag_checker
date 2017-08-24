@@ -70,28 +70,40 @@ class WebGenerator:
 
                         if firstDep:
                             firstDep = False
-                            self.genTd(file, dep, html_defs.A_ROWSPAN.format(allNotes))
+                            self.genDepartment(file, dep, allNotes)
 
                         if firstDev:
                             firstDev = False
-                            file.writeTag(html_defs.T_TD_O, html_defs.A_ROWSPAN.format(len(dev.getLast())))
-                            file.writeTag(html_defs.T_A_O, html_defs.A_HREF.format(note.name + common.FILE_EXT))
-                            file.writeTag(note.name)
-                            file.writeTag(html_defs.T_A_C)
-                            file.writeTag(html_defs.T_TD_C)
 
-                        self.genTd(file, self.getNumByType(note.type, note.num), html_defs.A_TITLE.format(note.tag))
+                            self.genTd(file,
+                                       note.name,
+                                       html_defs.A_ROWSPAN.format(len(dev.getLast())),
+                                       note.name)
+
+                        self.genItemNum(file, self.getNumByType(note.type, note.num), note.tag)
 
                         if firstDate:
                             firstDate = False
-                            self.genTd(file,
-                                       str(note.date),
-                                       html_defs.A_ROWSPAN.format(len(dev.getLast())))
-                            self.genTd(file,
-                                       note.sHash + "(" + note.commDate + ")",
-                                       html_defs.A_ROWSPAN.format(len(dev.getLast())))
+                            self.genNoteDate(file, note.date, len(dev.getLast()))
+                            self.genNoteHashWithCommDate(file, note.sHash, note.commDate, len(dev.getLast()))
 
                         file.writeTag(html_defs.T_TR_C)
+
+    def genItemNum(self, file, num, tag):
+        self.genTd(file, num, html_defs.A_TITLE.format(tag))
+
+    def genDepartment(self, file, dep, nums):
+        self.genTd(file, dep, html_defs.A_ROWSPAN.format(nums))
+
+    def genNoteDate(self, file, date, nums):
+        self.genTd(file,
+                   str(date),
+                   html_defs.A_ROWSPAN.format(nums))
+
+    def genNoteHashWithCommDate(self, file, hash, commDate, nums):
+        self.genTd(file,
+                   hash + " (" + commDate + ")",
+                   html_defs.A_ROWSPAN.format(nums))
 
     def getNumByType(self, type, num):
         res = ""
@@ -155,31 +167,35 @@ class WebGenerator:
                           html_defs.A_ALIGN.format(common.ALIGN) +
                           html_defs.A_BGCOLOR.format(color))
 
-            self.genTd(file, self.getNumByType(note.type, note.num), html_defs.A_TITLE.format(note.tag))
+            self.genItemNum(file, self.getNumByType(note.type, note.num), note.tag)
 
             if firstDate:
                 firstDate = False
-                self.genTd(file,
-                           str(note.date),
-                           html_defs.A_ROWSPAN.format(notesByDate))
-                self.genTd(file,
-                           note.sHash + "(" + note.commDate + ")",
-                           html_defs.A_ROWSPAN.format(notesByDate))
+
+                self.genNoteDate(file, note.date, notesByDate)
+                self.genNoteHashWithCommDate(file, note.sHash, note.commDate, notesByDate)
 
             file.writeTag(html_defs.T_TR_C)
 
-    # 0 - gen, 1 - text, 2 - adding
+    # 0 - gen, 1 - text, 2 - adding, 4 - link
     def genTd(self, *args):
         if len(args) < 2:
             return
 
-        if len(args) == 3:
+        if len(args) >= 3:
             args[0].writeTag(html_defs.T_TD_O, args[2])
         else:
             args[0].writeTag(html_defs.T_TD_O)
 
+        if len(args) == 4:
+            args[0].writeTag(html_defs.T_A_O, html_defs.A_HREF.format(args[3] + common.FILE_EXT))
+
         args[0].writeTag(args[1])
-        args[0].writeTag(html_defs.T_TH_C)
+
+        if len(args) == 4:
+            args[0].writeTag(html_defs.T_A_C)
+
+        args[0].writeTag(html_defs.T_TD_C)
 
     def genPageHead(self, gen):
         gen.writeTag(html_defs.HTML_HEAD)
@@ -263,18 +279,20 @@ class WebGenerator:
         gen.writeTag(html_defs.T_P_C)
 
     def genPageFoot(self, gen):
-        gen.writeTag(html_defs.T_H_O, "6")
         gen.writeTag(html_defs.T_P_O,
                      html_defs.A_ALIGN.format(common.ALIGN))
+        gen.writeTag(html_defs.T_FONT_O,
+                     html_defs.A_SIZE.format("1"))
         gen.writeTag(common.LAST_UPD + datetime.datetime.now().strftime("%Y-%m-%d %I:%M"))
+        gen.writeTag(html_defs.T_FONT_C)
         gen.writeTag(html_defs.T_P_C)
-        gen.writeTag(html_defs.T_H_C, "6")
 
-        gen.writeTag(html_defs.T_H_O, "6")
         gen.writeTag(html_defs.T_P_O, html_defs.A_ALIGN.format(common.ALIGN))
+        gen.writeTag(html_defs.T_FONT_O,
+                     html_defs.A_SIZE.format("1"))
         gen.writeTag(common.AUTHOR)
+        gen.writeTag(html_defs.T_FONT_C)
         gen.writeTag(html_defs.T_P_C)
-        gen.writeTag(html_defs.T_H_C, "6")
 
         gen.writeTag(html_defs.T_BODY_C)
         gen.writeTag(html_defs.T_HTML_C)

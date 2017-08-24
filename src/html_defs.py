@@ -41,6 +41,9 @@ T_BODY_C            = "</body>"
 T_TABLE_O           = "<table {0!s}>"
 T_TABLE_C           = "</table>"
 
+T_FONT_O            = "<font {0!s}>"
+T_FONT_C            = "</font>"
+
 T_TR_O              = "<tr {0!s}>"
 T_TR_C              = "</tr>"
 
@@ -81,6 +84,7 @@ A_ST_FONT_SZ        = "font-size:{0!s};"
 A_CHARSET           = "charset=\"{0!s}\""
 A_HREF              = "href=\"{0!s}\""
 A_TITLE             = "title=\"{0!s}\""
+A_SIZE              = "size=\"{0!s}\""
 
 HTML_HEAD           = "<!DOCTYPE html>"
 
