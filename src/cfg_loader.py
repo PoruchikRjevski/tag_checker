@@ -9,6 +9,7 @@ from tag_model import Repo
 class CfgLoader:
     def __init__(self):
         self.cfg = configparser.ConfigParser()
+        self.translateFile = ""
 
     def readFile(self, fileName):
         self.cfg.read(fileName)
@@ -18,9 +19,11 @@ class CfgLoader:
 
         for i in deps:
             if i == common.CONFIG:
-                common.INDEX_PATH = self.cfg.get(i, common.OUT)
+                if self.cfg.has_option(i, common.OUT_PATH):
+                    common.INDEX_PATH = self.cfg.get(i, common.OUT_PATH)
+                if self.cfg.has_option(i, common.TRANSLATE_PATH):
+                    self.translateFile = self.cfg.get(i, common.TRANSLATE_PATH)
 
-                print (common.AUTHOR)
                 continue
 
             reposLinks = self.cfg.get(i, common.REPOS).split("\n")
@@ -34,8 +37,20 @@ class CfgLoader:
 
             model.addDep(i, reposList)
 
+    def loadMapped(self, model):
+        f = open(self.translateFile)
+
+        if f:
+            fileText = f.readlines()
+
+            if fileText:
+                for line in fileText:
+                    model.addMappedDevNames(line.split("=")[:1][-1], line.split("=")[1:][-1])
         
     def loadCfg(self, fileName, model):
         self.readFile(fileName)
 
         self.fillModel(model)
+
+        if self.translateFile:
+            self.loadMapped(model)

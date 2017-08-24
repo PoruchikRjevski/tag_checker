@@ -2,7 +2,8 @@
 TAG_CHECKER     = "tag_checker"
 REPOS           = "repos"
 CONFIG          = "CONFIG"
-OUT             = "out"
+OUT_PATH             = "out"
+TRANSLATE_PATH  = "translate"
 
 # tag model
 PROD            = ("PROD", "ROD")

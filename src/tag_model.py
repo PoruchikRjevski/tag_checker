@@ -7,6 +7,16 @@ class TagModel:
     def __init__(self):
         self.deps = collections.OrderedDict()
 
+        self.mappedDevNames = {}
+
+    def addMappedDevNames(self, key, val):
+        self.mappedDevNames[key] = val
+
+    def getMappedDevName(self, name):
+        if name in self.mappedDevNames:
+            return self.mappedDevNames[name]
+        return name
+
     def addDep(self, key, val):
         self.deps[key] = val
 
@@ -38,6 +48,20 @@ class Device:
         self.history = [] # list if Notes
         self.last = [] # list if Notes
         self.items = [] # list of Notes by items
+        self.name = "" # name from repo
+        self.trName = "" # translated name
+
+    def setName(self, name):
+        self.name = name
+
+    def getName(self):
+        return self.name
+
+    def setTrName(self, trName):
+        self.trName = trName
+
+    def getTrName(self):
+        return self.trName
 
     def addToHistory(self, note):
         self.history.append(note)

@@ -198,6 +198,8 @@ class GitMan:
                                     if not note.name in repo.getDevices():
                                         dev = Device()
                                         dev.addToHistory(note)
+                                        dev.setName(note.name)
+                                        dev.setTrName(model.getMappedDevName(note.name))
                                         repo.addDeviceByName(note.name, dev)
                                     else:
                                         repo.addToDevice(note.name, note)
