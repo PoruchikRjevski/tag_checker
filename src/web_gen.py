@@ -1,5 +1,3 @@
-import os
-
 import common
 import html_defs
 
@@ -34,30 +32,25 @@ class WebGenerator:
         index.close()
 
     def genMainContent(self, model, file):
-        deps = model.getDepsKeys()
-        depsSort = model.getDepsSortedNames()
+        deps = model.getDeps()
 
         # for dep, repos in deps.items():
-        #for dep, repos in deps.items():
-
-        for dep in depsSort:
-            repos = deps.get(dep)
-
+        for dep, repos in deps.items():
             firstDep = True
             allNotes = 0
 
             for repo in repos:
-                for name, dev in repo.devices.items():
-                    allNotes += len(dev.last)
+                for name, dev in repo.getDevices().items():
+                    allNotes += len(dev.getLast())
 
             for repo in repos:
-                for name, dev in repo.devices.items():
+                for name, dev in repo.getDevices().items():
                     # generate device's own page
                     self.genDevicePage(dev, name)
 
                     # generate content for main page
                     firstDev = True
-                    for note in dev.last:
+                    for note in dev.getLast():
 
                         file.writeTag(html_defs.T_TR_O,
                                       html_defs.A_ALIGN.format(common.ALIGN) +
@@ -69,7 +62,7 @@ class WebGenerator:
 
                         if firstDev:
                             firstDev = False
-                            file.writeTag(html_defs.T_TD_O, html_defs.A_ROWSPAN.format(len(dev.last)))
+                            file.writeTag(html_defs.T_TD_O, html_defs.A_ROWSPAN.format(len(dev.getLast())))
                             file.writeTag(html_defs.T_A_O, html_defs.A_HREF.format(note.name + common.FILE_EXT))
                             file.writeTag(note.name)
                             file.writeTag(html_defs.T_A_C)
@@ -116,10 +109,10 @@ class WebGenerator:
         return color
 
     def genDeviceContent(self, device, file):
-        date = device.history[0].date
+        date = device.getHistory()[0].date
         color = common.TABLE_TR_COL_1
 
-        for note in device.history:
+        for note in device.getHistory():
             if date != note.date:
                 date = note.date
                 color = self.changeColor(color)
@@ -197,7 +190,6 @@ class WebGenerator:
     def genMidTableFoot(self, gen):
         gen.writeTag(html_defs.T_TR_C)
 
-
     def genBtmTableHead(self, gen):
         gen.writeTag(html_defs.T_TR_O, html_defs.A_BGCOLOR.format(common.TABLE_HD_COL))
         gen.writeTag(html_defs.T_TH_O, html_defs.A_ROWSPAN.format(common.BTM_ROWS))
@@ -233,78 +225,3 @@ class WebGenerator:
     def genPageFoot(self, gen):
         gen.writeTag(html_defs.T_BODY_C)
         gen.writeTag(html_defs.T_HTML_C)
-
-
-# -------------- OLD SHIT MAZAFAKA --------------------------------------------
-    def generateIndex(self, model):
-        outLog(self.__class__.__name__, "start gen index")
-
-        os.chdir(os.path.dirname(os.path.realpath(__file__)))
-
-        if not os.path.isdir(common.INDEX_PATH):
-            outLog(self.__class__.__name__, "make dir: " + common.INDEX_PATH)
-            os.mkdir(common.INDEX_PATH, 0o777)
-
-        self.file = open(common.INDEX_PATH + common.INDEX_NAME, 'w')
-
-        if not self.file:
-            outErr(self.__class__.__name__, "can't open file")
-            return
-
-        self.writeHead()
-
-        self.writeMain(model)
-
-        self.writeFoot()
-
-        self.file.close()
-
-    def writeMain(self, model):
-        deps = model.getDepsKeys()
-        for dep, repos in deps.items():
-            firstDep = True
-            allTags = 0
-            for repo in repos:
-                allTags = allTags + len(repo.history)
-
-            for repo in repos:
-                firstDev = True
-
-                for tag in repo.history:
-                    self.writeOpenTr()
-
-                    if firstDep:
-                        firstDep = False
-                        self.writeTd(dep, html_defs.SUPA % allTags)
-
-                    if firstDev:
-                        firstDev = False
-                        self.writeTd(tag.itemName, html_defs.SUPA % len(repo.history))
-
-                    self.writeTd(tag.itemNum, "")
-                    self.writeTd(tag.orderNum, "")
-                    self.writeTd(tag.date, "")
-                    self.writeTd(tag.sHash, "")
-
-                    self.writeCloseTr()
-
-    def writeTd(self, field, supa):
-        self.file.write(html_defs.TD_HD % supa)
-        self.file.write(field)
-        self.file.write(html_defs.TD_FT)
-
-    def writeOpenTr(self):
-        self.file.write(html_defs.TR_HD)
-
-    def writeCloseTr(self):
-        self.file.write(html_defs.TR_FT)
-
-    def writeHead(self):
-        outLog(self.__class__.__name__, "write head")
-        self.file.write(html_defs.HEAD)
-
-    def writeFoot(self):
-        outLog(self.__class__.__name__, "write foot")
-        self.file.write(html_defs.FOOT)
-
-    

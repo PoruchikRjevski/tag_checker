@@ -72,19 +72,19 @@ def main():
        sys.exit(common.EXIT_GNT)
 
     # work
+    # create model
     tagModel = TagModel()
 
+    # load config
     cfgLoader = CfgLoader()
     cfgLoader.loadCfg(path, tagModel)
 
-
-    tagModel.show()
-
+    # get tags and fill model
     repoMan = GitMan()
     repoMan.setUpdate(opts.update)
     repoMan.doDirtyJob(tagModel)
 
-    tagModel.show()
+    # generate web
     webGen = WebGenerator()
     webGen.generateWeb(tagModel)
 

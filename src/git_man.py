@@ -27,36 +27,36 @@ class GitMan:
             outErr(self.__class__.__name__, err)
 
     def checkBranch(self):
-        branch = self.curBranch()
+        branch = self.getCurrentBranch()
         outLog(self.__class__.__name__, "cur branch: " + branch)
 
         if branch != common.BR_DEV:
             self.lastBr = branch
             self.needReturnBranch = True
-            self.switchBranch(common.BR_DEV)
-            outLog(self.__class__.__name__, "cur branch: " + self.curBranch())
+            self.switchToBranch(common.BR_DEV)
+            outLog(self.__class__.__name__, "cur branch: " + self.getCurrentBranch())
 
-    def curBranch(self):
+    def getCurrentBranch(self):
         (branch, _) = runCmd(common.CUR_BRANCH)
         return branch
 
-    def switchBranch(self, branch):
+    def switchToBranch(self, branch):
         outLog(self.__class__.__name__, "switch to branch: " + branch)
         runCmd(common.SW_BRANCH + branch)
 
-    def returnBranch(self):
+    def returnBackBranch(self):
         outLog(self.__class__.__name__, "return branch")
-        outLog(self.__class__.__name__, "cur branch: " + self.curBranch())
-        self.switchBranch(self.lastBr)
+        outLog(self.__class__.__name__, "cur branch: " + self.getCurrentBranch())
+        self.switchToBranch(self.lastBr)
         self.needReturnBranch = False
-        outLog(self.__class__.__name__, "cur branch: " + self.curBranch())
+        outLog(self.__class__.__name__, "cur branch: " + self.getCurrentBranch())
 
     # use module os for multiplatform
     def goToDir(self, link):
         outLog(self.__class__.__name__, "go to dir: " + link)
         os.chdir(link)
 
-    def checkDir(self, link):
+    def isDirExist(self, link):
         curDir = os.getcwd()
 
         if link[-1:] == "/" and not curDir[-1:] == "/":
@@ -81,27 +81,7 @@ class GitMan:
 
         return out
 
-    def createTag(self, tagStr):
-        outLog(self.__class__.__name__, "cur tag create from: " + tagStr)
-
-        tag = Tag()
-
-        parts = tagStr.split("/")
-
-        if len(parts) >= 4:
-            tag.setOrderNum(parts[0])
-            tag.setItemName(parts[1])
-            tag.setItemNum(parts[2])
-            tag.setDate(parts[3])
-            tag.setValid(True)
-
-        tag.setShortHash(self.getSHash(tagStr))
-
-        return tag
-
     def getSHash(self, tagStr):
-        outLog(self.__class__.__name__, "get short hash")
-
         (out, err) = runCmd(common.GET_TAG_SSHA + tagStr)
 
         if err:
@@ -110,8 +90,6 @@ class GitMan:
         return out
 
     def getCommDateBySHash(self, hash):
-        outLog(self.__class__.__name__, "get comm date")
-
         (out, err) = runCmd(common.GET_COMM_DATE + hash)
 
         if err:
@@ -138,11 +116,11 @@ class GitMan:
 
         date = ""
         if len(parts) == 3:
-            date = self.repairDate(parts[2])
+            date = self.doRepairDate(parts[2])
         elif len(parts) == 4:
             note.type = parts[2].split("-")[:-1][0]
             note.num = int(parts[2].split("-")[-1:][0])
-            date = self.repairDate(parts[3])
+            date = self.doRepairDate(parts[3])
 
         if not date:
             outErr(self.__class__.__name__, "Bad tag: " + tag)
@@ -158,7 +136,7 @@ class GitMan:
 
         return note
 
-    def repairDate(self, date):
+    def doRepairDate(self, date):
         temp = date.split("-")
 
         res = ""
@@ -172,19 +150,16 @@ class GitMan:
         return res
 
     def doDirtyJob(self, model):
-        deps = model.getDepsKeys()
-        depsSort = model.getDepsSortedNames()
+        deps = model.getDeps()
 
-        #for dep, repos in deps.items():
-        for dep in depsSort:
-            repos = deps.get(dep)
-
+        for dep, repos in deps.items():
             outLog(self.__class__.__name__, dep)
             for repo in repos:
                 link = repo.getLink()
+                outLog(self.__class__.__name__, "Work with repo: " + link)
                 # try go to dir link
                 self.goToDir(link)
-                if self.checkDir(link):
+                if self.isDirExist(link):
                     # check branch
                     self.checkBranch()
 
@@ -198,25 +173,24 @@ class GitMan:
                     if tags:
                         for tag in tags.split("\n"):
                             if self.isTagValid(tag):
+                                outLog(self.__class__.__name__, "Work with tag: " + tag)
                                 note = self.genNoteByTag(tag)
 
                                 if note.valid:
-                                    if not note.name in repo.devices:
+                                    if not note.name in repo.getDevices():
                                         dev = Device()
-                                        dev.addNote(note)
-                                        repo.devices[note.name] = dev
+                                        dev.addToHistory(note)
+                                        repo.addDeviceByName(note.name, dev)
                                     else:
-                                        repo.devices[note.name].addNote(note)
+                                        repo.addToDevice(note.name, note)
 
                         # sort notes for devices and separate last updates
-                        for name, dev in repo.devices.items():
-                            dev.history = sorted(dev.history, key=lambda note: note.date, reverse=True)
-
-                            lastDate = dev.history[0].date
-                            for note in dev.history:
-                                if note.date == lastDate:
-                                    dev.last.append(note)
+                        for name, dev in repo.getDevices().items():
+                            outLog(self.__class__.__name__, "Sort history for: " + name)
+                            dev.sortHistory()
+                            outLog(self.__class__.__name__, "Separate last notes for: " + name)
+                            dev.fillLast()
 
                     # return last branch if need
                     if self.needReturnBranch:
-                        self.returnBranch()
+                        self.returnBackBranch()

@@ -1,45 +1,64 @@
+import collections
+
 import common
 
+# deps it is dict of (department, list of repos)
 class TagModel:
     def __init__(self):
-        self.deps = {}
-        self.list = []
+        self.deps = collections.OrderedDict()
 
-    def setDeps(self, deps):
-        self.deps = deps
+    def addDep(self, key, val):
+        self.deps[key] = val
 
-    def setSortedList(self, list):
-        self.list = list
-
-    def addDeps(self, deps):
-        self.deps.update(deps)
-
-    def getDepsKeys(self):
+    def getDeps(self):
         return self.deps
 
-    def getDepsSortedNames(self):
-        return self.list
+class Repo:
+    def __init__(self):
+        self.devices = collections.OrderedDict()
+        self.link = " "
 
+    def addToDevice(self, name, note):
+        self.devices[name].addToHistory(note)
 
-    # test method
-    def show(self):
-        print ("----- SOME SHIT -----")
-        for dep, repos in self.deps.items():
-            print (dep)
-            # for repo in repos:
-            #     repo.show()
-                # for name, dev in repo.devices.items():
-                #     print (name)
-                #     for note in dev.last:
-                #         print (note.name)
+    def addDeviceByName(self, name, dev):
+        self.devices[name] = dev
+
+    def getDevices(self):
+        return self.devices
+
+    def setLink(self, link):
+        self.link = link
+
+    def getLink(self):
+        return self.link
 
 class Device:
     def __init__(self):
         self.history = [] # list if Notes
         self.last = [] # list if Notes
 
-    def addNote(self, note):
+    def addToHistory(self, note):
         self.history.append(note)
+
+    def getHistory(self):
+        return self.history
+
+    def sortHistory(self):
+        self.history = sorted(self.history, key=lambda note: note.date, reverse=True)
+
+    def fillLast(self):
+        lastDate = self.getHistory()[0].date
+
+        for note in self.history:
+            if note.date == lastDate:
+                self.addToLast(note)
+
+    def addToLast(self, note):
+        self.last.append(note)
+
+    def getLast(self):
+        return self.last
 
 class Note:
     def __init__(self):
@@ -50,22 +69,3 @@ class Note:
         self.sHash = -1
         self.commDate = -1
         self.valid = False
-
-class Repo:
-    def __init__(self):
-        self.devices = {}
-        self.link = " "
-
-    def addDevice(self, dev):
-        self.devices.append(dev)
-
-    def getDevices(self):
-        return self.devices
-
-    def setLink(self, link):
-        self.link = link
-    def getLink(self):
-        return self.link
-
-    def show(self):
-        print ("-", self.link)

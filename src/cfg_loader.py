@@ -15,22 +15,18 @@ class CfgLoader:
     def fillModel(self, model):
         deps = self.cfg.sections()
 
-        depDict = {}
-        sortedList = []
-
         for i in deps:
-            sortedList.append(i)
-            repos = self.cfg.get(i, common.REPOS).split("\n")
+            reposLinks = self.cfg.get(i, common.REPOS).split("\n")
 
-            depDict[i] = []
+            reposList = []
 
-            for j in repos:
+            for j in reposLinks:
                 repo = Repo()
                 repo.setLink(j)
-                depDict[i].append(repo)
+                reposList.append(repo)
 
-        model.addDeps(depDict)
-        model.setSortedList(sortedList)
+            model.addDep(i, reposList)
+
         
     def loadCfg(self, fileName, model):
         self.readFile(fileName)

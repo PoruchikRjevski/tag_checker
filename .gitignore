@@ -1,2 +1,5 @@
 example/*
 out/*
+log/*
+src/__pycache__/*
+rc/~
