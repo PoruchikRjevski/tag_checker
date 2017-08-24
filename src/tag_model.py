@@ -37,6 +37,7 @@ class Device:
     def __init__(self):
         self.history = [] # list if Notes
         self.last = [] # list if Notes
+        self.items = [] # list of Notes by items
 
     def addToHistory(self, note):
         self.history.append(note)
@@ -48,8 +49,19 @@ class Device:
         self.history = sorted(self.history, key=lambda note: note.date, reverse=True)
 
     def fillLast(self):
-        lastDate = self.getHistory()[0].date
+        # for type in common.TYPES_L:
+        #     first = True
+        #     lastDate = 0
+        #     for note in self.history:
+        #         if note.type == type:
+        #             if first:
+        #                 first = False
+        #                 lastDate = note.date
+        #
+        #             if note.date == lastDate:
+        #                 self.addToLast(note)
 
+        lastDate = self.history[0].date
         for note in self.history:
             if note.date == lastDate:
                 self.addToLast(note)

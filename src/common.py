@@ -11,6 +11,8 @@ TYPE_ITEM       = "ITEM"
 TYPE_ORDER      = "ORDER"
 TYPE_ALL        = "ALL"
 
+TYPES_L = [TYPE_ITEM, TYPE_ORDER, TYPE_ALL]
+
 # exit codes and outputs
 EXIT_NORMAL     = 0                                         # all ok
 EXIT_GNT        = 1                                         # git not installed

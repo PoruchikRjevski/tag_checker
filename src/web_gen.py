@@ -148,8 +148,8 @@ class WebGenerator:
         firstDate = True
         notesByDate = 0
 
-        for note in device.getHistory():
-            if note.date == date:
+        for i in device.getHistory():
+            if i.date == date:
                 notesByDate += 1
 
         for note in device.getHistory():
@@ -159,8 +159,8 @@ class WebGenerator:
                 date = note.date
                 color = self.changeColor(color)
 
-                for note in device.getHistory():
-                    if note.date == date:
+                for i in device.getHistory():
+                    if i.date == date:
                         notesByDate += 1
 
             file.writeTag(html_defs.T_TR_O,
