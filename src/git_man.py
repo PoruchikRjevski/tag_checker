@@ -8,6 +8,7 @@ from tag_model import Device
 from cmd_wrap import runCmd
 from logger import outLog
 from logger import outErr
+from time_checker import TimeChecker
 
 class GitMan:
     def __init__(self):
@@ -150,6 +151,11 @@ class GitMan:
         return res
 
     def doDirtyJob(self, model):
+        # create time checker
+        timeCh = TimeChecker()
+        timeCh.start()
+
+        # do work
         deps = model.getDeps()
 
         for dep, repos in deps.items():
@@ -194,3 +200,7 @@ class GitMan:
                     # return last branch if need
                     if self.needReturnBranch:
                         self.returnBackBranch()
+
+        timeCh.stop()
+
+        outLog(self.__class__.__name__, timeCh.howMuchStr())

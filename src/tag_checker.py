@@ -12,6 +12,7 @@ from cfg_loader import CfgLoader
 from tag_model import TagModel
 from git_man import GitMan
 from web_gen import WebGenerator
+from time_checker import TimeChecker
 
 def isGitInstalled():
     out = runCmd(common.GIT_VER)
@@ -33,12 +34,21 @@ def setOptions(parser):
                       action="store_true", dest="update",
                       default=False,
                       help="update repo's before checking tags")
+    parser.add_option("-l", "--log",
+                      action="store_true", dest="log",
+                      default=False,
+                      help="don't write status messages to log-files")
     parser.add_option("-q", "--quiet",
                       action="store_true", dest="quiet",
                       default=False,
                       help="don't print status messages to stdout")
 
 def main():
+    # create time checker
+    timeCh = TimeChecker()
+
+    timeCh.start()
+
     # check options
     optParser = OptionParser()
     setOptions(optParser)
@@ -47,6 +57,9 @@ def main():
 
     if opts.quiet:
         common.QUIET = True
+
+    if opts.log:
+        common.LOGGING = True
 
     # check platform
     common.CUR_PLATFORM = sys.platform
@@ -87,6 +100,9 @@ def main():
     # generate web
     webGen = WebGenerator()
     webGen.generateWeb(tagModel)
+
+    timeCh.stop()
+    outLog(common.TAG_CHECKER, timeCh.howMuchStr())
 
 if __name__ == "__main__":
     main()

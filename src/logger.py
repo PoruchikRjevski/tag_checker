@@ -24,23 +24,18 @@ def initLog():
     LOG_F = open(common.CUR_PATH + common.LOG_T, 'w')
     ERR_F = open(common.CUR_PATH + common.ERR_T, 'w')
 
-def writeLog(msg):
-    LOG_F = open(common.CUR_PATH + common.LOG_T, 'a')
-    if LOG_F:
-        LOG_F.write(msg + "\n")
-        LOG_F.close()
-
-def writeErr(msg):
-    ERR_F = open(common.CUR_PATH + common.ERR_T, 'a')
-    if ERR_F:
-        ERR_F.write(msg + "\n")
-        ERR_F.close()
+def writeMsg(msg, path):
+    if common.LOGGING:
+        f = open(common.CUR_PATH + path, 'a')
+        if f:
+            f.write(msg + "\n")
+            f.close()
 
 def outLog(who, msg):
-    writeLog(outMsg(who, msg, common.LOG_T))
+    writeMsg(outMsg(who, msg, common.LOG_T), common.LOG_T)
 
 def outErr(who, msg):
-    writeErr(outMsg(who, msg, common.ERR_T))
+    writeMsg(outMsg(who, msg, common.ERR_T), common.ERR_T)
 
 def outMsg(who, msg, type):
     out = "[%s] : [%s:%-20s] : [%s] : [%s]" % (type, who, whoami()+"()", datetime.datetime.now().__str__(), msg)

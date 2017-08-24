@@ -5,18 +5,25 @@ from html_gen import HtmlGen
 from tag_model import TagModel
 from logger import outLog
 from logger import outErr
+from time_checker import TimeChecker
 
 class WebGenerator:
     def generateWeb(self, model):
+        # create time checker
+        timeCh = TimeChecker()
         outLog(self.__class__.__name__, "start gen web")
 
+        timeCh.start()
         # cycle main
         self.genPages(model)
+        timeCh.stop()
 
         outLog(self.__class__.__name__, "finish gen web")
+        outLog(self.__class__.__name__, timeCh.howMuchStr())
 
 
     def genPages(self, model):
+        outLog(self.__class__.__name__, "start gen index")
         index = HtmlGen(common.INDEX_PATH, common.INDEX_NAME)
 
         self.genPageHead(index)
@@ -30,8 +37,10 @@ class WebGenerator:
         self.genPageFoot(index)
 
         index.close()
+        outLog(self.__class__.__name__, "finish gen index")
 
     def genMainContent(self, model, file):
+        outLog(self.__class__.__name__, "gen main content")
         deps = model.getDeps()
 
         # for dep, repos in deps.items():
@@ -86,6 +95,7 @@ class WebGenerator:
         return res
 
     def genDevicePage(self, device, name):
+        outLog(self.__class__.__name__, "start gen device page: " + name)
         page = HtmlGen(common.INDEX_PATH, name + common.FILE_EXT)
 
         self.genPageHead(page)
@@ -99,6 +109,7 @@ class WebGenerator:
         self.genPageFoot(page)
 
         page.close()
+        outLog(self.__class__.__name__, "finish gen device page: " + name)
 
     def changeColor(self, color):
         if color == common.TABLE_TR_COL_1:
@@ -109,6 +120,7 @@ class WebGenerator:
         return color
 
     def genDeviceContent(self, device, file):
+        outLog(self.__class__.__name__, "gen device content")
         date = device.getHistory()[0].date
         color = common.TABLE_TR_COL_1
 

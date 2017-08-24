@@ -34,6 +34,7 @@ GET_TAG_SSHA    = "git rev-parse --short "                  # get short SHA1 for
 GET_COMM_DATE   = "git show -s --format=%ci "               # get commit date by hash
 
 QUIET           = False                                     # global flag for out or not log and err messages
+LOGGING         = False                                     # global flag for out or not log and err to files
 CUR_PLATFORM    = "None"
 CUR_PATH        = "None"
 
