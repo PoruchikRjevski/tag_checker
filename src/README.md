@@ -68,3 +68,22 @@ repo_3
 javascript:(function(){var loc=location.href;loc=loc.replace('www.govno.rub','www.ya.ru'); location.replace(loc)})()
 
 javascript:(function(){var loc=location.href;loc=loc.replace('file:///home/kozlov_vn/Projects/tag_checker/out/index.html','www.ya.ru'); location.replace(loc)})()
+
+
+
+
+install:
+/usr/bin/...
+
+/etc/
+
+/tmp/log
+
+
+
+
+javascripts
+how it work:
+- click to hash-link
+- open own .html with script selecting commit (?HOW PROMOTE COMMIT MSG?)
+-

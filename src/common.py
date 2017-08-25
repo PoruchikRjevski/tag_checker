@@ -2,7 +2,7 @@
 TAG_CHECKER     = "tag_checker"
 REPOS           = "repos"
 CONFIG          = "CONFIG"
-OUT_PATH             = "out"
+OUT_P           = "out"
 TRANSLATE_PATH  = "translate"
 
 # tag model
@@ -65,14 +65,17 @@ DEVICE          = "APP"
 ITEM            = "ITEM"
 
 # web generator
-INDEX_PATH      = "../out/"
+#OUT_PATH       = "../out/"
+OUT_PATH       = ""
 INDEX_NAME      = "index.html"
+MAIN_NAME       = "main.html"
 DEVICE_DIR      = "devices/"
-DEVICE_PATH     = INDEX_PATH + DEVICE_DIR
+DEVICE_PATH     = OUT_PATH + DEVICE_DIR
 ORDERS_DIR      = "orders/"
 ORDERS_PATH     = DEVICE_PATH + ORDERS_DIR
 FILE_EXT        = ".html"
 LEVEL_UP        = "../"
+SCRIPTS_NAME    = "scripts.js"
 
 BORDER_WIDTH    = "1"
 TABLE_WIDTH     = "100%"
@@ -93,6 +96,13 @@ TABLE_TR_COL_2  = "#dddddd"
 MAIN_TABLE_COLS = "5"
 MID_ROWS        = "2"
 BTM_ROWS        = "1"
+
+FRAME_ID        = "pridurok"
+FRAME_POS       = "absolute"
+FRAME_BORDER    = "none"
+FRAME_H         = "100%"
+FRAME_W         = "100%"
+
 
 # page table header
 MAIN_HEAD       = "Актуальные прошивки"

@@ -16,6 +16,9 @@ class WebGenerator:
         outLog(self.__class__.__name__, "start gen web")
 
         timeCh.start()
+
+        # gen index
+        self.genIndex(model)
         # cycle main
         self.genPages(model)
         timeCh.stop()
@@ -23,23 +26,37 @@ class WebGenerator:
         outLog(self.__class__.__name__, "finish gen web")
         outLog(self.__class__.__name__, timeCh.howMuchStr())
 
-
-    def genPages(self, model):
+    def genIndex(self, model):
         outLog(self.__class__.__name__, "start gen index")
-        index = HtmlGen(common.INDEX_PATH, common.INDEX_NAME)
+        index = HtmlGen(common.OUT_PATH, common.INDEX_NAME)
 
         self.genPageHead(index)
-        self.genTableHead(index)
 
-        self.genMainTableHead(index)
+        self.genIFrameHead(index)
+        # gen scripts
+        self.genIFrameFoot(index)
 
-        self.genMainContent(model, index)
-
-        self.genTableFoot(index)
         self.genPageFoot(index)
 
         index.close()
         outLog(self.__class__.__name__, "finish gen index")
+
+    def genPages(self, model):
+        outLog(self.__class__.__name__, "start gen main")
+        main = HtmlGen(common.OUT_PATH, common.MAIN_NAME)
+
+        self.genPageHead(main)
+        self.genTableHead(main)
+
+        self.genMainTableHead(main)
+
+        self.genMainContent(model, main)
+
+        self.genTableFoot(main)
+        self.genPageFoot(main)
+
+        main.close()
+        outLog(self.__class__.__name__, "finish gen main")
 
     def genMainContent(self, model, file):
         outLog(self.__class__.__name__, "gen main content")
@@ -299,6 +316,18 @@ class WebGenerator:
         gen.writeTag(html_defs.T_HEAD_C)
         gen.writeTag(html_defs.T_BODY_O, html_defs.A_LINK.format(common.BLACK) + html_defs.A_VLINK.format(common.BLACK))
 
+    def genIFrameHead(self, gen):
+        gen.writeTag(html_defs.T_IFRAME_O,
+                     html_defs.A_ID.format(common.FRAME_ID) +
+                     html_defs.A_STYLE.format(html_defs.A_ST_POS.format(common.FRAME_POS) +
+                                              html_defs.A_ST_HEIGHT.format(common.FRAME_H) +
+                                              html_defs.A_ST_WIDTH.format(common.FRAME_W) +
+                                              html_defs.A_ST_BORDER.format(common.FRAME_BORDER)) +
+                     html_defs.A_SRC.format(common.OUT_PATH + "/" + common.MAIN_NAME))
+
+    def genIFrameFoot(self, gen):
+        gen.writeTag(html_defs.T_IFRAME_C)
+
     def genTableHead(self, gen):
         gen.writeTag(html_defs.T_TABLE_O,
                      html_defs.A_BORDER.format(common.BORDER_WIDTH) +
@@ -375,7 +404,7 @@ class WebGenerator:
 
     def genBackLink(self, gen, levels):
         gen.writeTag(html_defs.T_P_O, html_defs.A_ALIGN.format(common.ALIGN))
-        gen.writeTag(html_defs.T_A_O, html_defs.A_HREF.format(levels + common.INDEX_NAME))
+        gen.writeTag(html_defs.T_A_O, html_defs.A_HREF.format(levels + common.MAIN_NAME))
         gen.writeTag(common.BACK)
         gen.writeTag(html_defs.T_A_C)
         gen.writeTag(html_defs.T_P_C)
