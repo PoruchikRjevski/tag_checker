@@ -75,7 +75,7 @@ ORDERS_DIR      = "orders/"
 ORDERS_PATH     = DEVICE_PATH + ORDERS_DIR
 FILE_EXT        = ".html"
 LEVEL_UP        = "../"
-SCRIPTS_NAME    = "scripts.js"
+SCRIPTS_NAME    = "js_scripts.js"
 
 BORDER_WIDTH    = "1"
 TABLE_WIDTH     = "100%"

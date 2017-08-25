@@ -76,6 +76,9 @@ T_META_O            = "<meta {0!s}>"
 T_IFRAME_O          = "<iframe {0!s}>"
 T_IFRAME_C          = "</iframe>"
 
+T_SCRIPT_O          = "<script {0!s}>"
+T_SCRIPT_C          = "</script>"
+
 # attributes
 A_ROWSPAN           = "rowspan=\"{0!s}\""
 A_COLSPAN           = "colspan=\"{0!s}\""
@@ -99,11 +102,14 @@ A_ID                = "id=\"{0!s}\""
 A_TITLE             = "title=\"{0!s}\""
 A_SIZE              = "size=\"{0!s}\""
 A_COLOR             = "color=\"{0!s}\""
+A_TYPE              = "type=\"{0!s}\""
 
 A_LINK              = "link=\"{0!s}\""
 A_ALINK             = "alink=\"{0!s}\""
 A_VLINK             = "vlink=\"{0!s}\""
 
 HTML_HEAD           = "<!DOCTYPE html>"
+
+JS_SCRIPT           = "text/javascript"
 
 

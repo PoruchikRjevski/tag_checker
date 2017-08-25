@@ -3,6 +3,8 @@ import datetime
 import common
 import html_defs
 
+import js_scripts
+
 from html_gen import HtmlGen
 from tag_model import TagModel
 from logger import outLog
@@ -35,6 +37,8 @@ class WebGenerator:
         self.genIFrameHead(index)
         # gen scripts
         self.genIFrameFoot(index)
+
+        #self.genScript(index, common.FRAME_ID)
 
         self.genPageFoot(index)
 
@@ -307,6 +311,12 @@ class WebGenerator:
         args[0].writeTag(args[1])
 
         args[0].writeTag(html_defs.T_FONT_C)
+
+    def genScript(self, gen, frameName):
+        gen.writeTag(html_defs.T_SCRIPT_O,
+                     html_defs.A_TYPE.format(html_defs.JS_SCRIPT))
+        gen.writeTag(js_scripts.SCRIPTS.format(frameName))
+        gen.writeTag(html_defs.T_SCRIPT_C)
 
     def genPageHead(self, gen):
         gen.writeTag(html_defs.HTML_HEAD)
