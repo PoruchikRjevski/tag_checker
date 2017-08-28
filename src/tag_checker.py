@@ -5,9 +5,9 @@ from optparse import OptionParser
 
 import common
 from cmd_wrap import runCmd
-from logger import outLog
-from logger import outErr
-from logger import initLog
+from logger import out_log
+from logger import out_err
+from logger import init_log
 from cfg_loader import CfgLoader
 from tag_model import TagModel
 from git_man import GitMan
@@ -65,23 +65,25 @@ def main():
     common.CUR_PLATFORM = sys.platform
 
     # init logger
-    initLog()
+    init_log()
+
+    print(common.CUR_PATH)
 
     if len(args) != 1:
-        outErr(common.TAG_CHECKER, common.E_WA_STR)
-        outErr(common.TAG_CHECKER, common.FOR_HELP)
+        out_err(common.TAG_CHECKER, common.E_WA_STR)
+        out_err(common.TAG_CHECKER, common.FOR_HELP)
         sys.exit(common.EXIT_WA)
 
     path = args[0]
 
     # check is config file was existed
     if not isConfFileExist(path):
-       outErr(common.TAG_CHECKER, common.E_CFNE_STR)
+       out_err(common.TAG_CHECKER, common.E_CFNE_STR)
        sys.exit(common.EXIT_CFNE)
     
     # check environment
     if not isGitInstalled():
-       outErr(common.TAG_CHECKER, common.E_GNT_STR)
+       out_err(common.TAG_CHECKER, common.E_GNT_STR)
        sys.exit(common.EXIT_GNT)
 
     # work
@@ -102,7 +104,7 @@ def main():
     webGen.generateWeb(tagModel)
 
     timeCh.stop()
-    outLog(common.TAG_CHECKER, timeCh.howMuchStr())
+    out_log(common.TAG_CHECKER, timeCh.howMuchStr())
 
 if __name__ == "__main__":
     main()

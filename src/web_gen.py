@@ -7,15 +7,15 @@ import js_scripts
 
 from html_gen import HtmlGen
 from tag_model import TagModel
-from logger import outLog
-from logger import outErr
+from logger import out_log
+from logger import out_err
 from time_checker import TimeChecker
 
 class WebGenerator:
     def generateWeb(self, model):
         # create time checker
         timeCh = TimeChecker()
-        outLog(self.__class__.__name__, "start gen web")
+        out_log(self.__class__.__name__, "start gen web")
 
         timeCh.start()
 
@@ -25,11 +25,11 @@ class WebGenerator:
         self.genPages(model)
         timeCh.stop()
 
-        outLog(self.__class__.__name__, "finish gen web")
-        outLog(self.__class__.__name__, timeCh.howMuchStr())
+        out_log(self.__class__.__name__, "finish gen web")
+        out_log(self.__class__.__name__, timeCh.howMuchStr())
 
     def genIndex(self, model):
-        outLog(self.__class__.__name__, "start gen index")
+        out_log(self.__class__.__name__, "start gen index")
         index = HtmlGen(common.OUT_PATH, common.INDEX_NAME)
 
         self.genPageHead(index)
@@ -38,15 +38,15 @@ class WebGenerator:
         # gen scripts
         self.genIFrameFoot(index)
 
-        #self.genScript(index, common.FRAME_ID)
+        self.genScript(index, common.FRAME_ID)
 
         self.genPageFoot(index)
 
         index.close()
-        outLog(self.__class__.__name__, "finish gen index")
+        out_log(self.__class__.__name__, "finish gen index")
 
     def genPages(self, model):
-        outLog(self.__class__.__name__, "start gen main")
+        out_log(self.__class__.__name__, "start gen main")
         main = HtmlGen(common.OUT_PATH, common.MAIN_NAME)
 
         self.genPageHead(main)
@@ -60,10 +60,10 @@ class WebGenerator:
         self.genPageFoot(main)
 
         main.close()
-        outLog(self.__class__.__name__, "finish gen main")
+        out_log(self.__class__.__name__, "finish gen main")
 
     def genMainContent(self, model, file):
-        outLog(self.__class__.__name__, "gen main content")
+        out_log(self.__class__.__name__, "gen main content")
         deps = model.getDeps()
 
         # for dep, repos in deps.items():
@@ -161,7 +161,7 @@ class WebGenerator:
         return res
 
     def genDevicePage(self, device, repoLink):
-        outLog(self.__class__.__name__, "start gen device page: " + device.getName())
+        out_log(self.__class__.__name__, "start gen device page: " + device.getName())
         page = HtmlGen(common.DEVICE_PATH, self.getDeviceFileName(device.getName()))
 
         self.genPageHead(page)
@@ -175,10 +175,10 @@ class WebGenerator:
         self.genPageFoot(page)
 
         page.close()
-        outLog(self.__class__.__name__, "finish gen device page: " + device.getName())
+        out_log(self.__class__.__name__, "finish gen device page: " + device.getName())
 
     def genOrdersPages(self, device, repoLink):
-        outLog(self.__class__.__name__, "start gen items pages for device: " + device.getName())
+        out_log(self.__class__.__name__, "start gen items pages for device: " + device.getName())
 
         used = []
 
@@ -218,7 +218,7 @@ class WebGenerator:
 
             used.append(note.num)
 
-        outLog(self.__class__.__name__, "finish gen items pages for device: " + device.getName())
+        out_log(self.__class__.__name__, "finish gen items pages for device: " + device.getName())
 
     def getDeviceFileName(self, name):
         return name + common.FILE_EXT
@@ -235,7 +235,7 @@ class WebGenerator:
         return color
 
     def genDeviceContent(self, device, file, repoLink):
-        outLog(self.__class__.__name__, "gen device content")
+        out_log(self.__class__.__name__, "gen device content")
         date = device.getHistory()[0].date
         color = common.TABLE_TR_COL_1
 
@@ -315,7 +315,7 @@ class WebGenerator:
     def genScript(self, gen, frameName):
         gen.writeTag(html_defs.T_SCRIPT_O,
                      html_defs.A_TYPE.format(html_defs.JS_SCRIPT))
-        gen.writeTag(js_scripts.SCRIPTS.format(frameName))
+        gen.writeTag(js_scripts.SCRIPTS.replace("%s", frameName))
         gen.writeTag(html_defs.T_SCRIPT_C)
 
     def genPageHead(self, gen):

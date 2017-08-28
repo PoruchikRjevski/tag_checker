@@ -9,8 +9,8 @@ class HtmlGen:
     def __init__(self, path, name):
         dir = common.OUT_PATH # os.path.dirname(os.path.realpath(__file__))
 
-        print (dir)
-        print (path)
+        #print (dir)
+        #print (path)
         if not os.path.isabs(path):
             #if not path:
             #   dir = dir + DEF_DIR
@@ -19,7 +19,7 @@ class HtmlGen:
         else:
             dir = path
 
-        print (dir)
+        #print (dir)
             #if not path == dir or path not in dir:
             #    dir = dir + "/" + path
 

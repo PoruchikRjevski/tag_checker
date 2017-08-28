@@ -6,8 +6,8 @@ from tag_model import Repo
 from tag_model import Note
 from tag_model import Device
 from cmd_wrap import runCmd
-from logger import outLog
-from logger import outErr
+from logger import out_log
+from logger import out_err
 from time_checker import TimeChecker
 
 class GitMan:
@@ -22,39 +22,39 @@ class GitMan:
     def updateRepo(self):
         (_, err) = runCmd(common.UPD_REPO)
 
-        outLog(self.__class__.__name__, "update repo")
+        out_log(self.__class__.__name__, "update repo")
 
         if err:
-            outErr(self.__class__.__name__, err)
+            out_err(self.__class__.__name__, err)
 
     def checkBranch(self):
         branch = self.getCurrentBranch()
-        outLog(self.__class__.__name__, "cur branch: " + branch)
+        out_log(self.__class__.__name__, "cur branch: " + branch)
 
         if branch != common.BR_DEV:
             self.lastBr = branch
             self.needReturnBranch = True
             self.switchToBranch(common.BR_DEV)
-            outLog(self.__class__.__name__, "cur branch: " + self.getCurrentBranch())
+            out_log(self.__class__.__name__, "cur branch: " + self.getCurrentBranch())
 
     def getCurrentBranch(self):
         (branch, _) = runCmd(common.CUR_BRANCH)
         return branch
 
     def switchToBranch(self, branch):
-        outLog(self.__class__.__name__, "switch to branch: " + branch)
+        out_log(self.__class__.__name__, "switch to branch: " + branch)
         runCmd(common.SW_BRANCH + branch)
 
     def returnBackBranch(self):
-        outLog(self.__class__.__name__, "return branch")
-        outLog(self.__class__.__name__, "cur branch: " + self.getCurrentBranch())
+        out_log(self.__class__.__name__, "return branch")
+        out_log(self.__class__.__name__, "cur branch: " + self.getCurrentBranch())
         self.switchToBranch(self.lastBr)
         self.needReturnBranch = False
-        outLog(self.__class__.__name__, "cur branch: " + self.getCurrentBranch())
+        out_log(self.__class__.__name__, "cur branch: " + self.getCurrentBranch())
 
     # use module os for multiplatform
     def goToDir(self, link):
-        outLog(self.__class__.__name__, "go to dir: " + link)
+        out_log(self.__class__.__name__, "go to dir: " + link)
         os.chdir(link)
 
     def isDirExist(self, link):
@@ -65,20 +65,20 @@ class GitMan:
         elif not link[-1:] == "/" and curDir[-1:] == "/":
             curDir = curDir[:-1]
 
-        outLog(self.__class__.__name__, "cur dir: " + curDir)
+        out_log(self.__class__.__name__, "cur dir: " + curDir)
 
         if curDir != link:
-            outErr(self.__class__.__name__, "can't go to " + link)
+            out_err(self.__class__.__name__, "can't go to " + link)
             return False
         return True
 
     def getTags(self):
-        outLog(self.__class__.__name__, "get tags")
+        out_log(self.__class__.__name__, "get tags")
 
         (out, err) = runCmd(common.GET_TAGS)
 
         if err:
-            outErr(self.__class__.__name__, err)
+            out_err(self.__class__.__name__, err)
 
         return out
 
@@ -86,7 +86,7 @@ class GitMan:
         (out, err) = runCmd(common.GET_TAG_SSHA + tagStr)
 
         if err:
-            outErr(self.__class__.__name__, err)
+            out_err(self.__class__.__name__, err)
 
         return out
 
@@ -94,7 +94,7 @@ class GitMan:
         (out, err) = runCmd(common.GET_COMM_DATE + hash)
 
         if err:
-            outErr(self.__class__.__name__, err)
+            out_err(self.__class__.__name__, err)
 
         return out
 
@@ -124,7 +124,7 @@ class GitMan:
             date = self.doRepairDate(parts[3])
 
         if not date:
-            outErr(self.__class__.__name__, "Bad tag: " + tag)
+            out_err(self.__class__.__name__, "Bad tag: " + tag)
             return note
         elif date:
             note.date = date
@@ -145,7 +145,7 @@ class GitMan:
         (out, err) = runCmd(common.GET_COMM_INFO.format(common.GIT_AUTHOR_NEST, common.FORM_AUTHOR) + hash)
 
         if err:
-            outErr(self.__class__.__name__, err)
+            out_err(self.__class__.__name__, err)
 
         return out
 
@@ -158,7 +158,7 @@ class GitMan:
             res += temp[0] + "-" + temp[1] + "-" + temp[2] + " "
             res += temp[3][0] + temp[3][1] + ":" + temp[3][2] + temp[3][3]
         except Exception:
-            outErr(self.__class__.__name__, "Bad date: " + date)
+            out_err(self.__class__.__name__, "Bad date: " + date)
 
         return res
 
@@ -171,10 +171,10 @@ class GitMan:
         deps = model.getDeps()
 
         for dep, repos in deps.items():
-            outLog(self.__class__.__name__, dep)
+            out_log(self.__class__.__name__, dep)
             for repo in repos:
                 link = repo.getLink()
-                outLog(self.__class__.__name__, "Work with repo: " + link)
+                out_log(self.__class__.__name__, "Work with repo: " + link)
                 # try go to dir link
                 self.goToDir(link)
                 if self.isDirExist(link):
@@ -191,7 +191,7 @@ class GitMan:
                     if tags:
                         for tag in tags.split("\n"):
                             if self.isTagValid(tag):
-                                outLog(self.__class__.__name__, "Work with tag: " + tag)
+                                out_log(self.__class__.__name__, "Work with tag: " + tag)
                                 note = self.genNoteByTag(tag)
 
                                 if note.valid:
@@ -206,9 +206,9 @@ class GitMan:
 
                         # sort notes for devices and separate last updates
                         for name, dev in repo.getDevices().items():
-                            outLog(self.__class__.__name__, "Sort history for: " + name)
+                            out_log(self.__class__.__name__, "Sort history for: " + name)
                             dev.sortHistory()
-                            outLog(self.__class__.__name__, "Separate last notes for: " + name)
+                            out_log(self.__class__.__name__, "Separate last notes for: " + name)
                             dev.fillLast()
 
                     # return last branch if need
@@ -217,4 +217,4 @@ class GitMan:
 
         timeCh.stop()
 
-        outLog(self.__class__.__name__, timeCh.howMuchStr())
+        out_log(self.__class__.__name__, timeCh.howMuchStr())

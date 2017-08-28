@@ -1,5 +1,4 @@
-example/*
-out/*
-log/*
-src/__pycache__/*l
-*.html
+example/
+out/
+log/
+src/__pycache__/
