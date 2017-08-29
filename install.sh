@@ -93,11 +93,11 @@ main() {
     chmod +x $SETUP_DIR*
 
     #check_and_rem_f "$CONFIG_DIR$CONFIG_FILE"
-    yes | cp -rf $CUR_DIR$CONFIG_FILE $CONFIG_DIR
+    no | cp -rf $CUR_DIR$CONFIG_FILE $CONFIG_DIR
     chmod 777 $CONFIG_DIR$CONFIG_FILE
     
     #check_and_rem_f "$CONFIG_DIR$TRANSLATE_FILE"
-    yes | cp -rf $CUR_DIR$TRANSLATE_FILE $CONFIG_DIR
+    no | cp -rf $CUR_DIR$TRANSLATE_FILE $CONFIG_DIR
     chmod 777 $CONFIG_DIR$TRANSLATE_FILE
     
     # CRON
