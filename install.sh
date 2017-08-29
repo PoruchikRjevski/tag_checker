@@ -56,30 +56,30 @@ main() {
     
     read -p "Log (y/n)? " answ
     case "$answ" in 
-      y|Y ) log=$"-l";;
+      y|Y ) log="-l";;
       n|N ) ;;
-      * ) exit 1;;
+      * ) log="";;
     esac
     
     read -p "Update repo's before scan (y/n)? " answ
     case "$answ" in 
       y|Y ) upd="-u";;
       n|N ) ;;
-      * ) exit 1;;
+      * ) upd="";;
     esac
 
     read -p "Switch branch to develop (y/n)? " answ
     case "$answ" in 
       y|Y ) dev="-d";;
       n|N ) ;;
-      * ) exit 1;;
+      * ) dev="";;
     esac
     
     read -p "Exec cmd's by sudo (y/n)? " answ
     case "$answ" in 
       y|Y ) sud="-s";;
       n|N ) ;;
-      * ) exit 1;;
+      * ) sud="";;
     esac
     
     # COPY
