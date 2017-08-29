@@ -1,89 +1,44 @@
-Production tag checker.
+Order tag checker.
 
+#### USER INFO ####
 Issues:
-- check tags in selected repo's in confing.ini
+- check tags in selected repo's at configuration file tag_checker.ini
 - create web-pages with tables of info about tag's commits, dates etc
 
 
+Installing:
+- git clone git@srv-swdev:/opensource/device_tag_visualiser.git
+- git checkout develop
+- go to dir tag_checker
+- edit tag_checker.ini
+- edit tag_checker_translate
+- run install.sh
+- go throw menu
+- if need - change in install.sh cron timeout update
+
+#### DEVELOPER INFO ####
 Main parts:
 - logger
-- config loader
-    - load config from config.ini
+- config loader(CfgLoader)
+    - load config and put it to model
+    - load mapped names of devices from tag_checker_translate
     - for even part [xxx] create dict and go to repo for check tags
-    - 
-- checker
-    - departmens(dep_num , repos) - dict
-    - repos(repo_link) - list
-    - apparats(app_1, app_2, app_3) - list
-    - app_1(app_name, order_num, date, hash) - tuple
-- web_configurer
-    - create web page for each one of departments
-    \\
+- tag model(TagModel)
+    - agregate all info about tags, repos, commits etc
+- checker(GitMan)
+    - got throw repos, update, get tags, parce it's put info to model
+- web configurator(WebGen)
+    - create web page's:
+        - main - last changes for all departments, devices and types(ITEM, ORDER, ALL)
+        - for every device
+        - for every item number
 
-
-
-Model:
-- department
-    - repos
-        -repo
-            - last tag
-                - item
-                - order num
-                - date
-                - hash
-            - history tag
-            - link
-
-departments     - dict      - (dep_num, repos)
-repos           - list      - (repo, ...)
-repo            - tuple     - (last, history, link)
-last            - tuple     - (item, order_num, date, comm_hash)
-history         - list      - (tag, ...)
-
-
-Order of doings:
-+ init logger
-+ check if git installed
-+ read config file to model
-+ update repos by links in config
-+ get tags from develop branches
-+ configurate web pages for each department
-+ close all
-    
-
-Git commands:
-check branch: 								git branch
-if not develop try switch to develop: 		git checkout develop
-update repo:                                git pull
-get all tags: 								git tag
-for each tag get ref:						git rev-parse --short $TAG
-    
-    
-repo_1
-repo_2
-repo_3
-
-    file:///home/kozlov_vn/Projects/tag_checker/out/index.html
-
-javascript:(function(){var loc=location.href;loc=loc.replace('www.govno.rub','www.ya.ru'); location.replace(loc)})()
-
-javascript:(function(){var loc=location.href;loc=loc.replace('file:///home/kozlov_vn/Projects/tag_checker/out/index.html','www.ya.ru'); location.replace(loc)})()
-
-
-
-
-install:
-/usr/bin/...
-
-/etc/
-
-/tmp/log
-
-
-
-
-javascripts
-how it work:
-- click to hash-link
-- open own .html with script selecting commit (?HOW PROMOTE COMMIT MSG?)
--
+Used git commands:
+GIT_VER         = "git --version"                           # get git ver
+CUR_BRANCH      = "git rev-parse --abbrev-ref HEAD"         # get current branch
+SW_BRANCH       = "git checkout "                           # switch branch to
+UPD_REPO        = "git pull"                                # update repo
+GET_TAGS        = "git tag"                                 # get all tags for cur branch
+GET_TAG_SSHA    = "git rev-parse --short "                  # get short SHA1 for tagged commit
+GET_COMM_DATE   = "git show -s --format=%cd --date=short "  # get commit date by hash
+GET_COMM_INFO   = "git log -{0!s} --format='{1!s}' "        # get commit info
