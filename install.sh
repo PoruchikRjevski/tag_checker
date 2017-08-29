@@ -89,13 +89,16 @@ main() {
     check_and_make_d "$OUT_ORD_DIR"
     
     # copy files
-    sudo yes | cp -rf $SRC_DIR$PY_FILES $SETUP_DIR
+    yes | cp -rf $SRC_DIR$PY_FILES $SETUP_DIR
+    chmod +x $SETUP_DIR*
 
     #check_and_rem_f "$CONFIG_DIR$CONFIG_FILE"
-    sudo yes | cp -rf $CUR_DIR$CONFIG_FILE $CONFIG_DIR
+    yes | cp -rf $CUR_DIR$CONFIG_FILE $CONFIG_DIR
+    chmod 777 $CONFIG_DIR$CONFIG_FILE
     
     #check_and_rem_f "$CONFIG_DIR$TRANSLATE_FILE"
-    sudo yes | cp -rf $CUR_DIR$TRANSLATE_FILE $CONFIG_DIR
+    yes | cp -rf $CUR_DIR$TRANSLATE_FILE $CONFIG_DIR
+    chmod 777 $CONFIG_DIR$TRANSLATE_FILE
     
     # CRON
     # del from cron old note(s)
