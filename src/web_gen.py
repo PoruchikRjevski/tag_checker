@@ -336,7 +336,7 @@ class WebGenerator:
                                               html_defs.A_ST_HEIGHT.format(common.FRAME_H) +
                                               html_defs.A_ST_WIDTH.format(common.FRAME_W) +
                                               html_defs.A_ST_BORDER.format(common.FRAME_BORDER)) +
-                      html_defs.A_SRC.format(common.FILE_PREFIX + common.OUT_PATH + common.MAIN_NAME))
+                      html_defs.A_SRC.format(common.MAIN_NAME))
 
     def genIFrameFoot(self, gen):
         gen.write_tag(html_defs.T_IFRAME_C)
