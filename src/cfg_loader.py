@@ -1,29 +1,33 @@
 import configparser
-import os
-import  codecs
 
 import common
+from logger import out_log, out_err
+from tag_model import TagModel, Repo
 
-from tag_model import TagModel
-from tag_model import Repo
 
 class CfgLoader:
     def __init__(self):
+        out_log(self.__class__.__name__, "init")
         self.cfg = configparser.ConfigParser()
         self.translateFile = ""
 
-    def readFile(self, fileName):
+    def read_file(self, fileName):
         self.cfg.read(fileName)
 
-    def fillModel(self, model):
+    def fill_model(self, model):
         deps = self.cfg.sections()
 
+        common.OUT_PATH = common.OUT_PATH_DEF
         for i in deps:
+            prefix = ""
             if i == common.CONFIG:
                 if self.cfg.has_option(i, common.OUT_P):
                     common.OUT_PATH = self.cfg.get(i, common.OUT_P)
 
                 continue
+
+            if self.cfg.has_option(i, common.PREFIX):
+                prefix = self.cfg.get(i, common.PREFIX)
 
             reposLinks = self.cfg.get(i, common.REPOS).split("\n")
 
@@ -31,12 +35,14 @@ class CfgLoader:
 
             for j in reposLinks:
                 repo = Repo()
-                repo.setLink(j)
+                repo.set_link(prefix + j)
                 reposList.append(repo)
 
-            model.addDep(i, reposList)
+            model.add_department(i, reposList)
 
-    def loadMapped(self, model):
+        out_log(self.__class__.__name__, "out path: " + common.OUT_PATH)
+
+    def load_mapped_dev_names(self, model):
         f = open(common.TRANSLATE_PATH)
 
         if f:
@@ -44,12 +50,14 @@ class CfgLoader:
 
             if fileText:
                 for line in fileText:
-                    model.addMappedDevNames(line.split("=")[:1][-1], line.split("=")[1:][-1])
+                    model.add_mapped_device_names(line.split("=")[:1][-1], line.split("=")[1:][-1])
         
-    def loadCfg(self, fileName, model):
-        self.readFile(fileName)
+    def load_config(self, fileName, model):
+        self.read_file(fileName)
+        self.fill_model(model)
 
-        self.fillModel(model)
+        out_log(self.__class__.__name__, "config was loaded")
 
         if self.translateFile:
-            self.loadMapped(model)
+            self.load_mapped_dev_names(model)
+            out_log(self.__class__.__name__, "mapped names was loaded")

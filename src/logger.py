@@ -41,12 +41,14 @@ def out_err(who, msg):
 def out_msg(who, msg, type):
     caller = caller_func()
 
+    caller += "()"
+
     symbols = common.LOG_SYMB_CALLER - len(caller) - len(who)
 
     caller += " " * symbols
 
     out = "{:s} : [{:s}:{:s}] : {:s} : {:s} ".format(type, who,
-                                                     caller + "()", datetime.datetime.now().__str__(),
+                                                     caller, datetime.datetime.now().__str__(),
                                                      msg)
 
     if not common.QUIET:

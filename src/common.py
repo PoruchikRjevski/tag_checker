@@ -1,12 +1,15 @@
 # constants for checker
 TAG_CHECKER     = "tag_checker"
 REPOS           = "repos"
+PREFIX          = "prefix"
 CONFIG          = "CONFIG"
 OUT_P           = "out"
 TRANSLATE_PATH  = "translate"
 
 CONFIG_PATH     = "/etc/tag_checker.ini"
 TRANSLATE_PATH  = "/etc/tag_checker_translate"
+
+OUT_PATH_DEF    = "/var/www/swver_hist/"
 
 LOG_SYMB_CALLER = 40
 
@@ -51,6 +54,7 @@ GIT_AUTHOR_NEST = 1
 
 QUIET           = False                                     # global flag for out or not log and err messages
 LOGGING         = False                                     # global flag for out or not log and err to files
+SUDOER          = False                                     # global flag for exec shell cmd by sudo
 CUR_PLATFORM    = "None"
 CUR_PATH        = "None"
 
@@ -64,14 +68,15 @@ LINUX_P         = "linux"
 WIN_PATH        = "../log/"
 LIN_PATH        = "/tmp/tag_checker_log/"
 
+SUDO_CMD        = "sudo "
+
 # tag descr
 ORDER           = "PROD"
 DEVICE          = "APP"
 ITEM            = "ITEM"
 
 # web generator
-#OUT_PATH       = "../out/"
-OUT_PATH       = ""
+OUT_PATH        = ""
 INDEX_NAME      = "index.html"
 MAIN_NAME       = "main.html"
 DEVICE_DIR      = "devices/"

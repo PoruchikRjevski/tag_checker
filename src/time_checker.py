@@ -11,5 +11,5 @@ class TimeChecker:
     def stop(self):
         self.result = time.time() - self.first
 
-    def howMuchStr(self):
+    def passed_time_str(self):
         return "exec time, s: " + str(round(self.result, 4))

@@ -2,6 +2,9 @@
 
 CUR_DIR="./"
 SETUP_DIR="/usr/local/bin/tag_checker/"
+OUT_DIR="/var/www/swver_hist/"
+OUT_DEV_DIR=$OUT_DIR"devices/"
+OUT_ORD_DIR=$OUT_DEV_DIR"orders/"
 SRC_DIR="src/"
 PY_FILES="*.py"
 CONFIG_DIR="/etc/"
@@ -25,6 +28,14 @@ check_and_rem_d() {
     if [ -d "$1" ] 
     then
         sudo rm -rf $1
+    fi
+}
+
+# check an make dir
+check_and_make_d() {
+    if [ ! -d "$1" ] 
+    then
+        sudo mkdir -p $1
     fi
 }
 
@@ -58,16 +69,18 @@ main() {
     esac
     
     # COPY
-    # copy files
-    check_and_rem_d "$SETUP_DIR"
-    sudo mkdir $SETUP_DIR
+    # prepare
+    check_and_make_d "$SETUP_DIR"
+    check_and_make_d "$OUT_DIR"
+    check_and_make_d "$OUT_ORD_DIR"
     
+    # copy files
     sudo cp -rf $SRC_DIR$PY_FILES $SETUP_DIR
 
-    check_and_rem_f "$CONFIG_DIR$CONFIG_FILE"
+    #check_and_rem_f "$CONFIG_DIR$CONFIG_FILE"
     sudo cp -rf $CUR_DIR$CONFIG_FILE $CONFIG_DIR
     
-    check_and_rem_f "$CONFIG_DIR$TRANSLATE_FILE"
+    #check_and_rem_f "$CONFIG_DIR$TRANSLATE_FILE"
     sudo cp -rf $CUR_DIR$TRANSLATE_FILE $CONFIG_DIR
     
     # CRON
@@ -78,7 +91,7 @@ main() {
     
     # add to cron
     crontab -l > temp
-    echo "0 0 * * * $SETUP_DIR$NAME $cmd $log $upd" >> temp
+    echo "1-59 * * * * $SETUP_DIR$NAME $cmd $log $upd" >> temp
     crontab temp
     rm temp
     

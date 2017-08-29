@@ -1,78 +1,83 @@
 import collections
 
 import common
+from logger import out_log, out_err
+
 
 # deps it is dict of (department, list of repos)
 class TagModel:
     def __init__(self):
+        out_log(self.__class__.__name__, "init")
         self.deps = collections.OrderedDict()
 
         self.mappedDevNames = {}
 
-    def addMappedDevNames(self, key, val):
+    def add_mapped_device_names(self, key, val):
         self.mappedDevNames[key] = val
 
-    def getMappedDevName(self, name):
+    def get_mapped_device_name(self, name):
         if name in self.mappedDevNames:
             return self.mappedDevNames[name]
         return name
 
-    def addDep(self, key, val):
+    def add_department(self, key, val):
         self.deps[key] = val
 
-    def getDeps(self):
+    def get_departments(self):
         return self.deps
+
 
 class Repo:
     def __init__(self):
         self.devices = collections.OrderedDict()
         self.link = " "
 
-    def addToDevice(self, name, note):
-        self.devices[name].addToHistory(note)
+    def add_to_device(self, name, note):
+        self.devices[name].add_to_history(note)
 
-    def addDeviceByName(self, name, dev):
+    def add_device_by_name(self, name, dev):
         self.devices[name] = dev
 
-    def getDevices(self):
+    def get_devices(self):
         return self.devices
 
-    def setLink(self, link):
+    def set_link(self, link):
         self.link = link
 
-    def getLink(self):
+    def get_link(self):
         return self.link
+
 
 class Device:
     def __init__(self):
-        self.history = [] # list if Notes
-        self.last = [] # list if Notes
-        self.items = [] # list of Notes by items
-        self.name = "" # name from repo
-        self.trName = "" # translated name
+        self.history = []       # list if Notes
+        self.last = []          # list if Notes
+        self.items = []         # list of Notes by items
+        self.name = ""          # name from repo
+        self.trName = ""        # translated name
 
-    def setName(self, name):
+    def set_name(self, name):
         self.name = name
 
-    def getName(self):
+    def get_name(self):
         return self.name
 
-    def setTrName(self, trName):
+    def set_mapped_name(self, trName):
         self.trName = trName
 
-    def getTrName(self):
+    def get_mapped_name(self):
         return self.trName
 
-    def addToHistory(self, note):
+    def add_to_history(self, note):
         self.history.append(note)
 
-    def getHistory(self):
+    def get_history(self):
         return self.history
 
-    def sortHistory(self):
+    def sort_history(self):
         self.history = sorted(self.history, key=lambda note: note.date, reverse=True)
 
-    def fillLast(self):
+    def fill_last(self):
         for type in common.TYPES_L:
             first = True
             lastDate = 0
@@ -82,20 +87,21 @@ class Device:
                         first = False
                         lastDate = note.date
                     if note.date == lastDate:
-                        self.addToLast(note)
+                        self.add_to_last(note)
 
-    def addToLast(self, note):
+    def add_to_last(self, note):
         self.last.append(note)
 
-    def getLast(self):
+    def get_last(self):
         return self.last
 
-    def getLastNumByType(self, type):
+    def get_last_num_by_type(self, type):
         res = 0
         for note in self.last:
             if type == note.type:
                 res += 1
         return res
+
 
 class Note:
     def __init__(self):
