@@ -60,17 +60,18 @@ class GitMan:
         os.chdir(link)
 
     def is_dir_exist(self, link):
-        curDir = os.getcwd()
+        #curDir = os.getcwd()
 
-        if link[-1:] == "/" and not curDir[-1:] == "/":
-            curDir = curDir + "/"
-        elif not link[-1:] == "/" and curDir[-1:] == "/":
-            curDir = curDir[:-1]
+        #if link[-1:] == "/" and not curDir[-1:] == "/":
+        #    curDir = curDir + "/"
+        #if not link[-1:] == "/" and curDir[-1:] == "/":
+        #    curDir = curDir[:-1]
 
-        out_log(self.__class__.__name__, "cur dir: " + curDir)
+        #out_log(self.__class__.__name__, "cur dir: " + link)
 
-        if curDir != link:
-            out_err(self.__class__.__name__, "can't go to " + link)
+        #if curDir != link:
+        if not os.path.isdir(link):
+            out_err(self.__class__.__name__, "can't find dir of repo: " + link)
             return False
         return True
 

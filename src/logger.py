@@ -47,8 +47,8 @@ def out_msg(who, msg, type):
 
     caller += " " * symbols
 
-    out = "{:s} : [{:s}:{:s}] : {:s} : {:s} ".format(type, who,
-                                                     caller, datetime.datetime.now().__str__(),
+    out = "{:s} : [{:s}:{:s}] : {:s} : {:s} ".format(datetime.datetime.now().__str__(), type,
+                                                     who, caller,
                                                      msg)
 
     if not common.QUIET:
