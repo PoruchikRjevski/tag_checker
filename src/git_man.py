@@ -126,7 +126,7 @@ class GitMan:
             date = self.do_repair_date(parts[2])
         elif len(parts) == 4:
             note.type = parts[2].split("-")[:-1][0]
-            note.num = int(parts[2].split("-")[-1:][0])
+            note.num = int(str(parts[2].split("-")[-1:][0]))
             date = self.do_repair_date(parts[3])
 
         if not date:
@@ -136,7 +136,7 @@ class GitMan:
             note.date = date
 
         out_log(self.__class__.__name__, "Note type: " + note.type)
-        out_log(self.__class__.__name__, "Note num: " + note.num)
+        out_log(self.__class__.__name__, "Note num: " + str(note.num))
         out_log(self.__class__.__name__, "Note date: " + note.date)
 
         note.sHash = self.get_short_hash(tag)
