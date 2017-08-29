@@ -68,14 +68,14 @@ main() {
       * ) exit 1;;
     esac
 
-    read -p "Switch branch to develop? " answ
+    read -p "Switch branch to develop (y/n)? " answ
     case "$answ" in 
       y|Y ) dev="-d";;
       n|N ) ;;
       * ) exit 1;;
     esac
     
-    read -p "Exec cmd's by sudo? " answ
+    read -p "Exec cmd's by sudo (y/n)? " answ
     case "$answ" in 
       y|Y ) sud="-s";;
       n|N ) ;;
