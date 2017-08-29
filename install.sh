@@ -6,20 +6,40 @@ SRC_DIR="src/"
 PY_FILES="*.py"
 CONFIG_DIR="/etc/"
 CONFIG_FILE="tag_checker.ini"
+TRANSLATE_FILE="tag_checker_translate"
 NAME="tag_checker.py"
 
 PYTHON="python3"
+
+
+# check and remove file
+check_and_rem_f() {    
+    if [ -f "$1" ] 
+    then
+        sudo rm -f $1
+    fi
+}
+
+# check and remove dir
+check_and_rem_d() {    
+    if [ -d "$1" ] 
+    then
+        sudo rm -rf $1
+    fi
+}
 
 # ---------------------------------
 # main
 # ---------------------------------
 main() {
+    # CHECKS
     # check pyton
     if ! which $PYTHON > /dev/null; then
         echo "Please, install python3 before using $0"
         exit 0
     fi
 
+    # ASKS
     # ask about log and update
     cmd="-q"
     
@@ -30,29 +50,27 @@ main() {
       * ) exit 1;;
     esac
     
-    read -p "Update repo before scan (y/n)? " answ
+    read -p "Update repo's before scan (y/n)? " answ
     case "$answ" in 
       y|Y ) upd="-u";;
       n|N ) ;;
       * ) exit 1;;
     esac
     
-    # copy script
-    if [ -d "$SETUP_DIR" ] 
-    then
-        sudo rm -rf $SETUP_DIR
-    fi
-    
+    # COPY
+    # copy files
+    check_and_rem_d "$SETUP_DIR"
     sudo mkdir $SETUP_DIR
     
     sudo cp -rf $SRC_DIR$PY_FILES $SETUP_DIR
 
-    if [ -f "$CONFIG_DIR$CONFIG_FILE" ] 
-    then
-        sudo rm -f $CONFIG_DIR$CONFIG_FILE
-    fi
+    check_and_rem_f "$CONFIG_DIR$CONFIG_FILE"
     sudo cp -rf $CUR_DIR$CONFIG_FILE $CONFIG_DIR
     
+    check_and_rem_f "$CONFIG_DIR$TRANSLATE_FILE"
+    sudo cp -rf $CUR_DIR$TRANSLATE_FILE $CONFIG_DIR
+    
+    # CRON
     # del from cron old note
     crontab -l | grep -q !"$NAME" > temp
     crontab temp
