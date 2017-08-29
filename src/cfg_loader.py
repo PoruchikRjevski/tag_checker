@@ -9,7 +9,7 @@ class CfgLoader:
     def __init__(self):
         out_log(self.__class__.__name__, "init")
         self.cfg = configparser.ConfigParser()
-        self.translateFile = ""
+        self.translateFile = common.TRANSLATE_PATH
 
     def read_file(self, fileName):
         self.cfg.read(fileName)

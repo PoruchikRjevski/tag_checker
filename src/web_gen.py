@@ -6,7 +6,7 @@ import html_defs
 import js_scripts
 
 from html_gen import HtmlGen
-from tag_model import TagModel
+from tag_model import TagModel, Device, Note, Repo
 from logger import out_log, out_err
 from time_checker import TimeChecker
 
@@ -132,6 +132,7 @@ class WebGenerator:
         return "Repo: " + repo + "\n" + "Author: " + author
 
     def genDeviceName(self, file, name, span, link):
+        out_log(self.__class__.__name__, "mapped name: " + name)
         self.genTd(file,
                    name,
                    html_defs.A_ROWSPAN.format(span),
