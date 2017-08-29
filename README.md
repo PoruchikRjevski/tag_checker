@@ -9,11 +9,8 @@ Issues:
 Installing:
 - git clone git@srv-swdev:/opensource/device_tag_visualiser.git
 - git checkout develop
-- go to dir tag_checker
-- edit tag_checker.ini
-- edit tag_checker_translate
-- run install.sh
-- go throw menu
+- sudo ./install.sh
+- go to /etc/ edit tag_checker.ini and tag_checker_translate
 - if need - change in install.sh cron timeout update
 
 #### DEVELOPER INFO ####
