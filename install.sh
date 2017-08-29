@@ -39,6 +39,21 @@ check_and_make_d() {
     fi
 }
 
+# remove note from crontab
+remove_from_crontab() {
+    crontab -l | grep -q !"$NAME" > temp
+    crontab temp
+    rm temp
+}
+
+# add note to crontab
+add_to_crontab() {
+    crontab -l > temp
+    echo "1-59 * * * * $SETUP_DIR$NAME $quiet $log $upd $sud $dev" >> temp
+    crontab temp
+    rm temp
+}
+
 # ---------------------------------
 # main
 # ---------------------------------
@@ -88,9 +103,13 @@ main() {
     check_and_make_d "$OUT_DIR"
     check_and_make_d "$OUT_ORD_DIR"
     
+    echo "Dirs was checked."
+    
     # copy files
     yes | cp -rf $SRC_DIR$PY_FILES $SETUP_DIR
     chmod +x $SETUP_DIR*
+    
+    echo "Executable files was copied."
 
     #check_and_rem_f "$CONFIG_DIR$CONFIG_FILE"
     cp -rfn $CUR_DIR$CONFIG_FILE $CONFIG_DIR
@@ -101,16 +120,17 @@ main() {
     chmod 777 $CONFIG_DIR$TRANSLATE_FILE
     
     # CRON
-    # del from cron old note(s)
-    crontab -l | grep -q !"$NAME" > temp
-    crontab temp
-    rm temp
-    
-    # add to cron
-    crontab -l > temp
-    echo "1-59 * * * * $SETUP_DIR$NAME $quiet $log $upd $sud $dev" >> temp
-    crontab temp
-    rm temp
+    read -p "Add to crontab (y/n)? " answ
+    case "$answ" in 
+      y|Y ) 
+      remove_from_crontab
+      add_to_crontab      
+      ;;
+      n|N )
+      remove_from_crontab
+      ;;
+      * ) ;;
+    esac
     
     exit 0
 }
