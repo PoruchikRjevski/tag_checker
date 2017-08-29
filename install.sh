@@ -23,12 +23,12 @@ fi
 # main loop
 # ---------------------------------
 if [[ $# -eq 2 ]] ; then
-    ## prepare
-    create_temp_d
-    find_pro_files
-    separate_names
+    # ask where .ini
     
-    clear_temp_files
+
+    # 
+    # cp /src to /usr/bin
+    
     
     case $2 in
     $MAIN_DEPENDS )

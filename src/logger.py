@@ -48,7 +48,6 @@ def out_msg(who, msg, type):
     out = "{:s} : [{:s}:{:s}] : {:s} : {:s} ".format(type, who,
                                                      caller + "()", datetime.datetime.now().__str__(),
                                                      msg)
-    # out = "[%s] : [%s:%-20s] : [%s] : [%s]" % (type, who, whoiam() + "()", datetime.datetime.now().__str__(), msg)
 
     if not common.QUIET:
         print(out)

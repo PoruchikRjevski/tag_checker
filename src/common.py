@@ -5,6 +5,8 @@ CONFIG          = "CONFIG"
 OUT_P           = "out"
 TRANSLATE_PATH  = "translate"
 
+CONFIG_PATH     = "/etc/tag_checker.ini"
+
 LOG_SYMB_CALLER = 40
 
 # tag model

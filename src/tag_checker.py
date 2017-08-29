@@ -26,7 +26,7 @@ def isConfFileExist(fileName):
     return os.path.exists(fileName)
 
 def setOptions(parser):
-    usage = "usage: %prog [options] path_to_config"
+    usage = "usage: %prog [options] [path_to_config]"
 
     parser.set_usage(usage)
 
@@ -67,14 +67,10 @@ def main():
     # init logger
     init_log()
 
-    print(common.CUR_PATH)
-
     if len(args) != 1:
-        out_err(common.TAG_CHECKER, common.E_WA_STR)
-        out_err(common.TAG_CHECKER, common.FOR_HELP)
-        sys.exit(common.EXIT_WA)
-
-    path = args[0]
+        path = common.CONFIG_PATH
+    else:
+        path = args[0]
 
     # check is config file was existed
     if not isConfFileExist(path):
