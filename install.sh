@@ -71,20 +71,18 @@ main() {
     sudo cp -rf $CUR_DIR$TRANSLATE_FILE $CONFIG_DIR
     
     # CRON
-    # del from cron old note
+    # del from cron old note(s)
     crontab -l | grep -q !"$NAME" > temp
     crontab temp
     rm temp
     
     # add to cron
     crontab -l > temp
-    echo "1-59 * * * * $SETUP_DIR$NAME $cmd $log $upd" >> temp
+    echo "0 0 * * * $SETUP_DIR$NAME $cmd $log $upd" >> temp
     crontab temp
     rm temp
     
-    
     exit 0
 }
-
 
 main
