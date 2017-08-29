@@ -84,7 +84,7 @@ def main():
 
     out_log(common.TAG_CHECKER, "-q: " + str(common.QUIET))
     out_log(common.TAG_CHECKER, "-l: " + str(common.LOGGING))
-    out_log(common.TAG_CHECKER, "-l: " + str(common.SUDOER))
+    out_log(common.TAG_CHECKER, "-s: " + str(common.SUDOER))
     out_log(common.TAG_CHECKER, "-d: " + str(opts.develop))
     out_log(common.TAG_CHECKER, "-u: " + str(opts.update))
 

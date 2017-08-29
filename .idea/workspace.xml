@@ -2,21 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="2c8eb497-6da4-44ad-8163-64862edfca81" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/install.sh" afterPath="$PROJECT_DIR$/install.sh" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cfg_loader.py" afterPath="$PROJECT_DIR$/src/cfg_loader.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/cmd_wrap.py" afterPath="$PROJECT_DIR$/src/cmd_wrap.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/common.py" afterPath="$PROJECT_DIR$/src/common.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/git_man.py" afterPath="$PROJECT_DIR$/src/git_man.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/html_defs.py" afterPath="$PROJECT_DIR$/src/html_defs.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/html_gen.py" afterPath="$PROJECT_DIR$/src/html_gen.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/js_scripts.py" afterPath="$PROJECT_DIR$/src/js_scripts.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/js_to_py_conv.py" afterPath="$PROJECT_DIR$/src/js_to_py_conv.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/logger.py" afterPath="$PROJECT_DIR$/src/logger.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tag_checker.py" afterPath="$PROJECT_DIR$/src/tag_checker.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/tag_model.py" afterPath="$PROJECT_DIR$/src/tag_model.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/time_checker.py" afterPath="$PROJECT_DIR$/src/time_checker.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/web_gen.py" afterPath="$PROJECT_DIR$/src/web_gen.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tag_checker.ini" afterPath="$PROJECT_DIR$/tag_checker.ini" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -28,11 +15,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="tag_checker.ini" pinned="false" current-in-tab="false">
+      <file leaf-file-name="tag_checker.ini" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/tag_checker.ini">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="17">
-              <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
+            <state relative-caret-position="136">
+              <caret line="8" column="16" lean-forward="false" selection-start-line="8" selection-start-column="16" selection-end-line="8" selection-end-column="16" />
               <folding />
             </state>
           </provider>
@@ -51,14 +38,14 @@
       <file leaf-file-name="tag_checker.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/tag_checker.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="374">
-              <caret line="123" column="21" lean-forward="false" selection-start-line="123" selection-start-column="21" selection-end-line="123" selection-end-column="21" />
+            <state relative-caret-position="408">
+              <caret line="86" column="35" lean-forward="false" selection-start-line="86" selection-start-column="35" selection-end-line="86" selection-end-column="35" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="web_gen.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="web_gen.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/web_gen.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="191">
@@ -166,16 +153,16 @@
         <option value="$PROJECT_DIR$/config.ini" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/src/logger.py" />
-        <option value="$PROJECT_DIR$/tag_checker.ini" />
         <option value="$PROJECT_DIR$/src/tag_model.py" />
         <option value="$PROJECT_DIR$/src/cfg_loader.py" />
         <option value="$PROJECT_DIR$/src/time_checker.py" />
         <option value="$PROJECT_DIR$/src/git_man.py" />
         <option value="$PROJECT_DIR$/src/web_gen.py" />
         <option value="$PROJECT_DIR$/src/common.py" />
-        <option value="$PROJECT_DIR$/src/tag_checker.py" />
         <option value="$PROJECT_DIR$/src/cmd_wrap.py" />
         <option value="$PROJECT_DIR$/src/html_gen.py" />
+        <option value="$PROJECT_DIR$/src/tag_checker.py" />
+        <option value="$PROJECT_DIR$/tag_checker.ini" />
       </list>
     </option>
   </component>
@@ -619,14 +606,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="680">
-          <caret line="40" column="26" lean-forward="false" selection-start-line="40" selection-start-column="19" selection-end-line="40" selection-end-column="26" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/cfg_loader.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="408">
@@ -639,14 +618,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="119">
           <caret line="7" column="4" lean-forward="false" selection-start-line="7" selection-start-column="4" selection-end-line="7" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/tag_checker.ini">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="17">
-          <caret line="1" column="0" lean-forward="false" selection-start-line="1" selection-start-column="0" selection-end-line="1" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -705,14 +676,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/tag_checker.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="374">
-          <caret line="123" column="21" lean-forward="false" selection-start-line="123" selection-start-column="21" selection-end-line="123" selection-end-column="21" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/web_gen.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="191">
@@ -720,6 +683,30 @@
           <folding>
             <element signature="e#0#15#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/tag_checker.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="408">
+          <caret line="86" column="35" lean-forward="false" selection-start-line="86" selection-start-column="35" selection-end-line="86" selection-end-column="35" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="680">
+          <caret line="40" column="26" lean-forward="false" selection-start-line="40" selection-start-column="19" selection-end-line="40" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tag_checker.ini">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="8" column="16" lean-forward="false" selection-start-line="8" selection-start-column="16" selection-end-line="8" selection-end-column="16" />
+          <folding />
         </state>
       </provider>
     </entry>

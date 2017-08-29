@@ -67,6 +67,20 @@ main() {
       n|N ) ;;
       * ) exit 1;;
     esac
+
+    read -p "Switch branch to develop? " answ
+    case "$answ" in 
+      y|Y ) dev="-d";;
+      n|N ) ;;
+      * ) exit 1;;
+    esac
+    
+    read -p "Exec cmd's by sudo? " answ
+    case "$answ" in 
+      y|Y ) sud="-s";;
+      n|N ) ;;
+      * ) exit 1;;
+    esac
     
     # COPY
     # prepare
@@ -91,7 +105,7 @@ main() {
     
     # add to cron
     crontab -l > temp
-    echo "1-59 * * * * $SETUP_DIR$NAME $cmd $log $upd" >> temp
+    echo "1-59 * * * * $SETUP_DIR$NAME $cmd $log $upd $sud $dev" >> temp
     crontab temp
     rm temp
     
