@@ -127,9 +127,12 @@ class GitMan:
         elif len(parts) == 4:
             prenum = parts[2].split("-")[-1:][0]
 
+            out_log(self.__class__.__name__, "prenum: " + prenum)
+
             if prenum not in common.WRONG_NUM:
                 note.type = parts[2].split("-")[:-1][0]
                 note.num = int(parts[2].split("-")[-1:][0])
+                out_err(self.__class__.__name__, "Bad tag item num: " + tag)
 
             note.num = int(parts[2].split("-")[-1:][0])
             date = self.do_repair_date(parts[3])
