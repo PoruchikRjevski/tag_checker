@@ -9,6 +9,8 @@ TRANSLATE_PATH  = "translate"
 CONFIG_PATH     = "/etc/tag_checker.ini"
 TRANSLATE_PATH  = "/etc/tag_checker_translate"
 
+FILE_PREFIX     = "file://"
+
 OUT_PATH_DEF    = "/var/www/swver_hist/"
 
 LOG_SYMB_CALLER = 40
