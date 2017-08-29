@@ -136,6 +136,7 @@ class GitMan:
             note.date = date
 
         out_log(self.__class__.__name__, "Note type: " + note.type)
+        out_log(self.__class__.__name__, "Note num: " + note.num)
         out_log(self.__class__.__name__, "Note date: " + note.date)
 
         note.sHash = self.get_short_hash(tag)
