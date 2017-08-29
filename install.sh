@@ -52,7 +52,7 @@ main() {
 
     # ASKS
     # ask about log and update
-    cmd="-q"
+    quiet="-q"
     
     read -p "Log (y/n)? " answ
     case "$answ" in 
@@ -108,7 +108,7 @@ main() {
     
     # add to cron
     crontab -l > temp
-    echo "1-59 * * * * $SETUP_DIR$NAME $cmd $log $upd $sud $dev" >> temp
+    echo "1-59 * * * * $SETUP_DIR$NAME $quiet $log $upd $sud $dev" >> temp
     crontab temp
     rm temp
     
