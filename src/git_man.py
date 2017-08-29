@@ -109,6 +109,7 @@ class GitMan:
         return False
 
     def gen_note_by_tag(self, tag):
+        out_log(self.__class__.__name__, "Gen note")
         parts = tag.split("/")
 
         note = Note()
@@ -117,6 +118,8 @@ class GitMan:
             return note
 
         note.name = parts[1]
+
+        out_log(self.__class__.__name__, "Note name: " + note.name)
 
         date = ""
         if len(parts) == 3:
@@ -132,13 +135,22 @@ class GitMan:
         elif date:
             note.date = date
 
+        out_log(self.__class__.__name__, "Note type: " + note.type)
+        out_log(self.__class__.__name__, "Note date: " + note.date)
+
         note.sHash = self.get_short_hash(tag)
 
+        out_log(self.__class__.__name__, "Note short hash: " + note.sHash)
+
         note.commDate = self.get_commit_date_by_short_hash(note.sHash)
+
+        out_log(self.__class__.__name__, "Note commit date: " + note.commDate)
 
         note.tag = tag
 
         note.author = self.get_commit_author_by_short_hash(note.sHash)
+
+        out_log(self.__class__.__name__, "Note author: " + note.author)
 
         note.valid = True
 
