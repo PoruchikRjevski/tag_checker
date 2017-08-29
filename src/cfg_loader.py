@@ -51,6 +51,8 @@ class CfgLoader:
             if fileText:
                 for line in fileText:
                     model.add_mapped_device_names(line.split("=")[:1][-1], line.split("=")[1:][-1])
+        else:
+            out_err(self.__class__.__name__, "can't open file with translates: " + common.TRANSLATE_PATH)
         
     def load_config(self, fileName, model):
         self.read_file(fileName)
