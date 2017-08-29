@@ -22,10 +22,6 @@ class CfgLoader:
             if i == common.CONFIG:
                 if self.cfg.has_option(i, common.OUT_P):
                     common.OUT_PATH = self.cfg.get(i, common.OUT_P)
-                    #if not os.path.isabs(common.OUT_PATH):
-                    #    common.OUT_PATH = os.path.abspath(common.OUT_PATH)
-                if self.cfg.has_option(i, common.TRANSLATE_PATH):
-                    self.translateFile = self.cfg.get(i, common.TRANSLATE_PATH)
 
                 continue
 
@@ -41,7 +37,7 @@ class CfgLoader:
             model.addDep(i, reposList)
 
     def loadMapped(self, model):
-        f = open(self.translateFile)
+        f = open(common.TRANSLATE_PATH)
 
         if f:
             fileText = f.readlines()

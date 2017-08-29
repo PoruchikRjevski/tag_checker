@@ -6,6 +6,7 @@ OUT_P           = "out"
 TRANSLATE_PATH  = "translate"
 
 CONFIG_PATH     = "/etc/tag_checker.ini"
+TRANSLATE_PATH  = "/etc/tag_checker_translate"
 
 LOG_SYMB_CALLER = 40
 

@@ -1,58 +1,72 @@
-#!/usr/bin/bash
+#!/bin/bash
 
-# show info
-show_info() {
-    echo "Set argument:"
-    echo "1 - path to *.ini"
-    echo "2 - mode:"
-    echo "        - depends"
-    echo "        - subdirs"
-    echo "        - config"
+CUR_DIR="./"
+SETUP_DIR="/usr/local/bin/tag_checker/"
+SRC_DIR="src/"
+PY_FILES="*.py"
+CONFIG_DIR="/etc/"
+CONFIG_FILE="tag_checker.ini"
+NAME="tag_checker.py"
+
+PYTHON="python3"
+
+# ---------------------------------
+# main
+# ---------------------------------
+main() {
+    # check pyton
+    if ! which $PYTHON > /dev/null; then
+        echo "Please, install python3 before using $0"
+        exit 0
+    fi
+
+    # ask about log and update
+    cmd="-q"
+    
+    read -p "Log (y/n)? " answ
+    case "$answ" in 
+      y|Y ) log=$"-l";;
+      n|N ) ;;
+      * ) exit 1;;
+    esac
+    
+    read -p "Update repo before scan (y/n)? " answ
+    case "$answ" in 
+      y|Y ) upd="-u";;
+      n|N ) ;;
+      * ) exit 1;;
+    esac
+    
+    # copy script
+    if [ -d "$SETUP_DIR" ] 
+    then
+        sudo rm -rf $SETUP_DIR
+    fi
+    
+    sudo mkdir $SETUP_DIR
+    
+    sudo cp -rf $SRC_DIR$PY_FILES $SETUP_DIR
+
+    if [ -f "$CONFIG_DIR$CONFIG_FILE" ] 
+    then
+        sudo rm -f $CONFIG_DIR$CONFIG_FILE
+    fi
+    sudo cp -rf $CUR_DIR$CONFIG_FILE $CONFIG_DIR
+    
+    # del from cron old note
+    crontab -l | grep -q !"$NAME" > temp
+    crontab temp
+    rm temp
+    
+    # add to cron
+    crontab -l > temp
+    echo "1-59 * * * * $SETUP_DIR$NAME $cmd $log $upd" >> temp
+    crontab temp
+    rm temp
+    
+    
+    exit 0
 }
 
-# ---------------------------------
-# checks
-# ---------------------------------
-# check entered dir with .pro files
-if [[ $# -eq 0 ]] ; then
-    show_info
-    exit 0
-fi
 
-# ---------------------------------
-# main loop
-# ---------------------------------
-if [[ $# -eq 2 ]] ; then
-    # ask where .ini
-    
-
-    # 
-    # cp /src to /usr/bin
-    
-    
-    case $2 in
-    $MAIN_DEPENDS )
-        get_depends
-        build_dot $DEP_DOT
-        build_png $DEP_PNG $DEP_DOT 
-        show_me_the_money $CUR_DIR/$DEP_PNG
-    ;;
-    $MAIN_SUBDIRS )
-        get_depends_ext $ATTR_SUBDIRS
-        build_dot $SUBD_DOT
-        build_png $SUBD_PNG $SUBD_DOT
-        show_me_the_money $CUR_DIR/$SUBD_PNG
-    ;;
-    $MAIN_CONFIG )
-        get_depends_ext $ATTR_CONFIG
-        build_dot $CONF_DOT
-        build_png $CONF_PNG $CONF_DOT
-        show_me_the_money $CUR_DIR/$CONF_PNG
-    ;;
-    * )
-        show_info
-    ;;
-    esac
-
-    remove_temp_d
-fi
+main
