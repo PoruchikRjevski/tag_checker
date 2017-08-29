@@ -15,6 +15,7 @@ LOG_SYMB_CALLER = 40
 
 # tag model
 PROD            = ("PROD", "ROD")
+WRONG_NUM       = ("xxxx")
 
 TYPE_ITEM       = "ITEM"
 TYPE_ORDER      = "ORDER"

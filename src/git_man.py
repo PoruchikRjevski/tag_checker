@@ -125,8 +125,13 @@ class GitMan:
         if len(parts) == 3:
             date = self.do_repair_date(parts[2])
         elif len(parts) == 4:
-            note.type = parts[2].split("-")[:-1][0]
-            note.num = int(str(parts[2].split("-")[-1:][0]))
+            prenum = parts[2].split("-")[-1:][0]
+
+            if prenum not in common.WRONG_NUM:
+                note.type = parts[2].split("-")[:-1][0]
+                note.num = int(parts[2].split("-")[-1:][0])
+
+            note.num = int(parts[2].split("-")[-1:][0])
             date = self.do_repair_date(parts[3])
 
         if not date:
