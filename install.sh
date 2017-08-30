@@ -49,7 +49,7 @@ remove_from_crontab() {
 # add note to crontab
 add_to_crontab() {
     crontab -l > temp
-    echo "1-59 * * * * $SETUP_DIR$NAME $quiet $log $upd $sud $dev" >> temp
+    echo "0 * * * * $SETUP_DIR$NAME $quiet $log $upd $sud $dev" >> temp
     crontab temp
     rm temp
 }
