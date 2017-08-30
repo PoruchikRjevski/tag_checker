@@ -30,7 +30,8 @@ class TagModel:
 class Repo:
     def __init__(self):
         self.devices = collections.OrderedDict()
-        self.link = " "
+        self.link = ""
+        self.name = ""
 
     def add_to_device(self, name, note):
         self.devices[name].add_item(note)
@@ -46,6 +47,15 @@ class Repo:
 
     def get_link(self):
         return self.link
+
+    def set_name(self, name):
+        self.name = name
+
+        if common.REPO_SUFFIX not in name:
+            self.name += common.REPO_SUFFIX
+
+    def get_name(self):
+        return self.name
 
 
 class Device:
@@ -101,10 +111,8 @@ class Device:
             self.items[key] = sorted(val, key=lambda note: note.date, reverse=True)
 
     def fill_last(self):
-        print("start")
         numsD = collections.OrderedDict()
         for type in common.TYPES_L:
-            print(type)
             for item in self.history:
                 if item.type == type:
                     for note in self.history:
@@ -117,19 +125,6 @@ class Device:
 
         for key, val in numsD.items():
             self.last.append(val)
-            print(note.name + "  -  " + str(note.num))
-
-        # for type in common.TYPES_L:
-        #     first = True
-        #     lastDate = 0
-        #     for note in self.history:
-        #         if note.type == type:
-        #             if first:
-        #                 first = False
-        #                 lastDate = note.date
-        #
-        #             if note.date == lastDate:
-        #                 self.add_to_last(note)
 
     def add_to_last(self, note):
         self.last.append(note)
@@ -153,7 +148,9 @@ class Note:
         self.num = -1
         self.date = -1
         self.sHash = -1
+        self.pHash = -1
         self.commDate = -1
+        self.commMsg = ""
         self.author = ""
         self.valid = False
         self.rating = 0

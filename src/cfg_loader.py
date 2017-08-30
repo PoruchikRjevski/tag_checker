@@ -35,6 +35,7 @@ class CfgLoader:
 
             for j in reposLinks:
                 repo = Repo()
+                repo.set_name(j)
                 repo.set_link(prefix + j)
                 reposList.append(repo)
 

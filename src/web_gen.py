@@ -84,7 +84,7 @@ class WebGenerator:
                 for name, dev in repo.get_devices().items():
                     # generate device's own page
                     #self.genDevicePage(dev, repo.get_link())
-                    self.genOrdersPages(dev, repo.get_link(), dep)
+                    self.genOrdersPages(dep, dev, repo.get_link(), repo.get_name())
 
                     # generate content for main page
                     firstDev = True
@@ -101,7 +101,7 @@ class WebGenerator:
                             typeColor = self.decrement_color(typeColor)
 
                         file.write_tag(html_defs.T_TR_O,
-                                       html_defs.A_ALIGN.format(common.ALIGN) +
+                                       html_defs.A_ALIGN.format(common.ALIGN_C) +
                                        html_defs.A_BGCOLOR.format(common.TABLE_TR_COL_1))
 
                         if firstDep:
@@ -121,16 +121,25 @@ class WebGenerator:
                         self.genNoteDate(file, note.date,
                                          html_defs.A_TITLE.format(common.TAG_STR + note.tag)
                                          + html_defs.A_BGCOLOR.format(typeColor))
-                        self.genNoteHashWithCommDate(file,
-                                                     note.sHash,
-                                                     note.commDate,
-                                                     html_defs.A_BGCOLOR.format(typeColor),
-                                                     self.getTitleForCommit(repo.get_link(), note.author))
+                        self.genNoteHash(file,
+                                         note.sHash,
+                                         html_defs.A_BGCOLOR.format(typeColor),
+                                         self.getTitleForCommit(repo.get_link(),
+                                                                note.author,
+                                                                note.commDate,
+                                                                note.commMsg),
+                                         common.LINK_TO_REPO.format(repo.get_name(),
+                                                                    common.GW_SHORTLOG,
+                                                                    note.commMsg,
+                                                                    note.pHash))
 
                         file.write_tag(html_defs.T_TR_C)
 
-    def getTitleForCommit(self, repo, author):
-        return common.REPO_STR + repo + "\n" + common.AUTHOR_STR + author
+    def getTitleForCommit(self, repo, author, commDate, commMsg):
+        return common.REPO_STR + repo + "\n" \
+               + common.AUTHOR_STR + author + "\n" \
+               + common.COMM_DATE_STR + commDate + "\n" \
+               + common.COMM_MSG_SHORT.format(commMsg)
 
     def genDeviceName(self, file, name, span, link):
         out_log(self.__class__.__name__, "mapped name: " + name)
@@ -153,10 +162,10 @@ class WebGenerator:
                    str(date),
                    attr)
 
-    def genNoteHashWithCommDate(self, file, hash, commDate, attr, title):
+    def genNoteHash(self, file, hash, attr, title, link):
         self.genTd(file,
-                   hash + " (" + commDate + ")",
-                   attr + html_defs.A_TITLE.format(title))
+                   hash,
+                   attr + html_defs.A_TITLE.format(title), link)
 
     def getNumByType(self, type, num):
         res = ""
@@ -190,7 +199,7 @@ class WebGenerator:
         page.close()
         out_log(self.__class__.__name__, "finish gen device page: " + device.get_name())
 
-    def genOrdersPages(self, device, repoLink, dep):
+    def genOrdersPages(self, dep, device, repoLink, repoName):
         out_log(self.__class__.__name__, "start gen items pages for device: " + device.get_name())
 
         for key, val in device.get_items_dict().items():
@@ -202,8 +211,6 @@ class WebGenerator:
                                       [common.HISTORY + device.get_mapped_name() + " - " + self.getNumByType(val[0].type,
                                                                                                             val[0].num),
                                       common.DEPART_STR + str(dep)])
-            #self.genOrderTableHead(page,
-            #                       device.get_mapped_name() + " - " + self.getNumByType(val[0].type, val[0].num))
 
             color = common.TABLE_TR_COL_1
             date = val[0].date
@@ -213,24 +220,24 @@ class WebGenerator:
                     color = self.changeColor(color)
 
                 page.write_tag(html_defs.T_TR_O,
-                               html_defs.A_ALIGN.format(common.ALIGN) +
+                               html_defs.A_ALIGN.format(common.ALIGN_C) +
                                html_defs.A_BGCOLOR.format(color))
 
                 self.genNoteDate(page,
                                  note.date,
                                  html_defs.A_TITLE.format(common.TAG_STR + note.tag)
                                  + html_defs.A_BGCOLOR.format(color))
-                self.genNoteHashWithCommDate(page,
-                                             note.sHash,
-                                             note.commDate,
-                                             html_defs.A_BGCOLOR.format(color),
-                                             self.getTitleForCommit(repoLink, note.author))
-                #self.genNoteDate(page, note.date, common.BTM_ROWS)
-                #self.genNoteHashWithCommDate(page,
-                #                             note.sHash,
-                #                             note.commDate,
-                #                             common.BTM_ROWS,
-                #                             self.getTitleForCommit(repoLink, note.author))
+                self.genNoteHash(page,
+                                 note.sHash,
+                                 html_defs.A_BGCOLOR.format(color),
+                                 self.getTitleForCommit(repoLink,
+                                                        note.author,
+                                                        note.commDate,
+                                                        note.commMsg),
+                                 common.LINK_TO_REPO.format(repoName,
+                                                            common.GW_SHORTLOG,
+                                                            note.commMsg,
+                                                            note.pHash))
 
                 page.write_tag(html_defs.T_TR_C)
 
@@ -240,45 +247,6 @@ class WebGenerator:
             self.genPageFoot(page)
 
             page.close()
-
-        # used = []
-        #
-        # for note in device.get_history():
-        #     if not note.num in used:
-        #         page = HtmlGen(common.ORDERS_PATH, self.getOrderFileName(device.get_name(), note.num))
-        #
-        #         self.genPageHead(page)
-        #         self.genTableHead(page)
-        #         self.genOrderTableHead(page, device.get_mapped_name() + " - " + self.getNumByType(note.type, note.num))
-        #
-        #         color = common.TABLE_TR_COL_1
-        #         date = note.date
-        #         for j in device.get_history():
-        #             if note.num == j.num:
-        #                 if date != j.date:
-        #                     date = j.date
-        #                     color = self.changeColor(color)
-        #                 page.write_tag(html_defs.T_TR_O,
-        #                                html_defs.A_ALIGN.format(common.ALIGN) +
-        #                                html_defs.A_BGCOLOR.format(color))
-        #
-        #                 self.genNoteDate(page, j.date, common.BTM_ROWS)
-        #                 self.genNoteHashWithCommDate(page,
-        #                                              j.sHash,
-        #                                              j.commDate,
-        #                                              common.BTM_ROWS,
-        #                                              self.getTitleForCommit(repoLink, j.author))
-        #
-        #                 page.write_tag(html_defs.T_TR_C)
-        #
-        #         self.genTableFoot(page)
-        #         self.genBackLink(page, common.LEVEL_UP + common.LEVEL_UP)
-        #         self.gen_page_foot_info(page)
-        #         self.genPageFoot(page)
-        #
-        #         page.close()
-        #
-        #     used.append(note.num)
 
         out_log(self.__class__.__name__, "finish gen items pages for device: " + device.get_name())
 
@@ -332,7 +300,7 @@ class WebGenerator:
                         notesByDate += 1
 
             file.write_tag(html_defs.T_TR_O,
-                           html_defs.A_ALIGN.format(common.ALIGN) +
+                           html_defs.A_ALIGN.format(common.ALIGN_C) +
                            html_defs.A_BGCOLOR.format(color))
 
             self.genOrderNum(file,
@@ -417,7 +385,7 @@ class WebGenerator:
                       html_defs.A_BORDER.format(common.BORDER_WIDTH) +
                       html_defs.A_BGCOLOR.format(common.TABLE_COLOR) +
                       html_defs.A_CELLPADDING.format(common.CELLPADDING) +
-                      html_defs.A_ALIGN.format(common.ALIGN) +
+                      html_defs.A_ALIGN.format(common.ALIGN_C) +
                       #html_defs.A_WIDTH.format(common.TABLE_WIDTH) +
                       html_defs.A_STYLE.format(html_defs.A_ST_FONT_FAM.format(common.FONT_FAM) +
                                               html_defs.A_ST_FONT_SZ.format(common.FONT_SZ)))
@@ -429,7 +397,6 @@ class WebGenerator:
         gen.write_tag(html_defs.T_TR_O, html_defs.A_BGCOLOR.format(common.MAIN_T_HD_COL))  # TABLE_HD_COL
         gen.write_tag(html_defs.T_TH_O, html_defs.A_COLSPAN.format(common.MAIN_TABLE_COLS))
 
-        print(attrList)
         for str in attrList:
             gen.write_tag(html_defs.T_H3_O)
             self.genFont(gen, str, html_defs.A_COLOR.format(common.WHITE))
@@ -479,13 +446,12 @@ class WebGenerator:
         self.genFont(gen, common.DATE, html_defs.A_COLOR.format(common.WHITE))
         gen.write_tag(html_defs.T_TH_C, html_defs.A_ROWSPAN.format(common.BTM_ROWS))
         gen.write_tag(html_defs.T_TH_O)
-        self.genFont(gen, common.HASH, html_defs.A_COLOR.format(common.WHITE))
+        self.genFont(gen, common.HASH_STR, html_defs.A_COLOR.format(common.WHITE))
         gen.write_tag(html_defs.T_TH_C, html_defs.A_ROWSPAN.format(common.BTM_ROWS))
         gen.write_tag(html_defs.T_TR_C)
 
     def genMainTableHead(self, gen):
         self.gen_top_table_head(gen, [common.MAIN_HEAD])
-        #self.genTopTableHead(gen, common.MAIN_HEAD)
         self.genMidTableHead(gen)
         self.genMidMainTableBody(gen)
         self.genMidCommonTableBody(gen)
@@ -523,7 +489,7 @@ class WebGenerator:
         self.genBtmTableHead(gen)
 
     def genBackLink(self, gen, levels):
-        gen.write_tag(html_defs.T_P_O, html_defs.A_ALIGN.format(common.ALIGN))
+        gen.write_tag(html_defs.T_P_O, html_defs.A_ALIGN.format(common.ALIGN_C))
         gen.write_tag(html_defs.T_A_O, html_defs.A_HREF.format(levels + common.MAIN_NAME))
         gen.write_tag(common.BACK)
         gen.write_tag(html_defs.T_A_C)
@@ -531,14 +497,14 @@ class WebGenerator:
 
     def gen_page_foot_info(self, gen):
         gen.write_tag(html_defs.T_P_O,
-                      html_defs.A_ALIGN.format(common.ALIGN))
+                      html_defs.A_ALIGN.format(common.ALIGN_C))
         gen.write_tag(html_defs.T_FONT_O,
                       html_defs.A_SIZE.format("2"))
         gen.write_tag(common.LAST_UPD + datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
         gen.write_tag(html_defs.T_FONT_C)
         gen.write_tag(html_defs.T_P_C)
 
-        gen.write_tag(html_defs.T_P_O, html_defs.A_ALIGN.format(common.ALIGN))
+        gen.write_tag(html_defs.T_P_O, html_defs.A_ALIGN.format(common.ALIGN_C))
         gen.write_tag(html_defs.T_FONT_O,
                       html_defs.A_SIZE.format("2"))
         gen.write_tag(common.COPYRIGHT)

@@ -45,7 +45,7 @@ class GitMan:
 
     def switch_to_branch(self, branch):
         out_log(self.__class__.__name__, "switch to branch: " + branch)
-        run_cmd(common.SW_BRANCH + branch)
+        run_cmd(common.SW_BRANCH.format(branch))
 
     def switch_back_branch(self):
         out_log(self.__class__.__name__, "return branch")
@@ -86,7 +86,7 @@ class GitMan:
         return out
 
     def get_short_hash(self, tagStr):
-        (out, err) = run_cmd(common.GET_TAG_SSHA + tagStr)
+        (out, err) = run_cmd(common.GET_TAG_SSHA.format(tagStr))
 
         if err:
             out_err(self.__class__.__name__, err)
@@ -94,7 +94,7 @@ class GitMan:
         return out
 
     def get_commit_date_by_short_hash(self, hash):
-        (out, err) = run_cmd(common.GET_COMM_DATE + hash)
+        (out, err) = run_cmd(common.GET_COMM_DATE.format(hash))
 
         if err:
             out_err(self.__class__.__name__, err)
@@ -161,14 +161,51 @@ class GitMan:
 
         out_log(self.__class__.__name__, "Note author: " + note.author)
 
+        note.commMsg = self.get_commit_msg_by_short_hash(note.sHash)
+        commSz = len(note.commMsg)
+        note.commMsg = note.commMsg[:common.COMMIT_MSG_SIZE]
+        if commSz > common.COMMIT_MSG_SIZE:
+            note.commMsg == " ..."
+
+        out_log(self.__class__.__name__, "Note commMsg: " + note.commMsg)
+
+        note.pHash = self.get_parents_commmit_hash(note.commDate)
+
+        out_log(self.__class__.__name__, "Note pHash: " + note.pHash)
+
         note.valid = True
 
         return note
 
+    def get_parents_commmit_hash(self, date):
+        (out, err) = run_cmd(common.GET_PAR_COMM_H.format(common.FORM_SHORT_HASH,
+                                                          common.FORM_SINCE.format(date)
+                                                          + " | "
+                                                          + common.FORM_TAIL.format(str(common.GIT_PAR_SH_NEST))))
+
+        out = out.split('\n')[:-1][0]
+
+        if err:
+            out_err(self.__class__.__name__, err)
+
+        return out
+
     def get_commit_author_by_short_hash(self, hash):
-        (out, err) = run_cmd(common.GET_COMM_INFO.format(common.GIT_AUTHOR_NEST,
-                                                         common.FORM_AUTHOR)
-                             + hash)
+        (out, err) = run_cmd(common.GET_COMM_INFO.format("",
+                                                         str(common.GIT_AUTHOR_NEST),
+                                                         common.FORM_AUTHOR,
+                                                         hash))
+
+        if err:
+            out_err(self.__class__.__name__, err)
+
+        return out
+
+    def get_commit_msg_by_short_hash(self, hash):
+        (out, err) = run_cmd(common.GET_COMM_INFO.format("",
+                                                         str(common.GIT_AUTHOR_NEST),
+                                                         common.FORM_PAR_SUBJ,
+                                                         hash))
 
         if err:
             out_err(self.__class__.__name__, err)

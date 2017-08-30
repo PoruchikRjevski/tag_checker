@@ -9,7 +9,16 @@ TRANSLATE_PATH  = "translate"
 CONFIG_PATH     = "/etc/tag_checker.ini"
 TRANSLATE_PATH  = "/etc/tag_checker_translate"
 
+
+LINK_TO_REPO    = "http://172.16.20.64/gitweb/?p=bourevest/{:s};a={:s};cm={:s};h={:s}"
+# http://172.16.20.64/gitweb/?p=bourevest/ase-2.git;a=shortlog;h=68b81e8557e56f63538e4ecff71cd84b9a5ba009
+
+GW_SHORTLOG     = "shortlog"
+GW_COMMIT       = "commit"
+
 FILE_PREFIX     = "file://"
+
+REPO_SUFFIX     = ".git"
 
 OUT_PATH_DEF    = "/var/www/swver_hist/"
 
@@ -41,19 +50,27 @@ BR_DEV          = "develop"
 BR_ORIG         = "original"
 
 # git commands
-GIT_VER         = "git --version"                           # get git ver
-CUR_BRANCH      = "git rev-parse --abbrev-ref HEAD"         # get current branch
-SW_BRANCH       = "git checkout "                           # switch branch to
-UPD_REPO        = "git pull"                                # update repo
-GET_TAGS        = "git tag"                                 # get all tags for cur branch
-GET_TAG_SSHA    = "git rev-parse --short "                  # get short SHA1 for tagged commit
-GET_COMM_DATE   = "git show -s --format=%cd --date=short "  # get commit date by hash
-GET_COMM_INFO   = "git log -{0!s} --format='{1!s}' "        # get commit info
-FORM_AUTHOR     = "%ae"                                     # author
-FORM_PAR_SHASH  = "%p"                                      # parents hash
+GIT_VER         = "git --version"                               # get git ver
+CUR_BRANCH      = "git rev-parse --abbrev-ref HEAD"             # get current branch
+SW_BRANCH       = "git checkout {:s}"                           # switch branch to
+UPD_REPO        = "git pull"                                    # update repo
+GET_TAGS        = "git tag"                                     # get all tags for cur branch
+GET_TAG_SSHA    = "git rev-parse --short {:s}"                  # get short SHA1 for tagged commit
+GET_COMM_DATE   = "git show -s --format=%cd --date=short {:s}"  # get commit date by hash
+GET_COMM_INFO   = "git log {:s} -{:s} --format='{:s}' {:s}"     # get commit info
+GET_PAR_COMM_H  = "git log --pretty=format:\"{:s}\" {:s}"
+FORM_AUTHOR     = "%ae"                                         # author
+FORM_PAR_SHASH  = "%p"                                          # parents hash
+FORM_PAR_SUBJ   = "%s"                                          # commit msg
+FORM_SHORT_HASH = "%h"
+FORM_SINCE      = "--since=\"{:s}\""                             # git cmd since
+FORM_TAIL       = "tail -{:s}"                                  # git tail
+FORM_REVERSE    = "--reverse"
 
-GIT_PAR_SH_NEST = 10
+GIT_PAR_SH_NEST = 15
 GIT_AUTHOR_NEST = 1
+
+COMMIT_MSG_SIZE = 30
 
 QUIET           = False                                     # global flag for out or not log and err messages
 LOGGING         = False                                     # global flag for out or not log and err to files
@@ -96,7 +113,8 @@ TABLE_COLOR     = "#aaaaaa"
 CELLPADDING     = "5%"
 FONT_FAM        = "arial"
 FONT_SZ         = "12"
-ALIGN           = "center"
+ALIGN_C         = "center"
+ALIGN_R         = "right"
 BLACK           = "black"
 WHITE           = "white"
 
@@ -129,7 +147,7 @@ DEVICE          = "Устройство"
 ITEM            = "№"
 LAST_SET        = "Последняя установка"
 DATE            = "Дата установки"
-HASH            = "Хэш-сумма коммита(дата)"
+HASH_STR            = "Хэш-сумма"
 HISTORY         = "История прошивок для устройства "
 DEPART_STR      = "Отдел: "
 
@@ -148,3 +166,5 @@ REPO_STR        = "Репозиторий: "
 AUTHOR_STR      = "Автор коммита: "
 TAG_STR         = "Тэг: "
 CNT_STR         = "В истории: "
+COMM_DATE_STR   = "Дата коммита: "
+COMM_MSG_SHORT  = "Сообщение коммита: {:s}"
