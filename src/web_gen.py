@@ -60,6 +60,7 @@ class WebGenerator:
         self.genMainContent(model, main)
 
         self.genTableFoot(main)
+        self.gen_page_foot_info(main)
         self.genPageFoot(main)
 
         main.close()
@@ -222,6 +223,7 @@ class WebGenerator:
 
                 self.genTableFoot(page)
                 self.genBackLink(page, common.LEVEL_UP + common.LEVEL_UP)
+                self.gen_page_foot_info(page)
                 self.genPageFoot(page)
 
                 page.close()
@@ -442,21 +444,22 @@ class WebGenerator:
         gen.write_tag(html_defs.T_A_C)
         gen.write_tag(html_defs.T_P_C)
 
-    def genPageFoot(self, gen):
+    def gen_page_foot_info(self, gen):
         gen.write_tag(html_defs.T_P_O,
                       html_defs.A_ALIGN.format(common.ALIGN))
         gen.write_tag(html_defs.T_FONT_O,
-                      html_defs.A_SIZE.format("1"))
+                      html_defs.A_SIZE.format("2"))
         gen.write_tag(common.LAST_UPD + datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
         gen.write_tag(html_defs.T_FONT_C)
         gen.write_tag(html_defs.T_P_C)
 
         gen.write_tag(html_defs.T_P_O, html_defs.A_ALIGN.format(common.ALIGN))
         gen.write_tag(html_defs.T_FONT_O,
-                      html_defs.A_SIZE.format("1"))
+                      html_defs.A_SIZE.format("2"))
         gen.write_tag(common.COPYRIGHT)
         gen.write_tag(html_defs.T_FONT_C)
         gen.write_tag(html_defs.T_P_C)
 
+    def genPageFoot(self, gen):
         gen.write_tag(html_defs.T_BODY_C)
         gen.write_tag(html_defs.T_HTML_C)

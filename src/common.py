@@ -118,7 +118,7 @@ BTM_ROWS        = "1"
 FRAME_ID        = "pridurok"
 FRAME_POS       = "absolute"
 FRAME_BORDER    = "none"
-FRAME_H         = "98%"
+FRAME_H         = "99%"
 FRAME_W         = "99%"
 
 
