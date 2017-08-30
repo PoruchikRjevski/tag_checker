@@ -70,7 +70,7 @@ FORM_REVERSE    = "--reverse"
 FORM_ALL        = "--all"
 NO_MERGES       = "--no-merges"
 
-GIT_PAR_SH_NEST = 1
+GIT_PAR_SH_NEST = 10
 GIT_AUTHOR_NEST = 1
 
 COMMIT_MSG_SIZE = 30
