@@ -239,6 +239,8 @@ class GitMan:
                             dev.sort_history()
                             out_log(self.__class__.__name__, "Separate last notes for: " + name)
                             dev.fill_last()
+                            out_log(self.__class__.__name__, "Count all items include for: " + name)
+                            dev.count_items()
                     else:
                         out_err(self.__class__.__name__, "no tags")
 

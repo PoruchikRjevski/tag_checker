@@ -77,28 +77,27 @@ class WebGenerator:
             for repo in repos:
                 for name, dev in repo.get_devices().items():
                     allNotes += len(dev.get_last())
+                    out_log(self.__class__.__name__, "Notes for dev: " + name + " - " + str(allNotes))
 
             for repo in repos:
                 for name, dev in repo.get_devices().items():
                     # generate device's own page
-                    self.genDevicePage(dev, repo.get_link())
+                    #self.genDevicePage(dev, repo.get_link())
                     self.genOrdersPages(dev, repo.get_link())
 
                     # generate content for main page
                     firstDev = True
-                    firstType = True
+                    typeColor = common.TABLE_TR_COL_1
 
                     if not dev.get_last():
                         continue
+
                     curType = dev.get_last()[0].type
-                    curDate = dev.get_last()[0].date
-                    curSHash = dev.get_last()[0].sHash
-                    rowsType = dev.get_last_num_by_type(curType)
+
                     for note in dev.get_last():
-                        if curType != note.type and curDate != note.date and curSHash != note.sHash:
-                            firstType = True
+                        if curType != note.type:
                             curType = note.type
-                            rowsType = dev.get_last_num_by_type(curType)
+                            typeColor = self.decrement_color(typeColor)
 
                         file.write_tag(html_defs.T_TR_O,
                                        html_defs.A_ALIGN.format(common.ALIGN) +
@@ -114,47 +113,52 @@ class WebGenerator:
 
                         self.genOrderNum(file,
                                          self.getNumByType(note.type, note.num),
-                                         note.tag,
+                                         html_defs.A_TITLE.format(common.CNT_STR + str(dev.get_cnt_by_num(note.num)))
+                                         + html_defs.A_BGCOLOR.format(typeColor),
                                          common.ORDERS_PATH + self.getOrderFileName(name, note.num))
 
-                        if firstType:
-                            firstType = False
-                            self.genNoteDate(file, note.date, rowsType)
-                            self.genNoteHashWithCommDate(file,
-                                                         note.sHash,
-                                                         note.commDate,
-                                                         rowsType,
-                                                         self.getTitleForCommit(repo.get_link(), note.author))
+                        #if firstType:
+                            #firstType = False
+                        self.genNoteDate(file, note.date,
+                                         html_defs.A_TITLE.format(common.TAG_STR + note.tag) + html_defs.A_BGCOLOR.format(typeColor))
+                        self.genNoteHashWithCommDate(file,
+                                                     note.sHash,
+                                                     note.commDate,
+                                                     html_defs.A_BGCOLOR.format(typeColor),
+                                                     self.getTitleForCommit(repo.get_link(), note.author))
                             # self.genNoteDate(file, note.date, len(dev.getLast()))
                             # self.genNoteHashWithCommDate(file, note.sHash, note.commDate, len(dev.getLast()))
 
                         file.write_tag(html_defs.T_TR_C)
 
     def getTitleForCommit(self, repo, author):
-        return "Repo: " + repo + "\n" + "Author: " + author
+        return common.REPO_STR + repo + "\n" + common.AUTHOR_STR + author
 
     def genDeviceName(self, file, name, span, link):
         out_log(self.__class__.__name__, "mapped name: " + name)
         self.genTd(file,
                    name,
-                   html_defs.A_ROWSPAN.format(span),
-                   common.DEVICE_DIR + self.getDeviceFileName(link))
+                   html_defs.A_ROWSPAN.format(span))
+        # self.genTd(file,
+        #            name,
+        #            html_defs.A_ROWSPAN.format(span),
+        #            common.DEVICE_DIR + self.getDeviceFileName(link))
 
-    def genOrderNum(self, file, num, tag, link):
-        self.genTd(file, num, html_defs.A_TITLE.format(tag), link)
+    def genOrderNum(self, file, num, attr, link):
+        self.genTd(file, num, attr, link)
 
     def genDepartment(self, file, dep, nums):
         self.genTd(file, dep, html_defs.A_ROWSPAN.format(nums))
 
-    def genNoteDate(self, file, date, nums):
+    def genNoteDate(self, file, date, attr):
         self.genTd(file,
                    str(date),
-                   html_defs.A_ROWSPAN.format(nums))
+                   attr)
 
-    def genNoteHashWithCommDate(self, file, hash, commDate, nums, title):
+    def genNoteHashWithCommDate(self, file, hash, commDate, attr, title):
         self.genTd(file,
                    hash + " (" + commDate + ")",
-                   html_defs.A_ROWSPAN.format(nums) + html_defs.A_TITLE.format(title))
+                   attr + html_defs.A_TITLE.format(title))
 
     def getNumByType(self, type, num):
         res = ""
@@ -232,6 +236,18 @@ class WebGenerator:
     def getOrderFileName(self, name, num):
         return name + "_" + str(num) + common.FILE_EXT
 
+    def decrement_color(self, color):
+        print(color[0])
+        if color[0] == "#":
+            color = color[1:]
+        temp = int(color, 16)
+
+        if temp >= common.COLOR_TOP_EDGE:
+            temp = common.COLOR_BTM_EDGE
+        else:
+            temp -= common.COLOR_STEP
+        return "#%06x" % temp
+
     def changeColor(self, color):
         if color == common.TABLE_TR_COL_1:
             color = common.TABLE_TR_COL_2
@@ -275,12 +291,12 @@ class WebGenerator:
             if firstDate:
                 firstDate = False
 
-                self.genNoteDate(file, note.date, notesByDate)
-                self.genNoteHashWithCommDate(file,
-                                             note.sHash,
-                                             note.commDate,
-                                             notesByDate,
-                                             self.getTitleForCommit(repoLink, note.author))
+                #self.genNoteDate(file, note.date, notesByDate)
+                #self.genNoteHashWithCommDate(file,
+                #                             note.sHash,
+                #                             note.commDate,
+                #                             notesByDate,
+                #                             self.getTitleForCommit(repoLink, note.author))
 
             file.write_tag(html_defs.T_TR_C)
 
@@ -349,7 +365,8 @@ class WebGenerator:
                       html_defs.A_BORDER.format(common.BORDER_WIDTH) +
                       html_defs.A_BGCOLOR.format(common.TABLE_COLOR) +
                       html_defs.A_CELLPADDING.format(common.CELLPADDING) +
-                      html_defs.A_WIDTH.format(common.TABLE_WIDTH) +
+                      html_defs.A_ALIGN.format(common.ALIGN) +
+                      #html_defs.A_WIDTH.format(common.TABLE_WIDTH) +
                       html_defs.A_STYLE.format(html_defs.A_ST_FONT_FAM.format(common.FONT_FAM) +
                                               html_defs.A_ST_FONT_SZ.format(common.FONT_SZ)))
 
@@ -437,7 +454,7 @@ class WebGenerator:
         gen.write_tag(html_defs.T_P_O, html_defs.A_ALIGN.format(common.ALIGN))
         gen.write_tag(html_defs.T_FONT_O,
                       html_defs.A_SIZE.format("1"))
-        gen.write_tag(common.AUTHOR)
+        gen.write_tag(common.COPYRIGHT)
         gen.write_tag(html_defs.T_FONT_C)
         gen.write_tag(html_defs.T_P_C)
 

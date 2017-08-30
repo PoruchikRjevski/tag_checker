@@ -106,6 +106,11 @@ MAIN_T_HD_COL   = "#333333"
 TABLE_HD_COL    = "#555555"
 TABLE_TR_COL_1  = "#eeeeee"
 TABLE_TR_COL_2  = "#dddddd"
+COLOR_STEP      = 0x101010
+COLOR_TOP_EDGE  = 0xffffff
+COLOR_BTM_EDGE  = 0x888888
+
+
 MAIN_TABLE_COLS = "5"
 MID_ROWS        = "2"
 BTM_ROWS        = "1"
@@ -113,7 +118,7 @@ BTM_ROWS        = "1"
 FRAME_ID        = "pridurok"
 FRAME_POS       = "absolute"
 FRAME_BORDER    = "none"
-FRAME_H         = "100%"
+FRAME_H         = "98%"
 FRAME_W         = "99%"
 
 
@@ -137,4 +142,8 @@ BACK            = "На главную"
 
 # footer
 LAST_UPD        = "Последнее обновление: "
-AUTHOR          = "140 отдел. Буревестник."
+COPYRIGHT       = "&copy;140 отдел. Буревестник."
+REPO_STR        = "Репозиторий: "
+AUTHOR_STR      = "Автор коммита: "
+TAG_STR         = "Тэг: "
+CNT_STR         = "В истории: "

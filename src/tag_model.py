@@ -55,9 +55,13 @@ class Device:
         self.items = []         # list of Notes by items
         self.name = ""          # name from repo
         self.trName = ""        # translated name
+        self.cntHist = {}       # all includes for every item in history
 
     def set_name(self, name):
         self.name = name
+
+    def get_cnt_by_num(self, num):
+        return self.cntHist[num]
 
     def get_name(self):
         return self.name
@@ -74,20 +78,47 @@ class Device:
     def get_history(self):
         return self.history
 
+    def count_items(self):
+        for item in self.history:
+            if item.num in self.cntHist:
+                self.cntHist[item.num] += 1
+            else:
+                self.cntHist[item.num] = 1
+
     def sort_history(self):
-        self.history = sorted(self.history, key=lambda note: note.date, reverse=True)
+        #self.history = sorted(self.history, key=lambda note: note.date, reverse=True)
+        self.history = sorted(self.history, key=lambda note: note.num, reverse=False)
 
     def fill_last(self):
+        print("start")
+        numsD = collections.OrderedDict()
         for type in common.TYPES_L:
-            first = True
-            lastDate = 0
-            for note in self.history:
-                if note.type == type:
-                    if first:
-                        first = False
-                        lastDate = note.date
-                    if note.date == lastDate:
-                        self.add_to_last(note)
+            print(type)
+            for item in self.history:
+                if item.type == type:
+                    for note in self.history:
+                        if note.num == item.num:
+                            if note.num in numsD:
+                                if numsD[note.num].date < note.date:
+                                    numsD[note.num] = note
+                            else:
+                                numsD[note.num] = note
+
+        for key, val in numsD.items():
+            self.last.append(val)
+            print(note.name + "  -  " + str(note.num))
+
+        # for type in common.TYPES_L:
+        #     first = True
+        #     lastDate = 0
+        #     for note in self.history:
+        #         if note.type == type:
+        #             if first:
+        #                 first = False
+        #                 lastDate = note.date
+        #
+        #             if note.date == lastDate:
+        #                 self.add_to_last(note)
 
     def add_to_last(self, note):
         self.last.append(note)
@@ -114,3 +145,5 @@ class Note:
         self.commDate = -1
         self.author = ""
         self.valid = False
+        self.rating = 0
+        self.cntInHistory = 0
