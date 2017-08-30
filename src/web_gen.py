@@ -84,7 +84,7 @@ class WebGenerator:
                 for name, dev in repo.get_devices().items():
                     # generate device's own page
                     #self.genDevicePage(dev, repo.get_link())
-                    self.genOrdersPages(dev, repo.get_link())
+                    self.genOrdersPages(dev, repo.get_link(), dep)
 
                     # generate content for main page
                     firstDev = True
@@ -174,7 +174,12 @@ class WebGenerator:
 
         self.genPageHead(page)
         self.genTableHead(page)
-        self.genDeviceTableHead(page, device.get_mapped_name())
+        self.gen_device_table_head(page,
+                                   common.HISTORY + device.get_mapped_name(),
+                                   common.DEPART_STR + "depdepdep")
+        # self.genDeviceTableHead(page,
+        #                         common.HISTORY + device.get_mapped_name(),
+        #                         common.DEPART_STR + "depdepdep")
 
         self.genDeviceContent(device, page, repoLink)
 
@@ -185,7 +190,7 @@ class WebGenerator:
         page.close()
         out_log(self.__class__.__name__, "finish gen device page: " + device.get_name())
 
-    def genOrdersPages(self, device, repoLink):
+    def genOrdersPages(self, device, repoLink, dep):
         out_log(self.__class__.__name__, "start gen items pages for device: " + device.get_name())
 
         for key, val in device.get_items_dict().items():
@@ -193,9 +198,12 @@ class WebGenerator:
 
             self.genPageHead(page)
             self.genTableHead(page)
-            self.genOrderTableHead(page,
-                                   device.get_mapped_name() + " - " + self.getNumByType(val[0].type,
-                                                                                        val[0].num))
+            self.gen_order_table_head(page,
+                                      [common.HISTORY + device.get_mapped_name() + " - " + self.getNumByType(val[0].type,
+                                                                                                            val[0].num),
+                                      common.DEPART_STR + str(dep)])
+            #self.genOrderTableHead(page,
+            #                       device.get_mapped_name() + " - " + self.getNumByType(val[0].type, val[0].num))
 
             color = common.TABLE_TR_COL_1
             date = val[0].date
@@ -417,9 +425,26 @@ class WebGenerator:
     def genTableFoot(self, gen):
         gen.write_tag(html_defs.T_TABLE_C)
 
+    def gen_top_table_head(self, gen, attrList):
+        gen.write_tag(html_defs.T_TR_O, html_defs.A_BGCOLOR.format(common.MAIN_T_HD_COL))  # TABLE_HD_COL
+        gen.write_tag(html_defs.T_TH_O, html_defs.A_COLSPAN.format(common.MAIN_TABLE_COLS))
+
+        print(attrList)
+        for str in attrList:
+            gen.write_tag(html_defs.T_H3_O)
+            self.genFont(gen, str, html_defs.A_COLOR.format(common.WHITE))
+            gen.write_tag(html_defs.T_H3_C)
+
+        gen.write_tag(html_defs.T_TH_C)
+        gen.write_tag(html_defs.T_TR_C)
+
+
     def genTopTableHead(self, gen, text):
         gen.write_tag(html_defs.T_TR_O, html_defs.A_BGCOLOR.format(common.MAIN_T_HD_COL)) #TABLE_HD_COL
         gen.write_tag(html_defs.T_TH_O, html_defs.A_COLSPAN.format(common.MAIN_TABLE_COLS))
+        gen.write_tag(html_defs.T_H3_O)
+        self.genFont(gen, text, html_defs.A_COLOR.format(common.WHITE))
+        gen.write_tag(html_defs.T_H3_C)
         gen.write_tag(html_defs.T_H3_O)
         self.genFont(gen, text, html_defs.A_COLOR.format(common.WHITE))
         gen.write_tag(html_defs.T_H3_C)
@@ -459,17 +484,35 @@ class WebGenerator:
         gen.write_tag(html_defs.T_TR_C)
 
     def genMainTableHead(self, gen):
-        self.genTopTableHead(gen, common.MAIN_HEAD)
+        self.gen_top_table_head(gen, [common.MAIN_HEAD])
+        #self.genTopTableHead(gen, common.MAIN_HEAD)
         self.genMidTableHead(gen)
         self.genMidMainTableBody(gen)
         self.genMidCommonTableBody(gen)
         self.genMidTableFoot(gen)
         self.genBtmTableHead(gen)
 
+    def gen_device_table_head(self, *args):
+        if len(args) < 2:
+            return
+
+        self.gen_top_table_head(args[0], args[1:])
+        self.genMidTableHead(args[0])
+        self.genMidCommonTableBody(args[0])
+        self.genMidTableFoot(args[0])
+        self.genBtmTableHead(args[0])
+
+
     def genDeviceTableHead(self, gen, text):
         self.genTopTableHead(gen, common.HISTORY + text)
         self.genMidTableHead(gen)
         self.genMidCommonTableBody(gen)
+        self.genMidTableFoot(gen)
+        self.genBtmTableHead(gen)
+
+    def gen_order_table_head(self, gen, attrList):
+        self.gen_top_table_head(gen, attrList)
+        self.genMidTableHead(gen)
         self.genMidTableFoot(gen)
         self.genBtmTableHead(gen)
 
