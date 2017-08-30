@@ -169,13 +169,38 @@ class GitMan:
 
         out_log(self.__class__.__name__, "Note commMsg: " + note.commMsg)
 
-        note.pHash = self.get_parents_commmit_hash(note.commDate)
+        # get pHash
+        bs_sHash = self.get_branches_by_hash(note.sHash)
+        out_log(self.__class__.__name__, "note's branches: " + bs_sHash)
+        pHashes = self.get_parents_commmit_hash(note.commDate)
+        out_log(self.__class__.__name__, "parents hashes: " + pHashes)
 
-        out_log(self.__class__.__name__, "Note pHash: " + note.pHash)
+        for hash in pHashes.split('\n'):
+            curBranches = self.get_branches_by_hash(hash)
+            if bs_sHash in curBranches:
+                note.pHash = hash
+                break
+
+        #note.pHash = self.get_parents_commmit_hash(note.commDate)
+
+        out_log(self.__class__.__name__, "Note pHash: " + str(note.pHash))
 
         note.valid = True
 
         return note
+
+    def get_branches_by_hash(self, hash):
+        cmd = common.GET_B_CONT.format(hash)
+
+        out_log(self.__class__.__name__, "cmd: " + cmd)
+
+        (out, err) = run_cmd(cmd)
+
+        if err:
+            out_err(self.__class__.__name__, err)
+
+        return out
+
 
     def get_parents_commmit_hash(self, date):
         cmd = common.GET_PAR_COMM_H.format(common.FORM_SHORT_HASH,
@@ -184,15 +209,17 @@ class GitMan:
                                            + " | "
                                            + common.FORM_TAIL.format(str(common.GIT_PAR_SH_NEST)))
 
-        out_log(self.__class__.__name__, "date: " + date)
-        out_log(self.__class__.__name__, "cmd: " + cmd)
-
         (out, err) = run_cmd(cmd)
 
-        out_log(self.__class__.__name__, out)
-
-        if out:
-            out = out.split('\n')[:-1][0]
+        # out_log(self.__class__.__name__, "date: " + date)
+        # out_log(self.__class__.__name__, "cmd: " + cmd)
+        #
+        # (out, err) = run_cmd(cmd)
+        #
+        # out_log(self.__class__.__name__, out)
+        #
+        # if out:
+        #     out = out.split('\n')[:-1][0]
 
         if err:
             out_err(self.__class__.__name__, err)
