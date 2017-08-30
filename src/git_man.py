@@ -181,6 +181,9 @@ class GitMan:
                 note.pHash = hash
                 break
 
+        if note.pHash == -1:
+            note.pHash = note.sHash
+
         #note.pHash = self.get_parents_commmit_hash(note.commDate)
 
         out_log(self.__class__.__name__, "Note pHash: " + str(note.pHash))
