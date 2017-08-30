@@ -112,4 +112,7 @@ HTML_HEAD           = "<!DOCTYPE html>"
 
 JS_SCRIPT           = "text/javascript"
 
+NEXT_STR            = "\n\r"
+TAB_STR             = "\t"
+
 

@@ -1,46 +1,46 @@
 SCRIPTS =  \
-"// check when frame was reloaded" \
-"var iframe = document.getElementById(\" %s\");" \
-"iframe.onload = function() {{" \
-"    var url = iframe.contentWindow.location.href;" \
-"" \
-"    var commit = getCommitFromUrl(url);" \
-"" \
-"    if (commit) {{" \
-"        highlight(commit);" \
-"    }}" \
-"}}" \
-"" \
-"// highlight commit" \
-"function highlight(commit) {{" \
-"    var iframe = document.getElementById(\" %s\");" \
-"    var inner = iframe.contentDocument || iframe.contentWindow.document;" \
-"" \
-"" \
-"    document.title = inner.title;" \
-"" \
-"    var commits = inner.getElementsByClassName(\"list subject\");" \
-"    for (var i = 0; i < commits.length; i++) {{" \
-"        if (commits[i].innerText.includes(commit)) {{" \
-"            commits[i].style.color=\"red\";" \
-"            commits[i].textContent = \"--> \" + commits[i].textContent;" \
-"        }}" \
-"    }}" \
-"}}" \
-"" \
-"// parce commit from url" \
-"function getCommitFromUrl(url) {{" \
-"        var splitted = url.split(';');" \
-"" \
-"        for (var i = 0; i < splitted.length; i++) {{" \
-"            if (splitted[i].includes(\"commit=\")) {{" \
-"                var commit = splitted[i];" \
-"" \
-"                commit = commit.replace(\"commit=\", \"\");" \
-"                commit = commit.replace(/%20/g, \" \");" \
-"" \
-"                return commit;" \
-"            }}" \
-"        }}" \
-"    return \"\";" \
-"}}"
+"// check when frame was reloaded\n\r" \
+"var iframe = document.getElementById(\" %s\");\n\r" \
+"iframe.onload = function() {{\n\r" \
+"    var url = iframe.contentWindow.location.href;\n\r" \
+"\n\r" \
+"    var commit = getCommitFromUrl(url);\n\r" \
+"\n\r" \
+"    if (commit) {{\n\r" \
+"        highlight(commit);\n\r" \
+"    }}\n\r" \
+"}}\n\r" \
+"\n\r" \
+"// highlight commit\n\r" \
+"function highlight(commit) {{\n\r" \
+"    var iframe = document.getElementById(\" %s\");\n\r" \
+"    var inner = iframe.contentDocument || iframe.contentWindow.document;\n\r" \
+"\n\r" \
+"\n\r" \
+"    document.title = inner.title;\n\r" \
+"\n\r" \
+"    var commits = inner.getElementsByClassName(\"list subject\");\n\r" \
+"    for (var i = 0; i < commits.length; i++) {{\n\r" \
+"        if (commits[i].innerText.includes(commit)) {{\n\r" \
+"            commits[i].style.color=\"red\";\n\r" \
+"            commits[i].textContent = \"--> \" + commits[i].textContent;\n\r" \
+"        }}\n\r" \
+"    }}\n\r" \
+"}}\n\r" \
+"\n\r" \
+"// parce commit from url\n\r" \
+"function getCommitFromUrl(url) {{\n\r" \
+"        var splitted = url.split(';');\n\r" \
+"\n\r" \
+"        for (var i = 0; i < splitted.length; i++) {{\n\r" \
+"            if (splitted[i].includes(\"commit=\")) {{\n\r" \
+"                var commit = splitted[i];\n\r" \
+"\n\r" \
+"                commit = commit.replace(\"commit=\", \"\");\n\r" \
+"                commit = commit.replace(/%20/g, \" \");\n\r" \
+"\n\r" \
+"                return commit;\n\r" \
+"            }}\n\r" \
+"        }}\n\r" \
+"    return \"\";\n\r" \
+"}}\n\r"

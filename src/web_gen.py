@@ -100,7 +100,7 @@ class WebGenerator:
                             curType = note.type
                             typeColor = self.decrement_color(typeColor)
 
-                        file.write_tag(html_defs.T_TR_O,
+                        file.write_tag(0, html_defs.T_TR_O,
                                        html_defs.A_ALIGN.format(common.ALIGN_C) +
                                        html_defs.A_BGCOLOR.format(common.TABLE_TR_COL_1))
 
@@ -133,7 +133,7 @@ class WebGenerator:
                                                                     note.commMsg,
                                                                     str(note.pHash)))
 
-                        file.write_tag(html_defs.T_TR_C)
+                        file.write_tag(0, html_defs.T_TR_C)
 
     def getTitleForCommit(self, repo, author, commDate, commMsg):
         return common.REPO_STR + repo + "\n" \
@@ -219,7 +219,7 @@ class WebGenerator:
                     date = note.date
                     color = self.changeColor(color)
 
-                page.write_tag(html_defs.T_TR_O,
+                page.write_tag(0, html_defs.T_TR_O,
                                html_defs.A_ALIGN.format(common.ALIGN_C) +
                                html_defs.A_BGCOLOR.format(color))
 
@@ -239,7 +239,7 @@ class WebGenerator:
                                                             note.commMsg,
                                                             str(note.pHash)))
 
-                page.write_tag(html_defs.T_TR_C)
+                page.write_tag(0, html_defs.T_TR_C)
 
             self.genTableFoot(page)
             self.genBackLink(page, common.LEVEL_UP + common.LEVEL_UP)
@@ -299,7 +299,7 @@ class WebGenerator:
                     if i.date == date:
                         notesByDate += 1
 
-            file.write_tag(html_defs.T_TR_O,
+            file.write_tag(0, html_defs.T_TR_O,
                            html_defs.A_ALIGN.format(common.ALIGN_C) +
                            html_defs.A_BGCOLOR.format(color))
 
@@ -318,7 +318,7 @@ class WebGenerator:
                 #                             notesByDate,
                 #                             self.getTitleForCommit(repoLink, note.author))
 
-            file.write_tag(html_defs.T_TR_C)
+            file.write_tag(0, html_defs.T_TR_C)
 
     # 0 - gen, 1 - text, 2 - adding, 4 - link
     def genTd(self, *args):
@@ -326,19 +326,19 @@ class WebGenerator:
             return
 
         if len(args) >= 3:
-            args[0].write_tag(html_defs.T_TD_O, args[2])
+            args[0].write_tag(0, html_defs.T_TD_O, args[2])
         else:
-            args[0].write_tag(html_defs.T_TD_O)
+            args[0].write_tag(0, html_defs.T_TD_O)
 
         if len(args) == 4:
-            args[0].write_tag(html_defs.T_A_O, html_defs.A_HREF.format(args[3]))
+            args[0].write_tag(0, html_defs.T_A_O, html_defs.A_HREF.format(args[3]))
 
-        args[0].write_tag(args[1])
+        args[0].write_tag(0, args[1])
 
         if len(args) == 4:
-            args[0].write_tag(html_defs.T_A_C)
+            args[0].write_tag(0, html_defs.T_A_C)
 
-        args[0].write_tag(html_defs.T_TD_C)
+        args[0].write_tag(0, html_defs.T_TD_C)
 
     # 0 -gen, 1 - text, 2- adding
     def genFont(self, *args):
@@ -346,30 +346,30 @@ class WebGenerator:
             return
 
         if len(args) >= 3:
-            args[0].write_tag(html_defs.T_FONT_O, args[2])
+            args[0].write_tag(4, html_defs.T_FONT_O, args[2])
         else:
-            args[0].write_tag(html_defs.T_FONT_O)
+            args[0].write_tag(4, html_defs.T_FONT_O)
 
-        args[0].write_tag(args[1])
+        args[0].write_tag(4, args[1])
 
-        args[0].write_tag(html_defs.T_FONT_C)
+        args[0].write_tag(4, html_defs.T_FONT_C)
 
     def genScript(self, gen, frameName):
-        gen.write_tag(html_defs.T_SCRIPT_O,
+        gen.write_tag(2, html_defs.T_SCRIPT_O,
                       html_defs.A_TYPE.format(html_defs.JS_SCRIPT))
-        gen.write_tag(js_scripts.SCRIPTS.replace("%s", frameName))
-        gen.write_tag(html_defs.T_SCRIPT_C)
+        gen.write_tag(0, js_scripts.SCRIPTS.replace("%s", frameName))
+        gen.write_tag(2, html_defs.T_SCRIPT_C)
 
     def genPageHead(self, gen):
-        gen.write_tag(html_defs.HTML_HEAD)
-        gen.write_tag(html_defs.T_HTML_O)
-        gen.write_tag(html_defs.T_HEAD_O)
-        gen.write_tag(html_defs.T_META_O, html_defs.A_CHARSET.format(common.DOC_CODE))
-        gen.write_tag(html_defs.T_HEAD_C)
-        gen.write_tag(html_defs.T_BODY_O, html_defs.A_LINK.format(common.BLACK) + html_defs.A_VLINK.format(common.BLACK))
+        gen.write_tag(0, html_defs.HTML_HEAD)
+        gen.write_tag(0, html_defs.T_HTML_O)
+        gen.write_tag(1, html_defs.T_HEAD_O)
+        gen.write_tag(2, html_defs.T_META_O, html_defs.A_CHARSET.format(common.DOC_CODE))
+        gen.write_tag(1, html_defs.T_HEAD_C)
+        gen.write_tag(1, html_defs.T_BODY_O, html_defs.A_LINK.format(common.BLACK) + html_defs.A_VLINK.format(common.BLACK))
 
     def genIFrameHead(self, gen):
-        gen.write_tag(html_defs.T_IFRAME_O,
+        gen.write_tag(2, html_defs.T_IFRAME_O,
                       html_defs.A_ID.format(common.FRAME_ID) +
                       html_defs.A_STYLE.format(html_defs.A_ST_POS.format(common.FRAME_POS) +
                                               html_defs.A_ST_HEIGHT.format(common.FRAME_H) +
@@ -378,10 +378,10 @@ class WebGenerator:
                       html_defs.A_SRC.format(common.MAIN_NAME))
 
     def genIFrameFoot(self, gen):
-        gen.write_tag(html_defs.T_IFRAME_C)
+        gen.write_tag(2, html_defs.T_IFRAME_C)
 
     def genTableHead(self, gen):
-        gen.write_tag(html_defs.T_TABLE_O,
+        gen.write_tag(2, html_defs.T_TABLE_O,
                       html_defs.A_BORDER.format(common.BORDER_WIDTH) +
                       html_defs.A_BGCOLOR.format(common.TABLE_COLOR) +
                       html_defs.A_CELLPADDING.format(common.CELLPADDING) +
@@ -391,64 +391,64 @@ class WebGenerator:
                                               html_defs.A_ST_FONT_SZ.format(common.FONT_SZ)))
 
     def genTableFoot(self, gen):
-        gen.write_tag(html_defs.T_TABLE_C)
+        gen.write_tag(2, html_defs.T_TABLE_C)
 
     def gen_top_table_head(self, gen, attrList):
-        gen.write_tag(html_defs.T_TR_O, html_defs.A_BGCOLOR.format(common.MAIN_T_HD_COL))  # TABLE_HD_COL
-        gen.write_tag(html_defs.T_TH_O, html_defs.A_COLSPAN.format(common.MAIN_TABLE_COLS))
+        gen.write_tag(3, html_defs.T_TR_O, html_defs.A_BGCOLOR.format(common.MAIN_T_HD_COL))  # TABLE_HD_COL
+        gen.write_tag(4, html_defs.T_TH_O, html_defs.A_COLSPAN.format(common.MAIN_TABLE_COLS))
 
         for str in attrList:
-            gen.write_tag(html_defs.T_H3_O)
+            gen.write_tag(4, html_defs.T_H3_O)
             self.genFont(gen, str, html_defs.A_COLOR.format(common.WHITE))
-            gen.write_tag(html_defs.T_H3_C)
+            gen.write_tag(4, html_defs.T_H3_C)
 
-        gen.write_tag(html_defs.T_TH_C)
-        gen.write_tag(html_defs.T_TR_C)
+        gen.write_tag(0, html_defs.T_TH_C)
+        gen.write_tag(0, html_defs.T_TR_C)
 
 
     def genTopTableHead(self, gen, text):
-        gen.write_tag(html_defs.T_TR_O, html_defs.A_BGCOLOR.format(common.MAIN_T_HD_COL)) #TABLE_HD_COL
-        gen.write_tag(html_defs.T_TH_O, html_defs.A_COLSPAN.format(common.MAIN_TABLE_COLS))
-        gen.write_tag(html_defs.T_H3_O)
+        gen.write_tag(0, html_defs.T_TR_O, html_defs.A_BGCOLOR.format(common.MAIN_T_HD_COL)) #TABLE_HD_COL
+        gen.write_tag(0, html_defs.T_TH_O, html_defs.A_COLSPAN.format(common.MAIN_TABLE_COLS))
+        gen.write_tag(0, html_defs.T_H3_O)
         self.genFont(gen, text, html_defs.A_COLOR.format(common.WHITE))
-        gen.write_tag(html_defs.T_H3_C)
-        gen.write_tag(html_defs.T_H3_O)
+        gen.write_tag(0, html_defs.T_H3_C)
+        gen.write_tag(0, html_defs.T_H3_O)
         self.genFont(gen, text, html_defs.A_COLOR.format(common.WHITE))
-        gen.write_tag(html_defs.T_H3_C)
-        gen.write_tag(html_defs.T_TH_C)
-        gen.write_tag(html_defs.T_TR_C)
+        gen.write_tag(0, html_defs.T_H3_C)
+        gen.write_tag(0, html_defs.T_TH_C)
+        gen.write_tag(0, html_defs.T_TR_C)
 
     def genMidCommonTableBody(self, gen):
-        gen.write_tag(html_defs.T_TH_O, html_defs.A_ROWSPAN.format(common.MID_ROWS))
+        gen.write_tag(0, html_defs.T_TH_O, html_defs.A_ROWSPAN.format(common.MID_ROWS))
         self.genFont(gen, common.ITEM, html_defs.A_COLOR.format(common.WHITE))
-        gen.write_tag(html_defs.T_TH_C)
+        gen.write_tag(0, html_defs.T_TH_C)
 
     def genMidMainTableBody(self, gen):
-        gen.write_tag(html_defs.T_TH_O, html_defs.A_ROWSPAN.format(common.MID_ROWS))
+        gen.write_tag(0, html_defs.T_TH_O, html_defs.A_ROWSPAN.format(common.MID_ROWS))
         self.genFont(gen, common.DEPARTMENT, html_defs.A_COLOR.format(common.WHITE))
-        gen.write_tag(html_defs.T_TH_C)
-        gen.write_tag(html_defs.T_TH_O, html_defs.A_ROWSPAN.format(common.MID_ROWS))
+        gen.write_tag(0, html_defs.T_TH_C)
+        gen.write_tag(0, html_defs.T_TH_O, html_defs.A_ROWSPAN.format(common.MID_ROWS))
         self.genFont(gen, common.DEVICE, html_defs.A_COLOR.format(common.WHITE))
-        gen.write_tag(html_defs.T_TH_C)
+        gen.write_tag(0, html_defs.T_TH_C)
 
     def genMidTableHead(self, gen):
-        gen.write_tag(html_defs.T_TR_O, html_defs.A_BGCOLOR.format(common.TABLE_HD_COL))
+        gen.write_tag(0, html_defs.T_TR_O, html_defs.A_BGCOLOR.format(common.TABLE_HD_COL))
 
     def genMidTableFoot(self, gen):
-        gen.write_tag(html_defs.T_TH_O, html_defs.A_COLSPAN.format(common.MID_ROWS))
+        gen.write_tag(0, html_defs.T_TH_O, html_defs.A_COLSPAN.format(common.MID_ROWS))
         self.genFont(gen, common.LAST_SET, html_defs.A_COLOR.format(common.WHITE))
-        gen.write_tag(html_defs.T_TH_C)
-        gen.write_tag(html_defs.T_TR_C)
+        gen.write_tag(0, html_defs.T_TH_C)
+        gen.write_tag(0, html_defs.T_TR_C)
 
     def genBtmTableHead(self, gen):
-        gen.write_tag(html_defs.T_TR_O, html_defs.A_BGCOLOR.format(common.TABLE_HD_COL))
-        gen.write_tag(html_defs.T_TH_O, html_defs.A_ROWSPAN.format(common.BTM_ROWS))
+        gen.write_tag(0, html_defs.T_TR_O, html_defs.A_BGCOLOR.format(common.TABLE_HD_COL))
+        gen.write_tag(0, html_defs.T_TH_O, html_defs.A_ROWSPAN.format(common.BTM_ROWS))
         self.genFont(gen, common.DATE, html_defs.A_COLOR.format(common.WHITE))
-        gen.write_tag(html_defs.T_TH_C, html_defs.A_ROWSPAN.format(common.BTM_ROWS))
-        gen.write_tag(html_defs.T_TH_O)
+        gen.write_tag(0, html_defs.T_TH_C, html_defs.A_ROWSPAN.format(common.BTM_ROWS))
+        gen.write_tag(0, html_defs.T_TH_O)
         self.genFont(gen, common.HASH_STR, html_defs.A_COLOR.format(common.WHITE))
-        gen.write_tag(html_defs.T_TH_C, html_defs.A_ROWSPAN.format(common.BTM_ROWS))
-        gen.write_tag(html_defs.T_TR_C)
+        gen.write_tag(0, html_defs.T_TH_C, html_defs.A_ROWSPAN.format(common.BTM_ROWS))
+        gen.write_tag(0, html_defs.T_TR_C)
 
     def genMainTableHead(self, gen):
         self.gen_top_table_head(gen, [common.MAIN_HEAD])
@@ -489,28 +489,28 @@ class WebGenerator:
         self.genBtmTableHead(gen)
 
     def genBackLink(self, gen, levels):
-        gen.write_tag(html_defs.T_P_O, html_defs.A_ALIGN.format(common.ALIGN_C))
-        gen.write_tag(html_defs.T_A_O, html_defs.A_HREF.format(levels + common.MAIN_NAME))
-        gen.write_tag(common.BACK)
-        gen.write_tag(html_defs.T_A_C)
-        gen.write_tag(html_defs.T_P_C)
+        gen.write_tag(0, html_defs.T_P_O, html_defs.A_ALIGN.format(common.ALIGN_C))
+        gen.write_tag(0, html_defs.T_A_O, html_defs.A_HREF.format(levels + common.MAIN_NAME))
+        gen.write_tag(0, common.BACK)
+        gen.write_tag(0, html_defs.T_A_C)
+        gen.write_tag(0, html_defs.T_P_C)
 
     def gen_page_foot_info(self, gen):
-        gen.write_tag(html_defs.T_P_O,
+        gen.write_tag(0, html_defs.T_P_O,
                       html_defs.A_ALIGN.format(common.ALIGN_C))
-        gen.write_tag(html_defs.T_FONT_O,
+        gen.write_tag(0, html_defs.T_FONT_O,
                       html_defs.A_SIZE.format("2"))
-        gen.write_tag(common.LAST_UPD + datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
-        gen.write_tag(html_defs.T_FONT_C)
-        gen.write_tag(html_defs.T_P_C)
+        gen.write_tag(0, common.LAST_UPD + datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
+        gen.write_tag(0, html_defs.T_FONT_C)
+        gen.write_tag(0, html_defs.T_P_C)
 
-        gen.write_tag(html_defs.T_P_O, html_defs.A_ALIGN.format(common.ALIGN_C))
-        gen.write_tag(html_defs.T_FONT_O,
+        gen.write_tag(0, html_defs.T_P_O, html_defs.A_ALIGN.format(common.ALIGN_C))
+        gen.write_tag(0, html_defs.T_FONT_O,
                       html_defs.A_SIZE.format("2"))
-        gen.write_tag(common.COPYRIGHT)
-        gen.write_tag(html_defs.T_FONT_C)
-        gen.write_tag(html_defs.T_P_C)
+        gen.write_tag(0, common.COPYRIGHT)
+        gen.write_tag(0, html_defs.T_FONT_C)
+        gen.write_tag(0, html_defs.T_P_C)
 
     def genPageFoot(self, gen):
-        gen.write_tag(html_defs.T_BODY_C)
-        gen.write_tag(html_defs.T_HTML_C)
+        gen.write_tag(1, html_defs.T_BODY_C)
+        gen.write_tag(0, html_defs.T_HTML_C)

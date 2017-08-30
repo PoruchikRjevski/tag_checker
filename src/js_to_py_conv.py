@@ -33,6 +33,7 @@ def doPy(file):
         if "pridurok" in nline:
             nline = nline.replace("pridurok", " %s")
         outF.write(nline)
+        outF.write("\\n\\r")
         outF.write("\"")
         outF.flush()
 

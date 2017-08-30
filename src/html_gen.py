@@ -25,10 +25,14 @@ class HtmlGen:
         self.file = open(filePath, 'w')
 
     def write_tag(self, *args):
-        if len(args) == 1:
-            self.file.write(args[0].format(""))
+        if len(args) >= 1:
+            for i in range(args[0]):
+                self.file.write(html_defs.TAB_STR)
         if len(args) == 2:
-            self.file.write(args[0].format(args[1]))
+            self.file.write(args[1].format(""))
+        if len(args) == 3:
+            self.file.write(args[1].format(args[2]))
+        self.file.write(html_defs.NEXT_STR)
         self.file.flush()
 
     def close(self):
