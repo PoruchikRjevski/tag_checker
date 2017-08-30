@@ -118,17 +118,14 @@ class WebGenerator:
                                          + html_defs.A_BGCOLOR.format(typeColor),
                                          common.ORDERS_PATH + self.getOrderFileName(name, note.num))
 
-                        #if firstType:
-                            #firstType = False
                         self.genNoteDate(file, note.date,
-                                         html_defs.A_TITLE.format(common.TAG_STR + note.tag) + html_defs.A_BGCOLOR.format(typeColor))
+                                         html_defs.A_TITLE.format(common.TAG_STR + note.tag)
+                                         + html_defs.A_BGCOLOR.format(typeColor))
                         self.genNoteHashWithCommDate(file,
                                                      note.sHash,
                                                      note.commDate,
                                                      html_defs.A_BGCOLOR.format(typeColor),
                                                      self.getTitleForCommit(repo.get_link(), note.author))
-                            # self.genNoteDate(file, note.date, len(dev.getLast()))
-                            # self.genNoteHashWithCommDate(file, note.sHash, note.commDate, len(dev.getLast()))
 
                         file.write_tag(html_defs.T_TR_C)
 
@@ -191,44 +188,89 @@ class WebGenerator:
     def genOrdersPages(self, device, repoLink):
         out_log(self.__class__.__name__, "start gen items pages for device: " + device.get_name())
 
-        used = []
+        for key, val in device.get_items_dict().items():
+            page = HtmlGen(common.ORDERS_PATH, self.getOrderFileName(device.get_name(), val[0].num))
 
-        for note in device.get_history():
-            if not note.num in used:
-                page = HtmlGen(common.ORDERS_PATH, self.getOrderFileName(device.get_name(), note.num))
+            self.genPageHead(page)
+            self.genTableHead(page)
+            self.genOrderTableHead(page,
+                                   device.get_mapped_name() + " - " + self.getNumByType(val[0].type,
+                                                                                        val[0].num))
 
-                self.genPageHead(page)
-                self.genTableHead(page)
-                self.genOrderTableHead(page, device.get_mapped_name() + " - " + self.getNumByType(note.type, note.num))
+            color = common.TABLE_TR_COL_1
+            date = val[0].date
+            for note in val:
+                if date != note.date:
+                    date = note.date
+                    color = self.changeColor(color)
 
-                color = common.TABLE_TR_COL_1
-                date = note.date
-                for j in device.get_history():
-                    if note.num == j.num:
-                        if date != j.date:
-                            date = j.date
-                            color = self.changeColor(color)
-                        page.write_tag(html_defs.T_TR_O,
-                                       html_defs.A_ALIGN.format(common.ALIGN) +
-                                       html_defs.A_BGCOLOR.format(color))
+                page.write_tag(html_defs.T_TR_O,
+                               html_defs.A_ALIGN.format(common.ALIGN) +
+                               html_defs.A_BGCOLOR.format(color))
 
-                        self.genNoteDate(page, j.date, common.BTM_ROWS)
-                        self.genNoteHashWithCommDate(page,
-                                                     j.sHash,
-                                                     j.commDate,
-                                                     common.BTM_ROWS,
-                                                     self.getTitleForCommit(repoLink, j.author))
+                self.genNoteDate(page,
+                                 note.date,
+                                 html_defs.A_TITLE.format(common.TAG_STR + note.tag)
+                                 + html_defs.A_BGCOLOR.format(color))
+                self.genNoteHashWithCommDate(page,
+                                             note.sHash,
+                                             note.commDate,
+                                             html_defs.A_BGCOLOR.format(color),
+                                             self.getTitleForCommit(repoLink, note.author))
+                #self.genNoteDate(page, note.date, common.BTM_ROWS)
+                #self.genNoteHashWithCommDate(page,
+                #                             note.sHash,
+                #                             note.commDate,
+                #                             common.BTM_ROWS,
+                #                             self.getTitleForCommit(repoLink, note.author))
 
-                        page.write_tag(html_defs.T_TR_C)
+                page.write_tag(html_defs.T_TR_C)
 
-                self.genTableFoot(page)
-                self.genBackLink(page, common.LEVEL_UP + common.LEVEL_UP)
-                self.gen_page_foot_info(page)
-                self.genPageFoot(page)
+            self.genTableFoot(page)
+            self.genBackLink(page, common.LEVEL_UP + common.LEVEL_UP)
+            self.gen_page_foot_info(page)
+            self.genPageFoot(page)
 
-                page.close()
+            page.close()
 
-            used.append(note.num)
+        # used = []
+        #
+        # for note in device.get_history():
+        #     if not note.num in used:
+        #         page = HtmlGen(common.ORDERS_PATH, self.getOrderFileName(device.get_name(), note.num))
+        #
+        #         self.genPageHead(page)
+        #         self.genTableHead(page)
+        #         self.genOrderTableHead(page, device.get_mapped_name() + " - " + self.getNumByType(note.type, note.num))
+        #
+        #         color = common.TABLE_TR_COL_1
+        #         date = note.date
+        #         for j in device.get_history():
+        #             if note.num == j.num:
+        #                 if date != j.date:
+        #                     date = j.date
+        #                     color = self.changeColor(color)
+        #                 page.write_tag(html_defs.T_TR_O,
+        #                                html_defs.A_ALIGN.format(common.ALIGN) +
+        #                                html_defs.A_BGCOLOR.format(color))
+        #
+        #                 self.genNoteDate(page, j.date, common.BTM_ROWS)
+        #                 self.genNoteHashWithCommDate(page,
+        #                                              j.sHash,
+        #                                              j.commDate,
+        #                                              common.BTM_ROWS,
+        #                                              self.getTitleForCommit(repoLink, j.author))
+        #
+        #                 page.write_tag(html_defs.T_TR_C)
+        #
+        #         self.genTableFoot(page)
+        #         self.genBackLink(page, common.LEVEL_UP + common.LEVEL_UP)
+        #         self.gen_page_foot_info(page)
+        #         self.genPageFoot(page)
+        #
+        #         page.close()
+        #
+        #     used.append(note.num)
 
         out_log(self.__class__.__name__, "finish gen items pages for device: " + device.get_name())
 

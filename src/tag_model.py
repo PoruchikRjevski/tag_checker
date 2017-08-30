@@ -33,7 +33,7 @@ class Repo:
         self.link = " "
 
     def add_to_device(self, name, note):
-        self.devices[name].add_to_history(note)
+        self.devices[name].add_item(note)
 
     def add_device_by_name(self, name, dev):
         self.devices[name] = dev
@@ -50,12 +50,12 @@ class Repo:
 
 class Device:
     def __init__(self):
-        self.history = []       # list if Notes
-        self.last = []          # list if Notes
-        self.items = []         # list of Notes by items
-        self.name = ""          # name from repo
-        self.trName = ""        # translated name
-        self.cntHist = {}       # all includes for every item in history
+        self.history = []                       # list if Notes
+        self.last = []                          # list if Notes
+        self.items = collections.OrderedDict()  # list of Notes by items
+        self.name = ""                          # name from repo
+        self.trName = ""                        # translated name
+        self.cntHist = {}                       # all includes for every item in history
 
     def set_name(self, name):
         self.name = name
@@ -72,11 +72,19 @@ class Device:
     def get_mapped_name(self):
         return self.trName
 
-    def add_to_history(self, note):
+    def add_item(self, note):
         self.history.append(note)
+
+        if note.num in self.items:
+            self.items[note.num].append(note)
+        else:
+            self.items[note.num] = [note]
 
     def get_history(self):
         return self.history
+
+    def get_items_dict(self):
+        return self.items
 
     def count_items(self):
         for item in self.history:
@@ -85,9 +93,12 @@ class Device:
             else:
                 self.cntHist[item.num] = 1
 
-    def sort_history(self):
+    def sort_items(self):
         #self.history = sorted(self.history, key=lambda note: note.date, reverse=True)
         self.history = sorted(self.history, key=lambda note: note.num, reverse=False)
+
+        for key, val in self.items.items():
+            self.items[key] = sorted(val, key=lambda note: note.date, reverse=True)
 
     def fill_last(self):
         print("start")

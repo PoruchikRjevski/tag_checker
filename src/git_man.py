@@ -226,7 +226,7 @@ class GitMan:
                                 if note.valid:
                                     if not note.name in repo.get_devices():
                                         dev = Device()
-                                        dev.add_to_history(note)
+                                        dev.add_item(note)
                                         dev.set_name(note.name)
                                         dev.set_mapped_name(model.get_mapped_device_name(note.name))
                                         repo.add_device_by_name(note.name, dev)
@@ -236,7 +236,7 @@ class GitMan:
                         # sort notes for devices and separate last updates
                         for name, dev in repo.get_devices().items():
                             out_log(self.__class__.__name__, "Sort history for: " + name)
-                            dev.sort_history()
+                            dev.sort_items()
                             out_log(self.__class__.__name__, "Separate last notes for: " + name)
                             dev.fill_last()
                             out_log(self.__class__.__name__, "Count all items include for: " + name)
