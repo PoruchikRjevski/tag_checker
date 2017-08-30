@@ -1,6 +1,6 @@
 SCRIPTS =  \
 "// check when frame was reloaded\n\r" \
-"var iframe = document.getElementById(\" %s\");\n\r" \
+"var iframe = document.getElementById(\"%s\");\n\r" \
 "iframe.onload = function() {{\n\r" \
 "    var url = iframe.contentWindow.location.href;\n\r" \
 "\n\r" \
@@ -13,7 +13,7 @@ SCRIPTS =  \
 "\n\r" \
 "// highlight commit\n\r" \
 "function highlight(commit) {{\n\r" \
-"    var iframe = document.getElementById(\" %s\");\n\r" \
+"    var iframe = document.getElementById(\"%s\");\n\r" \
 "    var inner = iframe.contentDocument || iframe.contentWindow.document;\n\r" \
 "\n\r" \
 "\n\r" \

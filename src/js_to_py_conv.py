@@ -31,7 +31,7 @@ def doPy(file):
         nline = nline.replace("{", "{{")
         nline = nline.replace("\n", "")
         if "pridurok" in nline:
-            nline = nline.replace("pridurok", " %s")
+            nline = nline.replace("pridurok", "%s")
         outF.write(nline)
         outF.write("\\n\\r")
         outF.write("\"")
