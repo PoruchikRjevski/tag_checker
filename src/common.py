@@ -114,7 +114,7 @@ FRAME_ID        = "pridurok"
 FRAME_POS       = "absolute"
 FRAME_BORDER    = "none"
 FRAME_H         = "100%"
-FRAME_W         = "100%"
+FRAME_W         = "99%"
 
 
 # page table header

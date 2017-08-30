@@ -91,9 +91,11 @@ class WebGenerator:
                     if not dev.get_last():
                         continue
                     curType = dev.get_last()[0].type
+                    curDate = dev.get_last()[0].date
+                    curSHash = dev.get_last()[0].sHash
                     rowsType = dev.get_last_num_by_type(curType)
                     for note in dev.get_last():
-                        if curType != note.type:
+                        if curType != note.type and curDate != note.date and curSHash != note.sHash:
                             firstType = True
                             curType = note.type
                             rowsType = dev.get_last_num_by_type(curType)
