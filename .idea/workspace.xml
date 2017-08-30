@@ -58,8 +58,8 @@
       <file leaf-file-name="git_man.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/git_man.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="309">
-              <caret line="186" column="12" lean-forward="false" selection-start-line="186" selection-start-column="12" selection-end-line="186" selection-end-column="12" />
+            <state relative-caret-position="394">
+              <caret line="191" column="15" lean-forward="false" selection-start-line="191" selection-start-column="15" selection-end-line="191" selection-end-column="15" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
               </folding>
@@ -697,8 +697,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/git_man.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="309">
-          <caret line="186" column="12" lean-forward="false" selection-start-line="186" selection-start-column="12" selection-end-line="186" selection-end-column="12" />
+        <state relative-caret-position="394">
+          <caret line="191" column="15" lean-forward="false" selection-start-line="191" selection-start-column="15" selection-end-line="191" selection-end-column="15" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
           </folding>

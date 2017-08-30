@@ -178,10 +178,18 @@ class GitMan:
         return note
 
     def get_parents_commmit_hash(self, date):
+        #print("date: ", date)
+        # print("cmd: ", common.GET_PAR_COMM_H.format(common.FORM_SHORT_HASH,
+        #                                                   common.FORM_SINCE.format(date)
+        #                                                   + " | "
+        #                                                   + common.FORM_TAIL.format(str(common.GIT_PAR_SH_NEST))))
+
         (out, err) = run_cmd(common.GET_PAR_COMM_H.format(common.FORM_SHORT_HASH,
                                                           common.FORM_SINCE.format(date)
                                                           + " | "
                                                           + common.FORM_TAIL.format(str(common.GIT_PAR_SH_NEST))))
+
+        out_log(self.__class__.__name__, out)
 
         if out:
             out = out.split('\n')[:-1][0]
