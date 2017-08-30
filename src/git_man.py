@@ -180,6 +180,7 @@ class GitMan:
     def get_parents_commmit_hash(self, date):
         cmd = common.GET_PAR_COMM_H.format(common.FORM_SHORT_HASH,
                                            common.FORM_SINCE.format(date)
+                                           + common.NO_MERGES
                                            + " | "
                                            + common.FORM_TAIL.format(str(common.GIT_PAR_SH_NEST)))
 

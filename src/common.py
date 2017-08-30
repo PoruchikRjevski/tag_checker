@@ -63,10 +63,11 @@ FORM_AUTHOR     = "%ae"                                         # author
 FORM_PAR_SHASH  = "%p"                                          # parents hash
 FORM_PAR_SUBJ   = "%s"                                          # commit msg
 FORM_SHORT_HASH = "%h"
-FORM_SINCE      = "--since=\"{:s}\""                             # git cmd since
+FORM_SINCE      = "--since=\"{:s}\" "                            # git cmd since
 FORM_TAIL       = "tail -{:s}"                                  # git tail
 FORM_REVERSE    = "--reverse"
 FORM_ALL        = "--all"
+NO_MERGES       = "--no-merges"
 
 GIT_PAR_SH_NEST = 5
 GIT_AUTHOR_NEST = 1
