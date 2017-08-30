@@ -67,7 +67,7 @@ FORM_SINCE      = "--since=\"{:s}\""                             # git cmd since
 FORM_TAIL       = "tail -{:s}"                                  # git tail
 FORM_REVERSE    = "--reverse"
 
-GIT_PAR_SH_NEST = 15
+GIT_PAR_SH_NEST = 5
 GIT_AUTHOR_NEST = 1
 
 COMMIT_MSG_SIZE = 30
