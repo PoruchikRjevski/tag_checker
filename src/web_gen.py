@@ -121,6 +121,15 @@ class WebGenerator:
                         self.genNoteDate(file, note.date,
                                          html_defs.A_TITLE.format(common.TAG_STR + note.tag)
                                          + html_defs.A_BGCOLOR.format(typeColor))
+
+                        linkHash = note.pHash
+                        if linkHash == -1:
+                            linkHash = note.sHash
+
+                        linkToRepo = common.LINK_TO_REPO.format(repo.get_name(),
+                                                                    common.GW_SHORTLOG,
+                                                                    note.commMsg,
+                                                                    str(note.pHash))
                         self.genNoteHash(file,
                                          note.sHash,
                                          html_defs.A_BGCOLOR.format(typeColor),
@@ -128,10 +137,7 @@ class WebGenerator:
                                                                 note.author,
                                                                 note.commDate,
                                                                 note.commMsg),
-                                         common.LINK_TO_REPO.format(repo.get_name(),
-                                                                    common.GW_SHORTLOG,
-                                                                    note.commMsg,
-                                                                    str(note.pHash)))
+                                         linkToRepo)
 
                         file.write_tag(0, html_defs.T_TR_C)
 

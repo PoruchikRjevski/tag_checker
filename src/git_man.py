@@ -177,6 +177,7 @@ class GitMan:
 
         for hash in pHashes.split('\n'):
             curBranches = self.get_branches_by_hash(hash)
+            out_log(self.__class__.__name__, "hash's branches: " + hash + " : " + bs_sHash)
             if bs_sHash in curBranches:
                 note.pHash = hash
                 break
