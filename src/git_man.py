@@ -183,7 +183,8 @@ class GitMan:
                                                           + " | "
                                                           + common.FORM_TAIL.format(str(common.GIT_PAR_SH_NEST))))
 
-        out = out.split('\n')[:-1][0]
+        if out:
+            out = out.split('\n')[:-1][0]
 
         if err:
             out_err(self.__class__.__name__, err)
