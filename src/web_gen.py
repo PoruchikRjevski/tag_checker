@@ -237,7 +237,7 @@ class WebGenerator:
                                  common.LINK_TO_REPO.format(repoName,
                                                             common.GW_SHORTLOG,
                                                             note.commMsg,
-                                                            note.pHash))
+                                                            str(note.pHash)))
 
                 page.write_tag(html_defs.T_TR_C)
 
