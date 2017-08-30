@@ -58,7 +58,7 @@ GET_TAGS        = "git tag"                                     # get all tags f
 GET_TAG_SSHA    = "git rev-parse --short {:s}"                  # get short SHA1 for tagged commit
 GET_COMM_DATE   = "git show -s --format=%cd --date=short {:s}"  # get commit date by hash
 GET_COMM_INFO   = "git log {:s} -{:s} --format='{:s}' {:s}"     # get commit info
-GET_PAR_COMM_H  = "git log --pretty=format:\"{:s}\" {:s}"
+GET_PAR_COMM_H  = "git log --all --pretty=format:\"{:s}\" {:s}"
 FORM_AUTHOR     = "%ae"                                         # author
 FORM_PAR_SHASH  = "%p"                                          # parents hash
 FORM_PAR_SUBJ   = "%s"                                          # commit msg
@@ -66,6 +66,7 @@ FORM_SHORT_HASH = "%h"
 FORM_SINCE      = "--since=\"{:s}\""                             # git cmd since
 FORM_TAIL       = "tail -{:s}"                                  # git tail
 FORM_REVERSE    = "--reverse"
+FORM_ALL        = "--all"
 
 GIT_PAR_SH_NEST = 5
 GIT_AUTHOR_NEST = 1
