@@ -3,6 +3,7 @@ from collections import OrderedDict
 import common
 from logger import *
 
+__all__ = ['TagModel', 'Repo', 'Device', 'Note']
 
 # __departments contain [repos] by name of department
 class TagModel:
@@ -72,6 +73,7 @@ class Device:
     @property
     def name(self):
         return self.__name
+
     @name.setter
     def name(self, name):
         self.__name = name
@@ -79,9 +81,10 @@ class Device:
     @property
     def trName(self):
         return self.__trName
+
     @trName.setter
-    def trName(self, trName):
-        self.__trName = trName
+    def trName(self, tr_name):
+        self.__trName = tr_name
 
     @property
     def orders(self):
@@ -97,7 +100,6 @@ class Device:
     def lastOrders(self):
         return self.__lastOrders
 
-
     def get_cnt_by_num(self, number):
         return len(self.orders[number])
 
@@ -106,9 +108,9 @@ class Device:
             self.orders[key] = sorted(val, key=lambda note: note.date, reverse=True)
 
     def fill_last(self):
-        for type in common.TYPES_L:
+        for m_type in common.TYPES_L:
             for num, notes in self.orders.items():
-                if notes[0].type == type:
+                if notes[0].type == m_type:
                     self.lastOrders.append(notes[0])
 
 

@@ -1,5 +1,6 @@
 # constants for checker
 TAG_CHECKER     = "tag_checker"
+CMD_WRAP        = "cmd_wrapper"
 REPOS           = "repos"
 PREFIX          = "prefix"
 CONFIG          = "CONFIG"

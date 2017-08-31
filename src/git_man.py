@@ -13,80 +13,106 @@ from time_checker import TimeChecker
 class GitMan:
     def __init__(self):
         out_log(self.__class__.__name__, "init")
-        self.update = False
-        self.switchDev = False
-        self.lastBr = ""
-        self.needReturnBranch = False
+        self.__update = False
+        self.__swDevelop = False
+        self.__lastBranch = None
+        self.__needReturnBranch = False
 
-    def set_update_flag(self, update):
-        self.update = update
-
-    def set_ch_develop_flag(self, chDev):
-        self.switchDev = chDev
-
-    def update_repo(self):
-        (_, err) = run_cmd(common.UPD_REPO)
-
-        out_log(self.__class__.__name__, "update repo")
-
-        if err:
-            out_err(self.__class__.__name__, err)
-
-    def checkout_branch(self):
-        branch = self.get_current_branch()
-        out_log(self.__class__.__name__, "cur branch: " + branch)
-
-        if branch != common.BR_DEV:
-            self.lastBr = branch
-            self.needReturnBranch = True
-            self.switch_to_branch(common.BR_DEV)
-            out_log(self.__class__.__name__, "cur branch: " + self.get_current_branch())
-
-    def get_current_branch(self):
-        (branch, _) = run_cmd(common.CUR_BRANCH)
-        return branch
-
-    def switch_to_branch(self, branch):
-        out_log(self.__class__.__name__, "switch to branch: " + branch)
-        run_cmd(common.SW_BRANCH.format(branch))
-
-    def switch_back_branch(self):
-        out_log(self.__class__.__name__, "return branch")
-        out_log(self.__class__.__name__, "cur branch: " + self.get_current_branch())
-        self.switch_to_branch(self.lastBr)
-        self.needReturnBranch = False
-        out_log(self.__class__.__name__, "cur branch: " + self.get_current_branch())
-
-    # use module os for multiplatform
-    def go_to_dir(self, link):
-        out_log(self.__class__.__name__, "go to dir: " + link)
-        os.chdir(link)
-
-    def is_dir_exist(self, link):
-        #curDir = os.getcwd()
-
-        #if link[-1:] == "/" and not curDir[-1:] == "/":
-        #    curDir = curDir + "/"
-        #if not link[-1:] == "/" and curDir[-1:] == "/":
-        #    curDir = curDir[:-1]
-
-        #out_log(self.__class__.__name__, "cur dir: " + link)
-
-        #if curDir != link:
+    def __is_dir_exist(self, link):
         if not os.path.isdir(link):
             out_err(self.__class__.__name__, "can't find dir of repo: " + link)
             return False
         return True
 
-    def get_tags(self):
+    def __go_to_dir(self, link):
+        os.chdir(link)
+        out_log(self.__class__.__name__, "go to dir: " + link)
+
+    def __get_current_branch(self):
+        branch = run_cmd(common.CUR_BRANCH)
+
+        out_log(self.__class__.__name__, "cur branch: " + branch)
+
+        return branch
+
+    def __switch_to_branch(self, branch):
+        out_log(self.__class__.__name__, "switch to branch: " + branch)
+        run_cmd(common.SW_BRANCH.format(branch))
+
+    def __checkout_branch(self):
+        branch = self.__get_current_branch()
+
+        if branch != common.BR_DEV:
+            self.lastBranch = branch
+            self.needReturnBranch = True
+            self.__switch_to_branch(common.BR_DEV)
+            out_log(self.__class__.__name__, "cur branch: " + self.__get_current_branch())
+
+    def __update_repo(self):
+        out_log(self.__class__.__name__, "update repo")
+        run_cmd(common.UPD_REPO)
+
+    def __get_tags(self):
         out_log(self.__class__.__name__, "get tags")
 
-        (out, err) = run_cmd(common.GET_TAGS)
+        return run_cmd(common.GET_TAGS)
 
-        if err:
-            out_err(self.__class__.__name__, err)
+    def __is_tag_valid(self, tag):
+        for inc in common.PROD:
+            if inc in tag:
+                return True
 
-        return out
+        return False
+
+    def __switch_back_branch(self):
+        out_log(self.__class__.__name__, "return branch")
+        out_log(self.__class__.__name__, "cur branch: " + self.__get_current_branch())
+
+        self.__switch_to_branch(self.__lastBranch)
+        self.__needReturnBranch = False
+
+        out_log(self.__class__.__name__, "cur branch: " + self.__get_current_branch())
+
+    @property
+    def update(self):
+        return self.__update
+
+    @update.setter
+    def update(self, update):
+        self.__update = update
+
+    @property
+    def swDevelop(self):
+        return self.__swDevelop
+
+    @swDevelop.setter
+    def swDevelop(self, develop):
+        self.__swDevelop = develop
+
+    @property
+    def lastBranch(self):
+        return self.__lastBranch
+
+    @lastBranch.setter
+    def lastBranch(self, last_branch):
+        self.__lastBranch = last_branch
+
+    @property
+    def needReturnBranch(self):
+        return self.__needReturnBranch
+
+    @needReturnBranch.setter
+    def needReturnBranch(self, flag):
+        self.__needReturnBranch = flag
+
+
+
+
+
+
+
+
+
 
     def get_short_hash(self, tagStr):
         (out, err) = run_cmd(common.GET_TAG_SSHA.format(tagStr))
@@ -104,12 +130,6 @@ class GitMan:
 
         return out
 
-    def is_tag_valid(self, tag):
-        for inc in common.PROD:
-            if inc in tag:
-                return True
-
-        return False
 
     def gen_note_by_tag(self, tag):
         out_log(self.__class__.__name__, "Gen note")
@@ -277,7 +297,6 @@ class GitMan:
 
         return out
 
-
     def get_parents_commmit_hash(self, date):
         cmd = common.GET_PAR_COMM_H.format(common.FORM_SHORT_HASH,
                                            common.FORM_SINCE.format(date)
@@ -339,63 +358,64 @@ class GitMan:
         out_log(self.__class__.__name__, "start scanning")
 
         # create time checker
-        timeCh = TimeChecker()
-        timeCh.start()
+        time_ch = TimeChecker()
+        time_ch.start
 
         # do work
-        # deps = model.get_departments()
         deps = model.departments
 
-        for dep, repos in deps.items():
-            out_log(self.__class__.__name__, "department: " + dep)
+        for name, repos in deps.items():
+            out_log(self.__class__.__name__, "department: " + name)
+
             for repo in repos:
                 link = repo.link
-                # link = repo.get_link()
                 out_log(self.__class__.__name__, "repo: " + link)
+
                 # try go to dir link
-                self.go_to_dir(link)
-                if self.is_dir_exist(link):
+                self.__go_to_dir(link)
+
+                if self.__is_dir_exist(link):
                     # check branch if need
-                    if self.switchDev:
-                        self.checkout_branch()
+                    if self.swDevelop:
+                        self.__checkout_branch()
 
                     # update if need
                     if self.update:
-                        self.update_repo()
+                        self.__update_repo()
 
                     # do dirty work
-                    tags = self.get_tags()
+                    tags = self.__get_tags()
 
                     if tags:
                         for tag in tags.split("\n"):
-                            if self.is_tag_valid(tag):
+                            if self.__is_tag_valid(tag):
                                 out_log(self.__class__.__name__, "tag: " + tag)
                                 note = self.gen_note_by_tag(tag)
 
                                 if note.valid:
-                                    if not note.name in repo.devices:
+                                    if note.name not in repo.devices:
                                         dev = Device()
                                         dev.add_order(note)
                                         dev.name = note.name
                                         dev.trName = model.get_mappedDevName(note.name)
-                                        # dev.set_mapped_name(model.get_mapped_device_name(note.name))
+
                                         repo.add_device(note.name, dev)
                                     else:
                                         repo.add_to_device(note.name, note)
 
                         # sort notes for devices and separate last updates
-                        for name, dev in repo.devices.items():
-                            out_log(self.__class__.__name__, "Sort history for: " + name)
+                        for dev_name, dev in repo.devices.items():
+                            out_log(self.__class__.__name__, "Sort history for: " + dev_name)
                             dev.sort_orders()
-                            out_log(self.__class__.__name__, "Separate last notes for: " + name)
+                            out_log(self.__class__.__name__, "Separate last notes for: " + dev_name)
                             dev.fill_last()
                     else:
                         out_err(self.__class__.__name__, "no tags")
 
                     # return last branch if need
                     if self.needReturnBranch:
-                        self.switch_back_branch()
+                        self.__switch_back_branch()
 
-        timeCh.stop()
+        time_ch.stop
 
-        out_log(self.__class__.__name__, timeCh.passed_time_str())
+        out_log(self.__class__.__name__, time_ch.passed_time_str)

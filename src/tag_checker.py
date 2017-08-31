@@ -1,21 +1,20 @@
-#!/usr/bin/sudo python3
+#!/usr/bin python3
 import os
 import sys
 from optparse import OptionParser
 
 import common
-from cmd_wrap import run_cmd
 from cfg_loader import CfgLoader
 from tag_model import TagModel
 from git_man import GitMan
 from web_gen import WebGenerator
-from time_checker import TimeChecker
 
 from logger import *
+from time_checker import *
 
 
-def is_conf_file_exist(fileName):
-    return os.path.exists(fileName)
+def is_conf_file_exist(file_name):
+    return os.path.exists(file_name)
 
 
 def set_options(parser):
@@ -57,8 +56,8 @@ def check_options(opts):
 
 def main():
     # create time checker
-    timeCh = TimeChecker()
-    timeCh.start()
+    time_ch = TimeChecker()
+    time_ch.start
 
     # check options
     optParser = OptionParser()
@@ -93,31 +92,30 @@ def main():
        sys.exit(common.EXIT_CFNE)
 
     # main func
-    gitMan = GitMan()
+    git_man = GitMan()
     # check environment
-    if not gitMan.check_git_installed():
+    if not git_man.check_git_installed():
         out_err(common.TAG_CHECKER, common.E_GNT_STR)
         sys.exit(common.EXIT_GNT)
 
     # create model
-    tagModel = TagModel()
-###########
+    tag_model = TagModel()
+
     # load config
-    cfgLoader = CfgLoader()
-    cfgLoader.load_config(path, tagModel)
+    cfg_loader = CfgLoader()
+    cfg_loader.load_config(path, tag_model)
 
     # get tags and fill model
-    gitMan = GitMan()
-    gitMan.set_update_flag(opts.update)
-    gitMan.set_ch_develop_flag(opts.develop)
-    gitMan.scanning(tagModel)
+    git_man.update = opts.update
+    git_man.swDevelop = opts.develop
+    git_man.scanning(tag_model)
 
     # generate web
-    webGen = WebGenerator()
-    webGen.generate_web(tagModel)
+    web_gen = WebGenerator()
+    web_gen.generate_web(tag_model)
 
-    timeCh.stop()
-    out_log(common.TAG_CHECKER, timeCh.passed_time_str())
+    time_ch.stop
+    out_log(common.TAG_CHECKER, time_ch.passed_time_str)
 
 if __name__ == "__main__":
     main()

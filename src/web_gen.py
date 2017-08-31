@@ -20,16 +20,16 @@ class WebGenerator:
         timeCh = TimeChecker()
         out_log(self.__class__.__name__, "start gen web")
 
-        timeCh.start()
+        timeCh.start
 
         # gen index
         self.gen_index(model)
         # cycle main
         self.genPages(model)
-        timeCh.stop()
+        timeCh.stop
 
         out_log(self.__class__.__name__, "finish gen web")
-        out_log(self.__class__.__name__, timeCh.passed_time_str())
+        out_log(self.__class__.__name__, timeCh.passed_time_str)
 
     def gen_index(self, model):
         out_log(self.__class__.__name__, "start gen index")

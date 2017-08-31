@@ -1,48 +1,46 @@
 import configparser
 
 import common
-from logger import out_log, out_err
-from tag_model import TagModel, Repo
+from logger import *
+from tag_model import *
+
+__all__ = ['CfgLoader']
 
 
 class CfgLoader:
     def __init__(self):
         out_log(self.__class__.__name__, "init")
-        self.cfg = configparser.ConfigParser()
-        self.translateFile = common.TRANSLATE_PATH
+        self.__cfg = configparser.ConfigParser()
+        self.__translateFile = common.TRANSLATE_PATH
 
-    def read_file(self, fileName):
-        self.cfg.read(fileName)
+    def read_file(self, file_name):
+        self.__cfg.read(file_name)
 
     def fill_model(self, model):
-        deps = self.cfg.sections()
+        deps = self.__cfg.sections()
 
         common.OUT_PATH = common.OUT_PATH_DEF
         for i in deps:
-            prefix = ""
+            prefix = None
             if i == common.CONFIG:
-                if self.cfg.has_option(i, common.OUT_P):
-                    common.OUT_PATH = self.cfg.get(i, common.OUT_P)
-
+                if self.__cfg.has_option(i, common.OUT_P):
+                    common.OUT_PATH = self.__cfg.get(i, common.OUT_P)
                 continue
 
-            if self.cfg.has_option(i, common.PREFIX):
-                prefix = self.cfg.get(i, common.PREFIX)
+            if self.__cfg.has_option(i, common.PREFIX):
+                prefix = self.__cfg.get(i, common.PREFIX)
 
-            reposLinks = self.cfg.get(i, common.REPOS).split("\n")
+            repos_links = self.__cfg.get(i, common.REPOS).split("\n")
 
-            reposList = []
+            repos_list = []
 
-            for j in reposLinks:
+            for j in repos_links:
                 repo = Repo()
                 repo.name = j
-                # repo.set_name(j)
                 repo.link = prefix + j
-                # repo.set_link(prefix + j)
-                reposList.append(repo)
+                repos_list.append(repo)
 
-            model.departments[i] = reposList
-            # model.add_department(i, reposList)
+            model.departments[i] = repos_list
 
         out_log(self.__class__.__name__, "out path: " + common.OUT_PATH)
 
@@ -50,23 +48,22 @@ class CfgLoader:
         f = open(common.TRANSLATE_PATH)
 
         if f:
-            fileText = f.readlines()
+            file_text = f.readlines()
 
-            if fileText:
-                for line in fileText:
+            if file_text is not None:
+                for line in file_text:
                     name = line.split("=")[:1][-1]
-                    trName = line.split("=")[1:][-1]
-                    model.mappedDevNames[name] = trName
-                    # model.add_mapped_device_names(line.split("=")[:1][-1], line.split("=")[1:][-1])
+                    tr_name = line.split("=")[1:][-1]
+                    model.mappedDevNames[name] = tr_name
         else:
             out_err(self.__class__.__name__, "can't open file with translates: " + common.TRANSLATE_PATH)
         
-    def load_config(self, fileName, model):
-        self.read_file(fileName)
+    def load_config(self, file_name, model):
+        self.read_file(file_name)
         self.fill_model(model)
 
         out_log(self.__class__.__name__, "config was loaded")
 
-        if self.translateFile:
+        if self.__translateFile:
             self.load_mapped_dev_names(model)
             out_log(self.__class__.__name__, "mapped names was loaded")

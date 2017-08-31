@@ -1,15 +1,22 @@
 import time
 
+__all__ = ['TimeChecker']
+
 class TimeChecker:
     def __init__(self):
-        self.first = 0
-        self.result = 0
+        self.__first = 0
+        self.__result = 0
 
+    @property
     def start(self):
-        self.first = time.time()
+        self.__first = time.time()
+        return None
 
+    @property
     def stop(self):
-        self.result = time.time() - self.first
+        self.__result = time.time() - self.__first
+        return None
 
+    @property
     def passed_time_str(self):
-        return "exec time, s: " + str(round(self.result, 4))
+        return "exec time, s: " + str(round(self.__result, 4))
