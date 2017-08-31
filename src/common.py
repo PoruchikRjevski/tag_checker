@@ -50,27 +50,29 @@ BR_DEV          = "develop"
 BR_ORIG         = "original"
 
 # git commands
-GIT_VER         = "git --version"                               # get git ver
-CUR_BRANCH      = "git rev-parse --abbrev-ref HEAD"             # get current branch
-SW_BRANCH       = "git checkout {:s}"                           # switch branch to
-UPD_REPO        = "git pull"                                    # update repo
-GET_TAGS        = "git tag"                                     # get all tags for cur branch
-GET_TAG_SSHA    = "git rev-parse --short {:s}"                  # get short SHA1 for tagged commit
-GET_COMM_DATE   = "git show -s --format=%cd --date=short {:s}"  # get commit date by hash
-GET_COMM_INFO   = "git log {:s} -{:s} --format='{:s}' {:s}"     # get commit info
-GET_PAR_COMM_H  = "git log --all --pretty=format:\"{:s}\" {:s}" # parent hashes
-GET_B_CONT      = "git branch --contains {:s}"                  # branch by hash
-FORM_AUTHOR     = "%ae"                                         # author
-FORM_PAR_SHASH  = "%p"                                          # parents hash
-FORM_PAR_SUBJ   = "%s"                                          # commit msg
+GIT_VER         = "git --version"                                       # get git ver
+CUR_BRANCH      = "git rev-parse --abbrev-ref HEAD"                     # get current branch
+SW_BRANCH       = "git checkout {:s}"                                   # switch branch to
+UPD_REPO        = "git pull"                                            # update repo
+GET_TAGS        = "git tag"                                             # get all tags for cur branch
+GET_TAG_SSHA    = "git rev-parse --short {:s}"                          # get short SHA1 for tagged commit
+GET_COMM_DATE   = "git show -s --format=%cd --date=short {:s}"          # get commit date by hash
+GET_COMM_INFO   = "git log {:s} -{:s} --format='{:s}' {:s}"             # get commit info
+GET_PAR_COMM_H  = "git log --all --pretty=format:\"{:s}\" {:s}"         # parent hashes
+GET_B_CONT      = "git branch --contains {:s}"                          # branch by hash
+GET_LAST_COMM   = "git log -1 --oneline {:s}"                           # get last commit on branch
+GET_LIST_BETW   = "git log --oneline {:s} ^{:s}^ --no-merges {:s}"      # get list of hashes between commits with tail
+FORM_AUTHOR     = "%ae"                                                 # author
+FORM_PAR_SHASH  = "%p"                                                  # parents hash
+FORM_PAR_SUBJ   = "%s"                                                  # commit msg
 FORM_SHORT_HASH = "%h"
-FORM_SINCE      = "--since=\"{:s}\" "                            # git cmd since
-FORM_TAIL       = "tail -{:s}"                                  # git tail
+FORM_SINCE      = "--since=\"{:s}\" "                                   # git cmd since
+FORM_TAIL       = "tail -{:s}"                                          # git tail
 FORM_REVERSE    = "--reverse"
 FORM_ALL        = "--all"
 NO_MERGES       = "--no-merges"
 
-GIT_PAR_SH_NEST = 10
+GIT_PAR_SH_NEST = 15
 GIT_AUTHOR_NEST = 1
 
 COMMIT_MSG_SIZE = 30

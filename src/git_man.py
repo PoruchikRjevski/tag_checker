@@ -170,20 +170,24 @@ class GitMan:
         out_log(self.__class__.__name__, "Note commMsg: " + note.commMsg)
 
         # get pHash
-        bs_sHash = self.get_branches_by_hash(note.sHash)
-        out_log(self.__class__.__name__, "note's branches: " + bs_sHash)
-        pHashes = self.get_parents_commmit_hash(note.commDate)
-        out_log(self.__class__.__name__, "parents hashes: " + pHashes)
+        note.pHash = self.get_parent_hash(note.sHash)
+        # if note.pHash == -1:
+        #     note.pHash = note.sHash
 
-        for hash in pHashes.split('\n'):
-            curBranches = self.get_branches_by_hash(hash)
-            out_log(self.__class__.__name__, "hash's branches: " + hash + " : " + bs_sHash)
-            if bs_sHash in curBranches:
-                note.pHash = hash
-                break
-
-        if note.pHash == -1:
-            note.pHash = note.sHash
+        # bs_sHash = self.get_branches_by_hash(note.sHash)
+        # out_log(self.__class__.__name__, "note's branches: " + bs_sHash)
+        # pHashes = self.get_parents_commmit_hash(note.commDate)
+        # out_log(self.__class__.__name__, "parents hashes: " + pHashes)
+        #
+        # for hash in pHashes.split('\n'):
+        #     curBranches = self.get_branches_by_hash(hash)
+        #     out_log(self.__class__.__name__, "hash's branches: " + hash + " : " + bs_sHash)
+        #     if bs_sHash in curBranches:
+        #         note.pHash = hash
+        #         break
+        #
+        # if note.pHash == -1:
+        #     note.pHash = note.sHash
 
         #note.pHash = self.get_parents_commmit_hash(note.commDate)
 
@@ -192,6 +196,83 @@ class GitMan:
         note.valid = True
 
         return note
+
+    def get_parent_hash(self, noteHash):
+        branch = self.get_dev_branch_by_hash(noteHash)
+        if not branch:
+            return -1
+
+        lastCommHash = self.get_last_commit_on_branch(branch)
+        if not lastCommHash:
+            return -1
+
+        parent = self.get_parent_commit_hash(noteHash, lastCommHash)
+
+        if not parent:
+            return -1;
+        else:
+            return parent
+
+    def get_parent_commit_hash(self, noteHash, lastCommHash):
+        cmd = common.GET_LIST_BETW.format(noteHash,
+                                          lastCommHash,
+                                          + " | "
+                                          + common.FORM_TAIL.format(str(common.GIT_PAR_SH_NEST)))
+
+        out_log(self.__class__.__name__, "cmd: " + cmd)
+
+        (out, err) = run_cmd(cmd)
+
+        out_log(self.__class__.__name__, "out: " + out)
+
+        if out:
+           out = out[0]
+
+        out_log(self.__class__.__name__, "res: " + out)
+
+        if err:
+            out_err(self.__class__.__name__, err)
+
+        return out
+
+    def get_last_commit_on_branch(self, branch):
+        cmd = common.GET_LAST_COMM.format(branch)
+
+        out_log(self.__class__.__name__, "cmd: " + cmd)
+
+        (out, err) = run_cmd(cmd)
+
+        out_log(self.__class__.__name__, "out: " + out)
+
+        if err:
+            out_err(self.__class__.__name__, err)
+
+        return out
+
+    def get_dev_branch_by_hash(self, hash):
+        cmd = common.GET_B_CONT.format(hash)
+
+        out_log(self.__class__.__name__, "cmd: " + cmd)
+
+        (out, err) = run_cmd(cmd)
+
+        out_log(self.__class__.__name__, "out: " + out)
+
+        res = ""
+
+        for br in [out]:
+            if common.BR_DEV in br:
+                res = br
+                break
+
+        out = res
+
+        out_log(self.__class__.__name__, "res: " + out)
+
+        if err:
+            out_err(self.__class__.__name__, err)
+
+        return out
 
     def get_branches_by_hash(self, hash):
         cmd = common.GET_B_CONT.format(hash)
@@ -214,16 +295,6 @@ class GitMan:
                                            + common.FORM_TAIL.format(str(common.GIT_PAR_SH_NEST)))
 
         (out, err) = run_cmd(cmd)
-
-        # out_log(self.__class__.__name__, "date: " + date)
-        # out_log(self.__class__.__name__, "cmd: " + cmd)
-        #
-        # (out, err) = run_cmd(cmd)
-        #
-        # out_log(self.__class__.__name__, out)
-        #
-        # if out:
-        #     out = out.split('\n')[:-1][0]
 
         if err:
             out_err(self.__class__.__name__, err)
