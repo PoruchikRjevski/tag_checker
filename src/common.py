@@ -61,16 +61,23 @@ GET_COMM_INFO   = "git log {:s} -{:s} --format='{:s}' {:s}"             # get co
 GET_PAR_COMM_H  = "git log --all --pretty=format:\"{:s}\" {:s}"         # parent hashes
 GET_B_CONT      = "git branch --contains {:s}"                          # branch by hash
 GET_LAST_COMM   = "git log -1 --pretty=format:\"{:s}\" {:s}"            # get last commit on branch
-GET_LIST_BETW   = "git log --pretty=format:\"{:s}\" {:s} ^{:s}^ {:s}"   # get list of hashes between commits with tail
+GET_LOG_BTW     = "git log --pretty=format:\"{:s}\" {:s} ^{:s}^ {:s}"   # get list of hashes between commits with tail
+GET_REVL_BTW    = "git rev-list --abbrev-commit 1705ba3...3738f0c | tail -3"
+
+
+GIT_CMD         = "git {:s}"
+GIT_REV_LIST    = "rev-list {:s}"
+
 FORM_AUTHOR     = "%ae"                                                 # author
 FORM_PAR_SHASH  = "%p"                                                  # parents hash
 FORM_PAR_SUBJ   = "%s"                                                  # commit msg
 FORM_SHORT_HASH = "%h"
 FORM_SINCE      = "--since=\"{:s}\" "                                   # git cmd since
-FORM_TAIL       = "tail -{:s}"                                          # git tail
+FORM_TAIL       = " tail -{:s}"                                          # git tail
 FORM_REVERSE    = "--reverse"
 FORM_ALL        = "--all"
-NO_MERGES       = "--no-merges"
+NO_MERGES       = "--no-merges "
+ABBREV_COMM     = "--abbrev-commit "
 
 GIT_PAR_SH_NEST = 15
 GIT_AUTHOR_NEST = 1

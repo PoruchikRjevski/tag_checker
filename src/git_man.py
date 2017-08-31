@@ -171,25 +171,8 @@ class GitMan:
 
         # get pHash
         note.pHash = self.get_parent_hash(note.sHash)
-        # if note.pHash == -1:
-        #     note.pHash = note.sHash
-
-        # bs_sHash = self.get_branches_by_hash(note.sHash)
-        # out_log(self.__class__.__name__, "note's branches: " + bs_sHash)
-        # pHashes = self.get_parents_commmit_hash(note.commDate)
-        # out_log(self.__class__.__name__, "parents hashes: " + pHashes)
-        #
-        # for hash in pHashes.split('\n'):
-        #     curBranches = self.get_branches_by_hash(hash)
-        #     out_log(self.__class__.__name__, "hash's branches: " + hash + " : " + bs_sHash)
-        #     if bs_sHash in curBranches:
-        #         note.pHash = hash
-        #         break
-        #
-        # if note.pHash == -1:
-        #     note.pHash = note.sHash
-
-        #note.pHash = self.get_parents_commmit_hash(note.commDate)
+        if note.pHash == -1:
+            note.pHash = note.sHash
 
         out_log(self.__class__.__name__, "Note pHash: " + str(note.pHash))
 
@@ -214,12 +197,11 @@ class GitMan:
             return parent
 
     def get_parent_commit_hash(self, noteHash, lastCommHash):
-        cmd = common.GET_LIST_BETW.format(common.FORM_SHORT_HASH,
-                                          lastCommHash,
-                                          noteHash,
-                                          common.NO_MERGES
-                                          + " | "
-                                          + common.FORM_TAIL.format(str(common.GIT_PAR_SH_NEST)))
+        cmd = common.GIT_CMD.format(common.GIT_REV_LIST.format(common.ABBREV_COMM
+                                                               + noteHash + "..."
+                                                               + lastCommHash
+                                                               + " |"
+                                                               + common.FORM_TAIL.format(str(common.GIT_PAR_SH_NEST))))
 
         out_log(self.__class__.__name__, "cmd: " + cmd)
 
