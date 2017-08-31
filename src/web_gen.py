@@ -68,7 +68,8 @@ class WebGenerator:
 
     def genMainContent(self, model, file):
         out_log(self.__class__.__name__, "gen main content")
-        deps = model.get_departments()
+        # deps = model.get_departments()
+        deps = model.departments
 
         # for dep, repos in deps.items():
         for dep, repos in deps.items():
@@ -76,26 +77,25 @@ class WebGenerator:
             allNotes = 0
 
             for repo in repos:
-                for name, dev in repo.get_devices().items():
-                    allNotes += len(dev.get_last())
+                for name, dev in repo.devices.items():
+                    allNotes += len(dev.lastOrders)
                     out_log(self.__class__.__name__, "Notes for dev: " + name + " - " + str(allNotes))
 
             for repo in repos:
-                for name, dev in repo.get_devices().items():
+                for name, dev in repo.devices.items():
                     # generate device's own page
-                    #self.genDevicePage(dev, repo.get_link())
-                    self.genOrdersPages(dep, dev, repo.get_link(), repo.get_name())
+                    self.genOrdersPages(dep, dev, repo.link, repo.name)
 
                     # generate content for main page
                     firstDev = True
                     typeColor = common.TABLE_TR_COL_1
 
-                    if not dev.get_last():
+                    if not dev.lastOrders:
                         continue
 
-                    curType = dev.get_last()[0].type
+                    curType = dev.lastOrders[0].type
 
-                    for note in dev.get_last():
+                    for note in dev.lastOrders:
                         if curType != note.type:
                             curType = note.type
                             typeColor = self.decrement_color(typeColor)
@@ -110,13 +110,13 @@ class WebGenerator:
 
                         if firstDev:
                             firstDev = False
-                            self.genDeviceName(file, dev.get_mapped_name(), len(dev.get_last()), name)
+                            self.genDeviceName(file, dev.trName, len(dev.lastOrders), name)
 
                         self.genOrderNum(file,
-                                         self.getNumByType(note.type, note.num),
-                                         html_defs.A_TITLE.format(common.CNT_STR + str(dev.get_cnt_by_num(note.num)))
+                                         self.getNumByType(note.type, note.cnt),
+                                         html_defs.A_TITLE.format(common.CNT_STR + str(dev.get_cnt_by_num(note.cnt)))
                                          + html_defs.A_BGCOLOR.format(typeColor),
-                                         common.ORDERS_PATH + self.getOrderFileName(name, note.num))
+                                         common.ORDERS_PATH + self.getOrderFileName(name, note.cnt))
 
                         self.genNoteDate(file, note.date,
                                          html_defs.A_TITLE.format(common.TAG_STR + note.tag)
@@ -126,14 +126,14 @@ class WebGenerator:
                         if linkHash == -1:
                             linkHash = note.sHash
 
-                        linkToRepo = common.LINK_TO_REPO.format(repo.get_name(),
-                                                                    common.GW_SHORTLOG,
-                                                                    note.commMsg,
-                                                                    str(note.pHash))
+                        linkToRepo = common.LINK_TO_REPO.format(repo.name,
+                                                                common.GW_SHORTLOG,
+                                                                note.commMsg,
+                                                                str(note.pHash))
                         self.genNoteHash(file,
                                          note.sHash,
                                          html_defs.A_BGCOLOR.format(typeColor),
-                                         self.getTitleForCommit(repo.get_link(),
+                                         self.getTitleForCommit(repo.link,
                                                                 note.author,
                                                                 note.commDate,
                                                                 note.commMsg),
@@ -183,39 +183,17 @@ class WebGenerator:
             res = common.ORDER_NUM + str(num)
         return res
 
-    def genDevicePage(self, device, repoLink):
-        out_log(self.__class__.__name__, "start gen device page: " + device.get_name())
-        page = HtmlGen(common.DEVICE_PATH, self.getDeviceFileName(device.get_name()))
-
-        self.genPageHead(page)
-        self.genTableHead(page)
-        self.gen_device_table_head(page,
-                                   common.HISTORY + device.get_mapped_name(),
-                                   common.DEPART_STR + "depdepdep")
-        # self.genDeviceTableHead(page,
-        #                         common.HISTORY + device.get_mapped_name(),
-        #                         common.DEPART_STR + "depdepdep")
-
-        self.genDeviceContent(device, page, repoLink)
-
-        self.genTableFoot(page)
-        self.genBackLink(page, common.LEVEL_UP)
-        self.genPageFoot(page)
-
-        page.close()
-        out_log(self.__class__.__name__, "finish gen device page: " + device.get_name())
-
     def genOrdersPages(self, dep, device, repoLink, repoName):
-        out_log(self.__class__.__name__, "start gen items pages for device: " + device.get_name())
+        out_log(self.__class__.__name__, "start gen items pages for device: " + device.name)
 
-        for key, val in device.get_items_dict().items():
-            page = HtmlGen(common.ORDERS_PATH, self.getOrderFileName(device.get_name(), val[0].num))
+        for key, val in device.orders.items():
+            page = HtmlGen(common.ORDERS_PATH, self.getOrderFileName(device.name, val[0].cnt))
 
             self.genPageHead(page)
             self.genTableHead(page)
             self.gen_order_table_head(page,
-                                      [common.HISTORY + device.get_mapped_name() + " - " + self.getNumByType(val[0].type,
-                                                                                                            val[0].num),
+                                      [common.HISTORY + device.trName + " - " + self.getNumByType(val[0].type,
+                                                                                                  val[0].cnt),
                                       common.DEPART_STR + str(dep)])
 
             color = common.TABLE_TR_COL_1
@@ -254,7 +232,7 @@ class WebGenerator:
 
             page.close()
 
-        out_log(self.__class__.__name__, "finish gen items pages for device: " + device.get_name())
+        out_log(self.__class__.__name__, "finish gen items pages for device: " + device.name)
 
     def getDeviceFileName(self, name):
         return name + common.FILE_EXT
@@ -281,50 +259,6 @@ class WebGenerator:
             color = common.TABLE_TR_COL_1
 
         return color
-
-    def genDeviceContent(self, device, file, repoLink):
-        out_log(self.__class__.__name__, "gen device content")
-        date = device.get_history()[0].date
-        color = common.TABLE_TR_COL_1
-
-        firstDate = True
-        notesByDate = 0
-
-        for i in device.get_history():
-            if i.date == date:
-                notesByDate += 1
-
-        for note in device.get_history():
-            if date != note.date:
-                notesByDate = 0
-                firstDate = True
-                date = note.date
-                color = self.changeColor(color)
-
-                for i in device.get_history():
-                    if i.date == date:
-                        notesByDate += 1
-
-            file.write_tag(0, html_defs.T_TR_O,
-                           html_defs.A_ALIGN.format(common.ALIGN_C) +
-                           html_defs.A_BGCOLOR.format(color))
-
-            self.genOrderNum(file,
-                             self.getNumByType(note.type, note.num),
-                             note.tag,
-                             common.LEVEL_UP + common.ORDERS_PATH + self.getOrderFileName(device.get_name(), note.num))
-
-            if firstDate:
-                firstDate = False
-
-                #self.genNoteDate(file, note.date, notesByDate)
-                #self.genNoteHashWithCommDate(file,
-                #                             note.sHash,
-                #                             note.commDate,
-                #                             notesByDate,
-                #                             self.getTitleForCommit(repoLink, note.author))
-
-            file.write_tag(0, html_defs.T_TR_C)
 
     # 0 - gen, 1 - text, 2 - adding, 4 - link
     def genTd(self, *args):

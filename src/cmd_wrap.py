@@ -2,6 +2,8 @@ import subprocess
 
 import common
 
+__all__ = ['run_cmd']
+
 
 def run_cmd(cmd):
     prefix = ""

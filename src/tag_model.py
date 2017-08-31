@@ -1,157 +1,128 @@
-import collections
+from collections import OrderedDict
 
 import common
-from logger import out_log, out_err
+from logger import *
 
 
-# deps it is dict of (department, list of repos)
+# __departments contain [repos] by name of department
 class TagModel:
     def __init__(self):
         out_log(self.__class__.__name__, "init")
-        self.deps = collections.OrderedDict()
+        self.__departments = OrderedDict()
 
-        self.mappedDevNames = {}
+        self.__mappedDevNames = {}
 
-    def add_mapped_device_names(self, key, val):
-        self.mappedDevNames[key] = val
+    def get_mappedDevName(self, key=None):
+        if key:
+            if key in self.__mappedDevNames:
+                return self.__mappedDevNames[key]
+            else:
+                return key
+        return self.__mappedDevNames
 
-    def get_mapped_device_name(self, name):
-        if name in self.mappedDevNames:
-            return self.mappedDevNames[name]
-        return name
+    @property
+    def mappedDevNames(self):
+        return self.get_mappedDevName()
 
-    def add_department(self, key, val):
-        self.deps[key] = val
-
-    def get_departments(self):
-        return self.deps
+    @property
+    def departments(self):
+        return self.__departments
 
 
 class Repo:
     def __init__(self):
-        self.devices = collections.OrderedDict()
-        self.link = ""
-        self.name = ""
+        self.__devices = OrderedDict()
+        self.__link = None
+        self.__name = None
 
-    def add_to_device(self, name, note):
-        self.devices[name].add_item(note)
+    @property
+    def name(self):
+        return self.__name
+    @name.setter
+    def name(self, name):
+        self.__name = name
+        if common.REPO_SUFFIX not in name:
+            self.__name += common.REPO_SUFFIX
 
-    def add_device_by_name(self, name, dev):
+    @property
+    def link(self):
+        return self.__link
+    @link.setter
+    def link(self, link):
+        self.__link = link
+
+    @property
+    def devices(self):
+        return self.__devices
+
+    def add_device(self, name, dev):
         self.devices[name] = dev
 
-    def get_devices(self):
-        return self.devices
-
-    def set_link(self, link):
-        self.link = link
-
-    def get_link(self):
-        return self.link
-
-    def set_name(self, name):
-        self.name = name
-
-        if common.REPO_SUFFIX not in name:
-            self.name += common.REPO_SUFFIX
-
-    def get_name(self):
-        return self.name
+    def add_to_device(self, name, note):
+        self.devices[name].add_order(note)
 
 
 class Device:
     def __init__(self):
-        self.history = []                       # list if Notes
-        self.last = []                          # list if Notes
-        self.items = collections.OrderedDict()  # list of Notes by items
-        self.name = ""                          # name from repo
-        self.trName = ""                        # translated name
-        self.cntHist = {}                       # all includes for every item in history
+        self.__lastOrders = []                      # list if Notes
+        self.__orders = OrderedDict()               # list of Notes by items
+        self.__name = ""                            # name from repo
+        self.__trName = ""                          # translated name
 
-    def set_name(self, name):
-        self.name = name
+    @property
+    def name(self):
+        return self.__name
+    @name.setter
+    def name(self, name):
+        self.__name = name
 
-    def get_cnt_by_num(self, num):
-        return self.cntHist[num]
+    @property
+    def trName(self):
+        return self.__trName
+    @trName.setter
+    def trName(self, trName):
+        self.__trName = trName
 
-    def get_name(self):
-        return self.name
+    @property
+    def orders(self):
+        return self.__orders
 
-    def set_mapped_name(self, trName):
-        self.trName = trName
-
-    def get_mapped_name(self):
-        return self.trName
-
-    def add_item(self, note):
-        self.history.append(note)
-
-        if note.num in self.items:
-            self.items[note.num].append(note)
+    def add_order(self, note):
+        if note.cnt in self.orders:
+            self.orders[note.cnt].append(note)
         else:
-            self.items[note.num] = [note]
+            self.orders[note.cnt] = [note]
 
-    def get_history(self):
-        return self.history
+    @property
+    def lastOrders(self):
+        return self.__lastOrders
 
-    def get_items_dict(self):
-        return self.items
 
-    def count_items(self):
-        for item in self.history:
-            if item.num in self.cntHist:
-                self.cntHist[item.num] += 1
-            else:
-                self.cntHist[item.num] = 1
+    def get_cnt_by_num(self, number):
+        return len(self.orders[number])
 
-    def sort_items(self):
-        #self.history = sorted(self.history, key=lambda note: note.date, reverse=True)
-        self.history = sorted(self.history, key=lambda note: note.num, reverse=False)
-
-        for key, val in self.items.items():
-            self.items[key] = sorted(val, key=lambda note: note.date, reverse=True)
+    def sort_orders(self):
+        for key, val in self.orders.items():
+            self.orders[key] = sorted(val, key=lambda note: note.date, reverse=True)
 
     def fill_last(self):
-        numsD = collections.OrderedDict()
         for type in common.TYPES_L:
-            for item in self.history:
-                if item.type == type:
-                    for note in self.history:
-                        if note.num == item.num:
-                            if note.num in numsD:
-                                if numsD[note.num].date < note.date:
-                                    numsD[note.num] = note
-                            else:
-                                numsD[note.num] = note
-
-        for key, val in numsD.items():
-            self.last.append(val)
-
-    def add_to_last(self, note):
-        self.last.append(note)
-
-    def get_last(self):
-        return self.last
-
-    def get_last_num_by_type(self, type):
-        res = 0
-        for note in self.last:
-            if type == note.type:
-                res += 1
-        return res
+            for num, notes in self.orders.items():
+                if notes[0].type == type:
+                    self.lastOrders.append(notes[0])
 
 
+# struct with info for one tag
 class Note:
     def __init__(self):
         self.type = common.TYPE_ALL
-        self.tag = ""
-        self.name = ""
-        self.num = -1
+        self.tag = None
+        self.name = None
+        self.cnt = -1
         self.date = -1
         self.sHash = -1
         self.pHash = -1
         self.commDate = -1
-        self.commMsg = ""
-        self.author = ""
+        self.commMsg = None
+        self.author = None
         self.valid = False
-        self.rating = 0
-        self.cntInHistory = 0

@@ -1,8 +1,11 @@
 import os
 
 import common
+import git_defs
+from cmd_wrap import *
+
+
 from tag_model import TagModel, Repo, Note, Device
-from cmd_wrap import run_cmd
 from logger import out_log, out_err
 from time_checker import TimeChecker
 
@@ -11,15 +14,15 @@ class GitMan:
     def __init__(self):
         out_log(self.__class__.__name__, "init")
         self.update = False
-        self.chDev = False
-        self.lastBr = " "
+        self.switchDev = False
+        self.lastBr = ""
         self.needReturnBranch = False
 
     def set_update_flag(self, update):
         self.update = update
 
     def set_ch_develop_flag(self, chDev):
-        self.chDev = chDev
+        self.switchDev = chDev
 
     def update_repo(self):
         (_, err) = run_cmd(common.UPD_REPO)
@@ -131,7 +134,7 @@ class GitMan:
 
             if prenum not in common.WRONG_NUM:
                 note.type = parts[2].split("-")[:-1][0]
-                note.num = int(prenum)
+                note.cnt = int(prenum)
             else:
                 out_err(self.__class__.__name__, "Bad tag item num: " + tag)
 
@@ -144,7 +147,7 @@ class GitMan:
             note.date = date
 
         out_log(self.__class__.__name__, "Note type: " + note.type)
-        out_log(self.__class__.__name__, "Note num: " + str(note.num))
+        out_log(self.__class__.__name__, "Note num: " + str(note.cnt))
         out_log(self.__class__.__name__, "Note date: " + note.date)
 
         note.sHash = self.get_short_hash(tag)
@@ -324,6 +327,14 @@ class GitMan:
 
         return res
 
+    def check_git_installed(self):
+        out = run_cmd(git_defs.GIT_CMD.format(git_defs.A_VERSION))
+
+        if "version" in str(out):
+            return True
+
+        return False
+
     def scanning(self, model):
         out_log(self.__class__.__name__, "start scanning")
 
@@ -332,18 +343,20 @@ class GitMan:
         timeCh.start()
 
         # do work
-        deps = model.get_departments()
+        # deps = model.get_departments()
+        deps = model.departments
 
         for dep, repos in deps.items():
             out_log(self.__class__.__name__, "department: " + dep)
             for repo in repos:
-                link = repo.get_link()
+                link = repo.link
+                # link = repo.get_link()
                 out_log(self.__class__.__name__, "repo: " + link)
                 # try go to dir link
                 self.go_to_dir(link)
                 if self.is_dir_exist(link):
                     # check branch if need
-                    if self.chDev:
+                    if self.switchDev:
                         self.checkout_branch()
 
                     # update if need
@@ -360,23 +373,22 @@ class GitMan:
                                 note = self.gen_note_by_tag(tag)
 
                                 if note.valid:
-                                    if not note.name in repo.get_devices():
+                                    if not note.name in repo.devices:
                                         dev = Device()
-                                        dev.add_item(note)
-                                        dev.set_name(note.name)
-                                        dev.set_mapped_name(model.get_mapped_device_name(note.name))
-                                        repo.add_device_by_name(note.name, dev)
+                                        dev.add_order(note)
+                                        dev.name = note.name
+                                        dev.trName = model.get_mappedDevName(note.name)
+                                        # dev.set_mapped_name(model.get_mapped_device_name(note.name))
+                                        repo.add_device(note.name, dev)
                                     else:
                                         repo.add_to_device(note.name, note)
 
                         # sort notes for devices and separate last updates
-                        for name, dev in repo.get_devices().items():
+                        for name, dev in repo.devices.items():
                             out_log(self.__class__.__name__, "Sort history for: " + name)
-                            dev.sort_items()
+                            dev.sort_orders()
                             out_log(self.__class__.__name__, "Separate last notes for: " + name)
                             dev.fill_last()
-                            out_log(self.__class__.__name__, "Count all items include for: " + name)
-                            dev.count_items()
                     else:
                         out_err(self.__class__.__name__, "no tags")
 

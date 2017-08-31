@@ -47,7 +47,6 @@ FOR_HELP        = "For help use --help"
 
 # git answers
 BR_DEV          = "develop"
-BR_ORIG         = "original"
 
 # git commands
 GIT_VER         = "git --version"                                       # get git ver
@@ -56,7 +55,7 @@ SW_BRANCH       = "git checkout {:s}"                                   # switch
 UPD_REPO        = "git pull"                                            # update repo
 GET_TAGS        = "git tag"                                             # get all tags for cur branch
 GET_TAG_SSHA    = "git rev-parse --short {:s}"                          # get short SHA1 for tagged commit
-GET_COMM_DATE   = "git show -s --format=%cd --date=short {:s}"          # get commit date by hash
+GET_COMM_DATE   = "git show -s --format=%cd --date=short {:s}"          # get commit date by hash git log -1 --pretty=format:"%cd" --date=short 1705ba3
 GET_COMM_INFO   = "git log {:s} -{:s} --format='{:s}' {:s}"             # get commit info
 GET_PAR_COMM_H  = "git log --all --pretty=format:\"{:s}\" {:s}"         # parent hashes
 GET_B_CONT      = "git branch --contains {:s}"                          # branch by hash

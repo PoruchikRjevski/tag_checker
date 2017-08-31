@@ -5,21 +5,13 @@ from optparse import OptionParser
 
 import common
 from cmd_wrap import run_cmd
-from logger import out_log, out_err, init_log
 from cfg_loader import CfgLoader
 from tag_model import TagModel
 from git_man import GitMan
 from web_gen import WebGenerator
 from time_checker import TimeChecker
 
-
-def is_git_installed():
-    out = run_cmd(common.GIT_VER)
-    
-    if str(out).__contains__("version"):
-        return True
-    
-    return False
+from logger import *
 
 
 def is_conf_file_exist(fileName):
@@ -99,16 +91,17 @@ def main():
     if not is_conf_file_exist(path):
        out_err(common.TAG_CHECKER, common.E_CFNE_STR)
        sys.exit(common.EXIT_CFNE)
-    
-    # check environment
-    if not is_git_installed():
-       out_err(common.TAG_CHECKER, common.E_GNT_STR)
-       sys.exit(common.EXIT_GNT)
 
-    # work
+    # main func
+    gitMan = GitMan()
+    # check environment
+    if not gitMan.check_git_installed():
+        out_err(common.TAG_CHECKER, common.E_GNT_STR)
+        sys.exit(common.EXIT_GNT)
+
     # create model
     tagModel = TagModel()
-
+###########
     # load config
     cfgLoader = CfgLoader()
     cfgLoader.load_config(path, tagModel)

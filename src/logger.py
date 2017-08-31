@@ -4,6 +4,7 @@ import os
 
 import common
 
+__all__ = ['init_log', 'out_log', 'out_err']
 
 def init_log():
     os.chdir(os.path.dirname(os.path.realpath(__file__)))

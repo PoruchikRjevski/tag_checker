@@ -35,11 +35,14 @@ class CfgLoader:
 
             for j in reposLinks:
                 repo = Repo()
-                repo.set_name(j)
-                repo.set_link(prefix + j)
+                repo.name = j
+                # repo.set_name(j)
+                repo.link = prefix + j
+                # repo.set_link(prefix + j)
                 reposList.append(repo)
 
-            model.add_department(i, reposList)
+            model.departments[i] = reposList
+            # model.add_department(i, reposList)
 
         out_log(self.__class__.__name__, "out path: " + common.OUT_PATH)
 
@@ -51,7 +54,10 @@ class CfgLoader:
 
             if fileText:
                 for line in fileText:
-                    model.add_mapped_device_names(line.split("=")[:1][-1], line.split("=")[1:][-1])
+                    name = line.split("=")[:1][-1]
+                    trName = line.split("=")[1:][-1]
+                    model.mappedDevNames[name] = trName
+                    # model.add_mapped_device_names(line.split("=")[:1][-1], line.split("=")[1:][-1])
         else:
             out_err(self.__class__.__name__, "can't open file with translates: " + common.TRANSLATE_PATH)
         
