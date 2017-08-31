@@ -33,10 +33,10 @@ SCRIPTS =  \
 "        var splitted = url.split(';');\n\r" \
 "\n\r" \
 "        for (var i = 0; i < splitted.length; i++) {{\n\r" \
-"            if (splitted[i].includes(\"commit=\")) {{\n\r" \
+"            if (splitted[i].includes(\"cm=\")) {{\n\r" \
 "                var commit = splitted[i];\n\r" \
 "\n\r" \
-"                commit = commit.replace(\"commit=\", \"\");\n\r" \
+"                commit = commit.replace(\"cm=\", \"\");\n\r" \
 "                commit = commit.replace(/%20/g, \" \");\n\r" \
 "\n\r" \
 "                return commit;\n\r" \

@@ -32,10 +32,10 @@ function getCommitFromUrl(url) {
         var splitted = url.split(';');
 
         for (var i = 0; i < splitted.length; i++) {
-            if (splitted[i].includes("commit=")) {
+            if (splitted[i].includes("cm=")) {
                 var commit = splitted[i];
 
-                commit = commit.replace("commit=", "");
+                commit = commit.replace("cm=", "");
                 commit = commit.replace(/%20/g, " ");
 
                 return commit;
