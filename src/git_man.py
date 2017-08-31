@@ -214,8 +214,10 @@ class GitMan:
             return parent
 
     def get_parent_commit_hash(self, noteHash, lastCommHash):
-        cmd = common.GET_LIST_BETW.format(noteHash,
+        cmd = common.GET_LIST_BETW.format(common.FORM_SHORT_HASH,
                                           lastCommHash,
+                                          noteHash,
+                                          common.NO_MERGES
                                           + " | "
                                           + common.FORM_TAIL.format(str(common.GIT_PAR_SH_NEST)))
 
@@ -226,7 +228,7 @@ class GitMan:
         out_log(self.__class__.__name__, "out: " + out)
 
         if out:
-           out = out[0]
+            out = out.split("\n")[0]
 
         out_log(self.__class__.__name__, "res: " + out)
 
@@ -236,7 +238,8 @@ class GitMan:
         return out
 
     def get_last_commit_on_branch(self, branch):
-        cmd = common.GET_LAST_COMM.format(branch)
+        cmd = common.GET_LAST_COMM.format(common.FORM_SHORT_HASH,
+                                          branch)
 
         out_log(self.__class__.__name__, "cmd: " + cmd)
 
@@ -263,6 +266,9 @@ class GitMan:
         for br in [out]:
             if common.BR_DEV in br:
                 res = br
+                if "* " in res:
+                    res = res.replace("* ", "")
+
                 break
 
         out = res

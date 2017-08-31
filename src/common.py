@@ -60,8 +60,8 @@ GET_COMM_DATE   = "git show -s --format=%cd --date=short {:s}"          # get co
 GET_COMM_INFO   = "git log {:s} -{:s} --format='{:s}' {:s}"             # get commit info
 GET_PAR_COMM_H  = "git log --all --pretty=format:\"{:s}\" {:s}"         # parent hashes
 GET_B_CONT      = "git branch --contains {:s}"                          # branch by hash
-GET_LAST_COMM   = "git log -1 --oneline {:s}"                           # get last commit on branch
-GET_LIST_BETW   = "git log --oneline {:s} ^{:s}^ --no-merges {:s}"      # get list of hashes between commits with tail
+GET_LAST_COMM   = "git log -1 --pretty=format:\"{:s}\" {:s}"            # get last commit on branch
+GET_LIST_BETW   = "git log --pretty=format:\"{:s}\" {:s} ^{:s}^ {:s}"   # get list of hashes between commits with tail
 FORM_AUTHOR     = "%ae"                                                 # author
 FORM_PAR_SHASH  = "%p"                                                  # parents hash
 FORM_PAR_SUBJ   = "%s"                                                  # commit msg
