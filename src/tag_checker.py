@@ -1,4 +1,4 @@
-#!/usr/bin python3
+#!/usr/bin/sudo python3
 import os
 import sys
 from optparse import OptionParser
