@@ -1,6 +1,6 @@
 import os
 
-# from multiprocessing.pool import ThreadPool
+import multiprocessing
 from threading import Thread
 from queue import Queue
 import common
@@ -264,6 +264,10 @@ class GitMan:
         else:
             return parents_hash
 
+    def __gen_notes_by_tag_list(self, tag_list, out_queue):
+        for tag in tag_list:
+            self.__gen_note_by_tag(tag, out_queue)
+
     def __gen_note_by_tag(self, tag, out_queue):
         out_log(self.__class__.__name__, "Gen note for tag: " + tag)
 
@@ -402,27 +406,49 @@ class GitMan:
                     out_log(self.__class__.__name__, "Tags number: " + str(len(tags.split("\n"))))
 
                     if tags:
+                        tags_list = tags.split("\n")
                         n_queue = Queue()
 
                         if common.MULTITH:
+                            cpu_s = multiprocessing.cpu_count()
+                            out_log(self.__class__.__name__, "cpu count: " + str(cpu_s))
+
                             threads = []
-                            for tag in tags.split("\n"):
-                                if self.__is_tag_valid(tag):
-                                    thread = Thread(target=self.__gen_note_by_tag, args=[tag, n_queue])
-                                    thread.start()
-                                    threads.append(thread)
+
+                            if common.FETCH_C_MT:
+                                len_tl = len(tags_list)
+                                avg = len_tl/cpu_s
+                                pos = 0
+                                out_log(self.__class__.__name__, "avg: " + str(avg))
+                                for n_t in range(cpu_s):
+                                    len_tl -= avg
+                                    last = len_tl/avg
+                                    out_log(self.__class__.__name__, "last: " + str(last))
+                                    out_log(self.__class__.__name__, "pos: " + str(pos))
+                                    if last > 1:
+                                        self.__gen_notes_by_tag_list(tags_list[int(pos):int(pos+avg)], n_queue)
+                                        pos += avg
+                                    else:
+                                        self.__gen_notes_by_tag_list(tags_list[int(pos):], n_queue)
+                            else:
+                                for tag in tags.split("\n"):
+                                    if self.__is_tag_valid(tag):
+                                        thread = Thread(target=self.__gen_note_by_tag, args=[tag, n_queue])
+                                        thread.start()
+                                        threads.append(thread)
 
                             for res in threads:
                                 res.join()
                                 threads.remove(res)
                         else:
-                            for tag in tags.split("\n"):
-                                if self.__is_tag_valid(tag):
-                                    out_log(self.__class__.__name__, "tag: " + tag)
-                                    int_time_ch.start
-                                    self.__gen_note_by_tag(tag, n_queue)
-                                    int_time_ch.stop
-                                    out_log(self.__class__.__name__, "gen one tag " + int_time_ch.passed_time_str)
+                            self.__gen_notes_by_tag_list(tags_list, n_queue)
+                            # for tag in tags.split("\n"):
+                            #     if self.__is_tag_valid(tag):
+                            #         out_log(self.__class__.__name__, "tag: " + tag)
+                            #         int_time_ch.start
+                            #         self.__gen_note_by_tag(tag, n_queue)
+                            #         int_time_ch.stop
+                            #         out_log(self.__class__.__name__, "gen one tag " + int_time_ch.passed_time_str)
 
                         while not n_queue.empty():
                             note = n_queue.get()

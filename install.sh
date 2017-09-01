@@ -49,14 +49,14 @@ remove_from_crontab() {
 # add note to crontab
 add_to_crontab() {
     crontab -l > temp
-    echo "0 * * * * $SETUP_DIR$NAME $quiet $log $upd $sud $dev $mt" >> temp
+    echo "0 * * * * $SETUP_DIR$NAME $quiet $log $upd $sud $dev $mt $fcm" >> temp
     crontab temp
     rm temp
 }
 
 # run script
 run_now() {
-    $SETUP_DIR$NAME $log $upd $sud $dev $mt
+    $SETUP_DIR$NAME $log $upd $sud $dev $mt $fcm
 }
 
 # ---------------------------------
@@ -93,6 +93,13 @@ main() {
       y|Y ) mt="-m";;
       n|N ) ;;
       * ) mt="";;
+    esac
+        
+    read -p "Run multithreading fetch to cpu' cores (y/n)? " answ
+    case "$answ" in 
+      y|Y ) fcm="-f";;
+      n|N ) ;;
+      * ) fcm="";;
     esac
     
     read -p "Update repo's before scan (y/n)? " answ

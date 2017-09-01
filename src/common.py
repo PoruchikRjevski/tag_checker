@@ -88,7 +88,8 @@ COMMIT_MSG_SIZE = 30
 QUIET           = False                                     # global flag for out or not log and err messages
 LOGGING         = False                                     # global flag for out or not log and err to files
 SUDOER          = False                                     # global flag for exec shell cmd by sudo
-MULTITH        = False                                     # global flag for exec by multithreading
+MULTITH         = False                                     # global flag for exec by multithreading
+FETCH_C_MT      = False                                     # global flag for exec by multithreading with fetch to cpu's cores
 CUR_PLATFORM    = "None"
 CUR_PATH        = "None"
 
