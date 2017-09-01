@@ -378,7 +378,11 @@ class GitMan:
                         self.__update_repo()
 
                     # do dirty work
+                    int_time_ch.start
                     tags = self.__get_tags()
+                    int_time_ch.stop
+                    out_log(self.__class__.__name__, "get all tags " + int_time_ch.passed_time_str)
+                    out_log(self.__class__.__name__, "Tags number: " + str(len(tags.split("\n"))))
 
                     if tags:
                         for tag in tags.split("\n"):
