@@ -442,13 +442,6 @@ class GitMan:
                                 threads.remove(res)
                         else:
                             self.__gen_notes_by_tag_list(tags_list, n_queue)
-                            # for tag in tags.split("\n"):
-                            #     if self.__is_tag_valid(tag):
-                            #         out_log(self.__class__.__name__, "tag: " + tag)
-                            #         int_time_ch.start
-                            #         self.__gen_note_by_tag(tag, n_queue)
-                            #         int_time_ch.stop
-                            #         out_log(self.__class__.__name__, "gen one tag " + int_time_ch.passed_time_str)
 
                         while not n_queue.empty():
                             note = n_queue.get()

@@ -90,16 +90,18 @@ main() {
     
     read -p "Run multithreading (y/n)? " answ
     case "$answ" in 
-      y|Y ) mt="-m";;
+      y|Y ) 
+      mt="-m"
+      
+      read -p "Run multithreading fetch to cpu' cores (y/n)? " answ
+      case "$answ" in 
+        y|Y ) fcm="-f";;
+        n|N ) ;;
+        * ) fcm="";;
+      esac
+      ;;
       n|N ) ;;
       * ) mt="";;
-    esac
-        
-    read -p "Run multithreading fetch to cpu' cores (y/n)? " answ
-    case "$answ" in 
-      y|Y ) fcm="-f";;
-      n|N ) ;;
-      * ) fcm="";;
     esac
     
     read -p "Update repo's before scan (y/n)? " answ
