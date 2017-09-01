@@ -91,14 +91,18 @@ class Device:
         return self.__orders
 
     def add_order(self, note):
-        if note.cnt in self.orders:
-            self.orders[note.cnt].append(note)
+        if note.num in self.orders:
+            self.orders[note.num].append(note)
         else:
-            self.orders[note.cnt] = [note]
+            self.orders[note.num] = [note]
 
     @property
     def lastOrders(self):
         return self.__lastOrders
+
+    @lastOrders.setter
+    def lastOrders(self, adding):
+        self.__lastOrders += adding
 
     def get_cnt_by_num(self, number):
         return len(self.orders[number])
@@ -109,10 +113,12 @@ class Device:
 
     def fill_last(self):
         for m_type in common.TYPES_L:
+            to_sort = []
             for num, notes in self.orders.items():
                 if notes[0].type == m_type:
-                    self.lastOrders.append(notes[0])
-
+                    to_sort.append(notes[0])
+            to_sort = sorted(to_sort, key=lambda note: note.num, reverse=False)
+            self.lastOrders = to_sort
 
 # struct with info for one tag
 class Note:
@@ -120,7 +126,7 @@ class Note:
         self.type = common.TYPE_ALL
         self.tag = None
         self.name = None
-        self.cnt = -1
+        self.num = -1
         self.date = -1
         self.sHash = -1
         self.pHash = -1

@@ -110,7 +110,7 @@ class GitMan:
 
             if prenum not in common.WRONG_NUM:
                 note_out.type = tag_parts[2].split("-")[:-1][0]
-                note_out.cnt = int(prenum)
+                note_out.num = int(prenum)
             else:
                 out_err(self.__class__.__name__, "Bad tag item num: " + note_out.tag)
 
@@ -123,7 +123,7 @@ class GitMan:
             note_out.date = date
 
         out_log(self.__class__.__name__, "Note type: " + note_out.type)
-        out_log(self.__class__.__name__, "Note num: " + str(note_out.cnt))
+        out_log(self.__class__.__name__, "Note num: " + str(note_out.num))
         out_log(self.__class__.__name__, "Note date: " + note_out.date)
 
         return True
@@ -312,6 +312,17 @@ class GitMan:
 
         return res
 
+    def __add_note(self, model, repo, note):
+        if note.name not in repo.devices:
+            dev = Device()
+            dev.add_order(note)
+            dev.name = note.name
+            dev.trName = model.get_mappedDevName(note.name)
+
+            repo.add_device(note.name, dev)
+        else:
+            repo.add_to_device(note.name, note)
+
     @property
     def update(self):
         return self.__update
@@ -391,50 +402,32 @@ class GitMan:
                     out_log(self.__class__.__name__, "Tags number: " + str(len(tags.split("\n"))))
 
                     if tags:
-                        t_queue = Queue()
-                        threads = []
-                        for tag in tags.split("\n"):
-                            if self.__is_tag_valid(tag):
-                                thread = Thread(target=self.__gen_note_by_tag, args=[tag, t_queue])
-                                thread.start()
-                                threads.append(thread)
+                        n_queue = Queue()
 
-                        for res in threads:
-                            res.join()
-                            threads.remove(res)
+                        if common.MULTITH:
+                            threads = []
+                            for tag in tags.split("\n"):
+                                if self.__is_tag_valid(tag):
+                                    thread = Thread(target=self.__gen_note_by_tag, args=[tag, n_queue])
+                                    thread.start()
+                                    threads.append(thread)
 
-                        while not t_queue.empty():
-                            note = t_queue.get()
+                            for res in threads:
+                                res.join()
+                                threads.remove(res)
+                        else:
+                            for tag in tags.split("\n"):
+                                if self.__is_tag_valid(tag):
+                                    out_log(self.__class__.__name__, "tag: " + tag)
+                                    int_time_ch.start
+                                    self.__gen_note_by_tag(tag, n_queue)
+                                    int_time_ch.stop
+                                    out_log(self.__class__.__name__, "gen one tag " + int_time_ch.passed_time_str)
+
+                        while not n_queue.empty():
+                            note = n_queue.get()
                             if note.valid:
-                                if note.name not in repo.devices:
-                                    dev = Device()
-                                    dev.add_order(note)
-                                    dev.name = note.name
-                                    dev.trName = model.get_mappedDevName(note.name)
-
-                                    repo.add_device(note.name, dev)
-                                else:
-                                    repo.add_to_device(note.name, note)
-
-
-                        # for tag in tags.split("\n"):
-                        #     if self.__is_tag_valid(tag):
-                        #         out_log(self.__class__.__name__, "tag: " + tag)
-                        #         int_time_ch.start
-                        #         note = self.__gen_note_by_tag(tag)
-                        #         int_time_ch.stop
-                        #         out_log(self.__class__.__name__, "gen one tag " + int_time_ch.passed_time_str)
-                        #
-                        #         if note.valid:
-                        #             if note.name not in repo.devices:
-                        #                 dev = Device()
-                        #                 dev.add_order(note)
-                        #                 dev.name = note.name
-                        #                 dev.trName = model.get_mappedDevName(note.name)
-                        #
-                        #                 repo.add_device(note.name, dev)
-                        #             else:
-                        #                 repo.add_to_device(note.name, note)
+                                self.__add_note(model, repo, note)
 
                         # sort notes for devices and separate last updates
                         int_time_ch.start

@@ -38,11 +38,14 @@ def set_options(parser):
                       action="store_true", dest="develop",
                       default=False,
                       help="checkout branch to develop before scan")
-
     parser.add_option("-s", "--sudoer",
                       action="store_true", dest="sudoer",
                       default=False,
                       help="exec shell cmd from sudo")
+    parser.add_option("-m", "--multith",
+                      action="store_true", dest="multithreading",
+                      default=False,
+                      help="exec script with multithreading")
 
 
 def check_options(opts):
@@ -52,6 +55,8 @@ def check_options(opts):
         common.LOGGING = True
     if opts.sudoer:
         common.SUDOER = True
+    if opts.multithreading:
+        common.MULTITH = True
 
 
 def main():

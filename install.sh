@@ -49,14 +49,14 @@ remove_from_crontab() {
 # add note to crontab
 add_to_crontab() {
     crontab -l > temp
-    echo "0 * * * * $SETUP_DIR$NAME $quiet $log $upd $sud $dev" >> temp
+    echo "0 * * * * $SETUP_DIR$NAME $quiet $log $upd $sud $dev $mt" >> temp
     crontab temp
     rm temp
 }
 
 # run script
 run_now() {
-    $SETUP_DIR$NAME $log $upd $sud $dev
+    $SETUP_DIR$NAME $log $upd $sud $dev $mt
 }
 
 # ---------------------------------
@@ -81,6 +81,20 @@ main() {
       * ) log="";;
     esac
     
+    read -p "Exec cmd's by sudo (y/n)? " answ
+    case "$answ" in 
+      y|Y ) sud="-s";;
+      n|N ) ;;
+      * ) sud="";;
+    esac
+    
+    read -p "Run multithreading (y/n)? " answ
+    case "$answ" in 
+      y|Y ) mt="-m";;
+      n|N ) ;;
+      * ) mt="";;
+    esac
+    
     read -p "Update repo's before scan (y/n)? " answ
     case "$answ" in 
       y|Y ) upd="-u";;
@@ -93,13 +107,6 @@ main() {
       y|Y ) dev="-d";;
       n|N ) ;;
       * ) dev="";;
-    esac
-    
-    read -p "Exec cmd's by sudo (y/n)? " answ
-    case "$answ" in 
-      y|Y ) sud="-s";;
-      n|N ) ;;
-      * ) sud="";;
     esac
     
     # COPY

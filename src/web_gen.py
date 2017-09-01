@@ -113,10 +113,10 @@ class WebGenerator:
                             self.genDeviceName(file, dev.trName, len(dev.lastOrders), name)
 
                         self.genOrderNum(file,
-                                         self.getNumByType(note.type, note.cnt),
-                                         html_defs.A_TITLE.format(common.CNT_STR + str(dev.get_cnt_by_num(note.cnt)))
+                                         self.getNumByType(note.type, note.num),
+                                         html_defs.A_TITLE.format(common.CNT_STR + str(dev.get_cnt_by_num(note.num)))
                                          + html_defs.A_BGCOLOR.format(typeColor),
-                                         common.ORDERS_PATH + self.getOrderFileName(name, note.cnt))
+                                         common.ORDERS_PATH + self.getOrderFileName(name, note.num))
 
                         self.genNoteDate(file, note.date,
                                          html_defs.A_TITLE.format(common.TAG_STR + note.tag)
@@ -187,13 +187,13 @@ class WebGenerator:
         out_log(self.__class__.__name__, "start gen items pages for device: " + device.name)
 
         for key, val in device.orders.items():
-            page = HtmlGen(common.ORDERS_PATH, self.getOrderFileName(device.name, val[0].cnt))
+            page = HtmlGen(common.ORDERS_PATH, self.getOrderFileName(device.name, val[0].num))
 
             self.genPageHead(page)
             self.genTableHead(page)
             self.gen_order_table_head(page,
                                       [common.HISTORY + device.trName + " - " + self.getNumByType(val[0].type,
-                                                                                                  val[0].cnt),
+                                                                                                  val[0].num),
                                       common.DEPART_STR + str(dep)])
 
             color = common.TABLE_TR_COL_1
