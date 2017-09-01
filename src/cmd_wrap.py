@@ -22,7 +22,8 @@ def run_cmd(cmd):
     u_err = err.decode("utf-8").strip()
 
     if u_err:
-        out_err(common.CMD_WRAP, u_err)
+        out_err(common.CMD_WRAP, "cmd: " + cmd)
+        out_err(common.CMD_WRAP, "err: " + u_err)
 
     return u_out
 

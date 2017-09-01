@@ -1,10 +1,11 @@
 import datetime
 import inspect
 import os
+from queue import Queue
 
 import common
 
-__all__ = ['init_log', 'out_log', 'out_err']
+__all__ = ['init_log', 'out_log', 'out_err', 'out_log_def', 'out_err_def', 'release_log', 'release_err']
 
 def init_log():
     os.chdir(os.path.dirname(os.path.realpath(__file__)))
@@ -32,14 +33,48 @@ def write_msg(msg, path):
 
 
 def out_log(who, msg):
-    write_msg(out_msg(who, msg, common.LOG_T), common.LOG_T)
+    out = gen_log_msg(who, msg, common.LOG_T)
+    write_msg(out, common.LOG_T)
+
+    show_msg(out)
+
+
+def out_log_def(who, msg):
+    return gen_log_msg(who, msg, common.LOG_T)
+
+
+def release_log(msgs):
+    if not isinstance(msgs, str):
+        for msg in msgs:
+            write_msg(msg, common.LOG_T)
+            show_msg(msg)
+    else:
+        write_msg(msgs, common.LOG_T)
+        show_msg(msgs)
 
 
 def out_err(who, msg):
-    write_msg(out_msg(who, msg, common.ERR_T), common.ERR_T)
+    out = gen_log_msg(who, msg, common.ERR_T)
+    write_msg(out, common.ERR_T)
+
+    show_msg(out)
 
 
-def out_msg(who, msg, type):
+def out_err_def(who, msg):
+    return gen_log_msg(who, msg, common.ERR_T)
+
+
+def release_err(msgs):
+    if not isinstance(msgs, str):
+        for msg in msgs:
+            write_msg(msg, common.ERR_T)
+            show_msg(msg)
+    else:
+        write_msg(msgs, common.ERR_T)
+        show_msg(msgs)
+
+
+def gen_log_msg(who, msg, type):
     caller = caller_func()
     c_line = caller_line()
 
@@ -57,10 +92,12 @@ def out_msg(who, msg, type):
                                                                        who, caller,
                                                                        c_line, msg)
 
-    if not common.QUIET:
-        print(out)
-
     return out
+
+
+def show_msg(msg):
+    if not common.QUIET:
+        print(msg)
 
 
 def caller_func():

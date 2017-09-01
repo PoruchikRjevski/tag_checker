@@ -3,14 +3,13 @@ import os
 import multiprocessing
 from threading import Thread
 from queue import Queue
+
 import common
 import git_defs
 from cmd_wrap import *
-
-
-from tag_model import TagModel, Repo, Note, Device
-from logger import out_log, out_err
-from time_checker import TimeChecker
+from tag_model import *
+from logger import *
+from time_checker import *
 
 
 class GitMan:
@@ -37,7 +36,6 @@ class GitMan:
                                       + git_defs.REV_HEAD)
         out_log(self.__class__.__name__, "cmd: " + cmd)
         branch = run_cmd(cmd)
-        # branch = run_cmd(common.CUR_BRANCH)
 
         out_log(self.__class__.__name__, "cur branch: " + branch)
 
@@ -49,7 +47,6 @@ class GitMan:
         out_log(self.__class__.__name__, "cmd: " + cmd)
 
         run_cmd(cmd)
-        # run_cmd(common.SW_BRANCH.format(branch))
 
     def __checkout_branch(self):
         branch = self.__get_current_branch()
@@ -66,7 +63,6 @@ class GitMan:
         out_log(self.__class__.__name__, "cmd: " + cmd)
 
         run_cmd(cmd)
-        # run_cmd(common.UPD_REPO)
 
     def __get_tags(self):
         cmd = git_defs.GIT_CMD.format(git_defs.A_TAG)
@@ -90,7 +86,7 @@ class GitMan:
 
         out_log(self.__class__.__name__, "cur branch: " + self.__get_current_branch())
 
-    def __parce_tag(self, note_out):
+    def __parce_tag(self, note_out, t_logs, t_errs):
         tag_parts = note_out.tag.split("/")
 
         if len(tag_parts) < 3:
@@ -98,7 +94,7 @@ class GitMan:
 
         note_out.name = tag_parts[1]
 
-        out_log(self.__class__.__name__, "Note name: " + note_out.name)
+        t_logs.append(out_log_def(self.__class__.__name__, "Note name: " + note_out.name))
 
         date = ""
         if len(tag_parts) == 3:
@@ -106,35 +102,19 @@ class GitMan:
         elif len(tag_parts) == 4:
             prenum = tag_parts[2].split("-")[-1:][0]
 
-            out_log(self.__class__.__name__, "prenum: " + prenum)
+            t_logs.append(out_log_def(self.__class__.__name__, "prenum: " + prenum))
 
             note_out.type = tag_parts[2].split("-")[:-1][0]
 
             if note_out.type not in common.TYPES_L:
-                out_err(self.__class__.__name__, "Bad item type: " + note_out.type)
+                t_errs.append(out_err_def(self.__class__.__name__, "Bad item type: " + note_out.type))
                 return False
 
             try:
                 note_out.num = int(prenum)
             except ValueError:
-                out_err(self.__class__.__name__, "EXCEPT Bad item num: " + prenum)
+                t_errs.append(out_err_def(self.__class__.__name__, "EXCEPT Bad item num: " + prenum))
                 return False
-
-            # if prenum not in common.WRONG_NUM:
-            #     note_out.type = tag_parts[2].split("-")[:-1][0]
-            #
-            #     if not note_out.type in common.TYPES_L:
-            #         out_err(self.__class__.__name__, "Bad tag item type: " + note_out.tag)
-            #
-            #     try:
-            #         note_out.num = int(prenum)
-            #     except ValueError:
-            #         note_out.num = -1
-            #         note_out.numStr = prenum
-            #         note_out.type = common.TYPE_UNKNOWN
-            #         out_err(self.__class__.__name__, "EXCEPT Bad tag item num: " + note_out.tag)
-            # else:
-            #     out_err(self.__class__.__name__, "Bad tag item num: " + note_out.tag)
 
             date = self.__repair_tag_date(tag_parts[3])
 
@@ -143,9 +123,9 @@ class GitMan:
         elif date:
             note_out.date = date
 
-        out_log(self.__class__.__name__, "Note type: " + note_out.type)
-        out_log(self.__class__.__name__, "Note num: " + str(note_out.num))
-        out_log(self.__class__.__name__, "Note date: " + note_out.date)
+        t_logs.append(out_log_def(self.__class__.__name__, "Note type: " + note_out.type))
+        t_logs.append(out_log_def(self.__class__.__name__, "Note num: " + str(note_out.num)))
+        t_logs.append(out_log_def(self.__class__.__name__, "Note date: " + note_out.date))
 
         return True
 
@@ -154,10 +134,9 @@ class GitMan:
                                       + git_defs.A_SHORT
                                       + " " + tag)
 
-        out_log(self.__class__.__name__, "cmd: " + cmd)
+        # out_log(self.__class__.__name__, "cmd: " + cmd)
 
         return run_cmd(cmd)
-        # (out, err) = run_cmd(common.GET_TAG_SSHA.format(tagStr))
 
     def __get_commit_date_by_short_hash(self, hash):
         cmd = git_defs.GIT_CMD.format(git_defs.A_LOG
@@ -166,10 +145,9 @@ class GitMan:
                                       + git_defs.A_DATE.format(git_defs.A_D_SHORT)
                                       + " " + hash)
 
-        out_log(self.__class__.__name__, "cmd: " + cmd)
+        # out_log(self.__class__.__name__, "cmd: " + cmd)
 
         return run_cmd(cmd)
-        # (out, err) = run_cmd(common.GET_COMM_DATE.format(hash))
 
     def __get_commit_author_by_short_hash(self, hash):
         cmd = git_defs.GIT_CMD.format(git_defs.A_LOG
@@ -177,13 +155,9 @@ class GitMan:
                                       + git_defs.A_FORMAT.format(git_defs.AA_AUTHOR)
                                       + " " + hash)
 
-        out_log(self.__class__.__name__, "cmd: " + cmd)
+        # out_log(self.__class__.__name__, "cmd: " + cmd)
 
         return run_cmd(cmd)
-        # (out, err) = run_cmd(common.GET_COMM_INFO.format("",
-        #                                                  str(common.GIT_AUTHOR_DEEP),
-        #                                                  common.FORM_AUTHOR,
-        #                                                  hash))
 
     def __repair_commit_msg(self, msg):
         size = len(msg)
@@ -198,13 +172,9 @@ class GitMan:
                                       + git_defs.A_FORMAT.format(git_defs.AA_COMMIT_MSG)
                                       + " " + hash)
 
-        out_log(self.__class__.__name__, "cmd: " + cmd)
+        # out_log(self.__class__.__name__, "cmd: " + cmd)
 
         return run_cmd(cmd)
-        # (out, err) = run_cmd(common.GET_COMM_INFO.format("",
-        #                                                  str(common.GIT_AUTHOR_DEEP),
-        #                                                  common.FORM_PAR_SUBJ,
-        #                                                  hash))
 
     def __find_develop_branche(self, branches):
         res = None
@@ -223,14 +193,13 @@ class GitMan:
         cmd = git_defs.GIT_CMD.format(git_defs.A_BRANCH
                                       + git_defs.A_CONTAINS.format(hash))
 
-        out_log(self.__class__.__name__, "cmd: " + cmd)
+        # out_log(self.__class__.__name__, "cmd: " + cmd)
 
         out = run_cmd(cmd)
 
         out = self.__find_develop_branche(out)
 
         return out
-        # cmd = common.GET_B_CONT.format(hash)
 
     def __get_last_commit_on_branch(self, branch):
         cmd = git_defs.GIT_CMD.format(git_defs.A_LOG
@@ -238,11 +207,9 @@ class GitMan:
                                       + git_defs.A_FORMAT.format(git_defs.AA_SHASH)
                                       + " " + branch)
 
-        out_log(self.__class__.__name__, "cmd: " + cmd)
+        # out_log(self.__class__.__name__, "cmd: " + cmd)
 
         return run_cmd(cmd)
-        # cmd = common.GET_LAST_COMM.format(common.FORM_SHORT_HASH,
-        #                                   branch)
 
     def __get_parent_commit_hash(self, noteHash, lastCommHash):
         cmd = common.GIT_CMD.format(common.GIT_REV_LIST.format(common.ABBREV_COMM
@@ -251,7 +218,7 @@ class GitMan:
                                                                + " |"
                                                                + common.FORM_TAIL.format(str(common.GIT_PAR_SH_NEST))))
 
-        out_log(self.__class__.__name__, "cmd: " + cmd)
+        # out_log(self.__class__.__name__, "cmd: " + cmd)
 
         out = run_cmd(cmd)
 
@@ -261,25 +228,20 @@ class GitMan:
             out = out.split("\n")[0]
 
         return out
-        # cmd = common.GIT_CMD.format(common.GIT_REV_LIST.format(common.ABBREV_COMM
-        #                                                        + noteHash + "..."
-        #                                                        + lastCommHash
-        #                                                        + " |"
-        #                                                        + common.FORM_TAIL.format(str(common.GIT_PAR_SH_NEST))))
 
     def __get_parents_short_hash(self, note_hash):
         branch = self.__get_develop_branch_by_hash(note_hash)
-        out_log(self.__class__.__name__, "finded branch: " + str(branch))
+        # out_log(self.__class__.__name__, "finded branch: " + str(branch))
         if branch is None:
             return -1
 
         last_commit_s_hash = self.__get_last_commit_on_branch(branch)
-        out_log(self.__class__.__name__, "last commit short hash: " + str(last_commit_s_hash))
+        # out_log(self.__class__.__name__, "last commit short hash: " + str(last_commit_s_hash))
         if last_commit_s_hash is None:
             return -1
 
         parents_hash = self.__get_parent_commit_hash(note_hash, last_commit_s_hash)
-        out_log(self.__class__.__name__, "parent's hash: " + str(parents_hash))
+        # out_log(self.__class__.__name__, "parent's hash: " + str(parents_hash))
         if parents_hash is None:
             return -1
         else:
@@ -290,40 +252,43 @@ class GitMan:
             self.__gen_note_by_tag(tag, out_queue)
 
     def __gen_note_by_tag(self, tag, out_queue):
-        out_log(self.__class__.__name__, "Gen note for tag: " + tag)
+        t_logs = []
+        t_errs = []
+
+        t_logs.append(out_log_def(self.__class__.__name__, "Gen note for tag: " + tag))
 
         note = Note()
         note.tag = tag
 
-        if not self.__parce_tag(note):
-            out_err(self.__class__.__name__, "Bad tag: " + tag)
+        if not self.__parce_tag(note, t_logs, t_errs):
+            t_errs.append(out_err_def(self.__class__.__name__, "Bad tag: " + tag))
             return False
-            # return note
 
         note.sHash = self.__get_short_hash(tag)
-        out_log(self.__class__.__name__, "Note short hash: " + note.sHash)
+        t_logs.append(out_log_def(self.__class__.__name__, "Note short hash: " + note.sHash))
 
         note.commDate = self.__get_commit_date_by_short_hash(note.sHash)
-        out_log(self.__class__.__name__, "Note commit date: " + note.commDate)
+        t_logs.append(out_log_def(self.__class__.__name__, "Note commit date: " + note.commDate))
 
         note.author = self.__get_commit_author_by_short_hash(note.sHash)
-        out_log(self.__class__.__name__, "Note author: " + note.author)
+        t_logs.append(out_log_def(self.__class__.__name__, "Note author: " + note.author))
 
         msg = self.__get_commit_msg_by_short_hash(note.sHash)
         note.commMsg = self.__repair_commit_msg(msg)
-        out_log(self.__class__.__name__, "Note commMsg: " + note.commMsg)
+        t_logs.append(out_log_def(self.__class__.__name__, "Note commMsg: " + note.commMsg))
 
         # get pHash
         note.pHash = self.__get_parents_short_hash(note.sHash)
         if note.pHash == -1:
             note.pHash = note.sHash
-        out_log(self.__class__.__name__, "Note pHash: " + str(note.pHash))
+        t_logs.append(out_log_def(self.__class__.__name__, "Note pHash: " + str(note.pHash)))
 
         note.valid = True
 
-        out_queue.put(note)
+        out_queue.logs = t_logs
+        out_queue.errs = t_errs
+        out_queue.notes.put(note)
         return True
-        # return note
 
     def __repair_tag_date(self, date):
         temp = date.split("-")
@@ -429,7 +394,7 @@ class GitMan:
 
                     if tags:
                         tags_list = tags.split("\n")
-                        n_queue = Queue()
+                        n_queue = ThreadQueue()
 
                         if common.MULTITH:
                             cpu_s = multiprocessing.cpu_count()
@@ -465,8 +430,11 @@ class GitMan:
                         else:
                             self.__gen_notes_by_tag_list(tags_list, n_queue)
 
-                        while not n_queue.empty():
-                            note = n_queue.get()
+                        n_queue.logs
+                        n_queue.errs
+                        while not n_queue.notes.empty():
+                            note = n_queue.notes.get()
+
                             if note.valid:
                                 self.__add_note(model, repo, note)
 
