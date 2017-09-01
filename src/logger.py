@@ -41,6 +41,7 @@ def out_err(who, msg):
 
 def out_msg(who, msg, type):
     caller = caller_func()
+    c_line = caller_line()
 
     caller += "()"
 
@@ -48,9 +49,13 @@ def out_msg(who, msg, type):
 
     caller += " " * symbols
 
-    out = "[{:s}] : [{:s}] : [{:s}:{:s}] : [{:s}] ".format(datetime.datetime.now().__str__(), type,
-                                                           who, caller,
-                                                           msg)
+    symbols = common.LOG_SYMB_C_LINE - len(c_line)
+
+    c_line = " " * symbols + c_line
+
+    out = "[{:s}] : [{:s}] : [{:s}:{:s}] : [L: {:s}] : [{:s}] ".format(datetime.datetime.now().__str__(), type,
+                                                                       who, caller,
+                                                                       c_line, msg)
 
     if not common.QUIET:
         print(out)
@@ -59,8 +64,12 @@ def out_msg(who, msg, type):
 
 
 def caller_func():
-    return inspect.stack()[3][3]
+    return str(inspect.stack()[3][3])
 
+def caller_line():
+    frame = inspect.stack()[3][0]
+    info = inspect.getframeinfo(frame)
+    return str(info.lineno)
 
 def main():
     print("do nothing from there")

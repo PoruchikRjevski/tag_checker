@@ -94,7 +94,7 @@ def main():
     # main func
     git_man = GitMan()
     # check environment
-    if not git_man.check_git_installed():
+    if not git_man.check_git_installed:
         out_err(common.TAG_CHECKER, common.E_GNT_STR)
         sys.exit(common.EXIT_GNT)
 

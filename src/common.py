@@ -23,7 +23,8 @@ REPO_SUFFIX     = ".git"
 
 OUT_PATH_DEF    = "/var/www/swver_hist/"
 
-LOG_SYMB_CALLER = 40
+LOG_SYMB_CALLER = 50
+LOG_SYMB_C_LINE = 5
 
 # tag model
 PROD            = ("PROD", "ROD")
@@ -80,7 +81,7 @@ NO_MERGES       = "--no-merges "
 ABBREV_COMM     = "--abbrev-commit "
 
 GIT_PAR_SH_NEST = 15
-GIT_AUTHOR_NEST = 1
+GIT_AUTHOR_DEEP = 1
 
 COMMIT_MSG_SIZE = 30
 

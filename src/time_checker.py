@@ -1,5 +1,7 @@
 import time
 
+from logger import *
+
 __all__ = ['TimeChecker']
 
 class TimeChecker:

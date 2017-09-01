@@ -16,6 +16,7 @@ A_SHORT             = " --short"
 A_PRETTY            = " --pretty={:s}"
 A_CONTAINS          = " --contains {:s}"
 A_DATE              = " --date={:s}"
+A_FORMAT          = " --format=\"{:s}\""
 A_TAIL              = " | tail -{:s}"
 
 A_P_FORMAT          = "format:\"{:s}\""
@@ -32,6 +33,7 @@ AA_AUTHOR           = "%ae"
 AA_PARENT_SHASH     = "%p"
 AA_COMMIT_MSG       = "%s"
 AA_SHASH            = "%h"
+AA_COMMIT_DATE      = "%cd"
 
 
 
