@@ -108,16 +108,37 @@ class GitMan:
 
             out_log(self.__class__.__name__, "prenum: " + prenum)
 
-            if prenum not in common.WRONG_NUM:
-                note_out.type = tag_parts[2].split("-")[:-1][0]
+            note_out.type = tag_parts[2].split("-")[:-1][0]
+
+            if note_out.type not in common.TYPES_L:
+                out_err(self.__class__.__name__, "Bad item type: " + note_out.type)
+                return False
+
+            try:
                 note_out.num = int(prenum)
-            else:
-                out_err(self.__class__.__name__, "Bad tag item num: " + note_out.tag)
+            except ValueError:
+                out_err(self.__class__.__name__, "EXCEPT Bad item num: " + prenum)
+                return False
+
+            # if prenum not in common.WRONG_NUM:
+            #     note_out.type = tag_parts[2].split("-")[:-1][0]
+            #
+            #     if not note_out.type in common.TYPES_L:
+            #         out_err(self.__class__.__name__, "Bad tag item type: " + note_out.tag)
+            #
+            #     try:
+            #         note_out.num = int(prenum)
+            #     except ValueError:
+            #         note_out.num = -1
+            #         note_out.numStr = prenum
+            #         note_out.type = common.TYPE_UNKNOWN
+            #         out_err(self.__class__.__name__, "EXCEPT Bad tag item num: " + note_out.tag)
+            # else:
+            #     out_err(self.__class__.__name__, "Bad tag item num: " + note_out.tag)
 
             date = self.__repair_tag_date(tag_parts[3])
 
         if not date:
-            out_err(self.__class__.__name__, "Bad tag: " + note_out.tag)
             return False
         elif date:
             note_out.date = date
@@ -275,6 +296,7 @@ class GitMan:
         note.tag = tag
 
         if not self.__parce_tag(note):
+            out_err(self.__class__.__name__, "Bad tag: " + tag)
             return False
             # return note
 

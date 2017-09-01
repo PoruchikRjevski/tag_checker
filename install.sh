@@ -12,6 +12,9 @@ CONFIG_FILE="tag_checker.ini"
 TRANSLATE_FILE="tag_checker_translate"
 NAME="tag_checker.py"
 
+EXEC_F="run.sh"
+PREFIX_F="#!/bin/bash"
+
 PYTHON="python3"
 
 
@@ -49,9 +52,19 @@ remove_from_crontab() {
 # add note to crontab
 add_to_crontab() {
     crontab -l > temp
-    echo "0 * * * * $SETUP_DIR$NAME $quiet $log $upd $sud $dev $mt $fcm" >> temp
+    echo "0 * * * * $SETUP_DIR$EXEC_F" >> temp
     crontab temp
     rm temp
+}
+
+# create executable file
+create_exec_file() {
+    touch $SETUP_DIR$EXEC_F
+    
+    chmod 777 $SETUP_DIR$EXEC_F
+    
+    echo $PREFIX_F > $SETUP_DIR$EXEC_F
+    echo $SETUP_DIR$NAME $quiet $log $upd $sud $dev $mt $fcm >> $SETUP_DIR$EXEC_F
 }
 
 # run script
@@ -139,6 +152,8 @@ main() {
     #check_and_rem_f "$CONFIG_DIR$TRANSLATE_FILE"
     cp -rfn $CUR_DIR$TRANSLATE_FILE $CONFIG_DIR
     chmod 777 $CONFIG_DIR$TRANSLATE_FILE
+    
+    create_exec_file
     
     # CRON
     read -p "Add to crontab (y/n)? " answ

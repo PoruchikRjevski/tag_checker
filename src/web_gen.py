@@ -181,6 +181,7 @@ class WebGenerator:
             res = common.ITEM_NUM + str(num)
         elif common.TYPE_ORDER in type:
             res = common.ORDER_NUM + str(num)
+
         return res
 
     def genOrdersPages(self, dep, device, repoLink, repoName):
@@ -191,6 +192,7 @@ class WebGenerator:
 
             self.genPageHead(page)
             self.genTableHead(page)
+
             self.gen_order_table_head(page,
                                       [common.HISTORY + device.trName + " - " + self.getNumByType(val[0].type,
                                                                                                   val[0].num),
