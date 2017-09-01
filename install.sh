@@ -54,6 +54,11 @@ add_to_crontab() {
     rm temp
 }
 
+# run script
+run_now() {
+    $SETUP_DIR$NAME $log $upd $sud $dev
+}
+
 # ---------------------------------
 # main
 # ---------------------------------
@@ -128,6 +133,17 @@ main() {
       ;;
       n|N )
       remove_from_crontab
+      ;;
+      * ) ;;
+    esac
+    
+    # CRON
+    read -p "Run now (y/n)? " answ
+    case "$answ" in 
+      y|Y ) 
+      run_now   
+      ;;
+      n|N )
       ;;
       * ) ;;
     esac
