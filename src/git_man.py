@@ -413,10 +413,20 @@ class GitMan:
                                     out_log(self.__class__.__name__, "last: " + str(last))
                                     out_log(self.__class__.__name__, "pos: " + str(pos))
                                     if last > 1:
-                                        self.__gen_notes_by_tag_list(tags_list[int(pos):int(pos+avg)], n_queue)
+                                        thread = Thread(target=self.__gen_notes_by_tag_list,
+                                                        args=[tags_list[int(pos):int(pos+avg)],
+                                                              n_queue])
+                                        thread.start()
+                                        threads.append(thread)
+                                        # self.__gen_notes_by_tag_list(tags_list[int(pos):int(pos+avg)], n_queue)
                                         pos += avg
                                     else:
-                                        self.__gen_notes_by_tag_list(tags_list[int(pos):], n_queue)
+                                        thread = Thread(target=self.__gen_notes_by_tag_list,
+                                                        args=[tags_list[int(pos):],
+                                                              n_queue])
+                                        thread.start()
+                                        threads.append(thread)
+                                        # self.__gen_notes_by_tag_list(tags_list[int(pos):], n_queue)
                             else:
                                 for tag in tags.split("\n"):
                                     if self.__is_tag_valid(tag):
