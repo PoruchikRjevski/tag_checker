@@ -131,8 +131,10 @@ class WebGenerator:
                                                                 note.commMsg,
                                                                 str(note.pHash))
                         self.genNoteHash(file,
-                                         note.sHash,
-                                         html_defs.A_BGCOLOR.format(typeColor),
+                                         (note.sHash + " "
+                                          + note.commDate),
+                                         (html_defs.A_BGCOLOR.format(typeColor)
+                                          + html_defs.A_ALIGN.format(common.ALIGN_R)),
                                          self.getTitleForCommit(repo.link,
                                                                 note.author,
                                                                 note.commDate,

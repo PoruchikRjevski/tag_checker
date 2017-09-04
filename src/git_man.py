@@ -142,10 +142,10 @@ class GitMan:
         cmd = git_defs.GIT_CMD.format(git_defs.A_LOG
                                       + git_defs.A_NN.format(str(1))
                                       + git_defs.A_PRETTY.format(git_defs.A_P_FORMAT.format(git_defs.AA_COMMIT_DATE))
-                                      + git_defs.A_DATE.format(git_defs.A_D_SHORT)
+                                      + git_defs.A_DATE.format(git_defs.A_D_ISO)
                                       + " " + hash)
 
-        # out_log(self.__class__.__name__, "cmd: " + cmd)
+        out_log(self.__class__.__name__, "cmd: " + cmd)
 
         return run_cmd(cmd)
 
@@ -267,7 +267,8 @@ class GitMan:
         note.sHash = self.__get_short_hash(tag)
         t_logs.append(out_log_def(self.__class__.__name__, "Note short hash: " + note.sHash))
 
-        note.commDate = self.__get_commit_date_by_short_hash(note.sHash)
+        note.commDate = self.__repair_commit_date(self.__get_commit_date_by_short_hash(note.sHash))
+        # out_log(self.__class__.__name__, "Note commit date: " + note.commDate)
         t_logs.append(out_log_def(self.__class__.__name__, "Note commit date: " + note.commDate))
 
         note.author = self.__get_commit_author_by_short_hash(note.sHash)
@@ -298,6 +299,21 @@ class GitMan:
         try:
             res += temp[0] + "-" + temp[1] + "-" + temp[2] + " "
             res += temp[3][0] + temp[3][1] + ":" + temp[3][2] + temp[3][3]
+        except Exception:
+            out_err(self.__class__.__name__, "Bad date: " + date)
+
+        return res
+
+    def __repair_commit_date(self, date):
+        temp = date.split(" ")
+        timeT = temp[1].split(":")
+
+        res = ""
+
+        try:
+            res += temp[0] + " " + timeT[0] + ":" + timeT[1]
+
+            print(res)
         except Exception:
             out_err(self.__class__.__name__, "Bad date: " + date)
 

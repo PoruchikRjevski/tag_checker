@@ -22,6 +22,7 @@ A_TAIL              = " | tail -{:s}"
 A_P_FORMAT          = "format:\"{:s}\""
 
 A_D_SHORT           = "short"
+A_D_ISO             = "iso"
 
 A_PULL              = " pull"
 
