@@ -1,4 +1,4 @@
-- BUG: sometimes <hash> in link to gitweb not present 
++ BUG: sometimes <hash> in link to gitweb not present
     Example: 
         ASE-2 
         ITEM-0106
