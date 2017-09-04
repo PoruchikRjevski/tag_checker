@@ -82,3 +82,15 @@
     
     - show "for all" version for each found domains and for root domain
     - check versions metrics with base in same domain or in upper domain (if same domain base is not exists)
+    
+- for each repo add sw name prefix in config:
+
+    HL:asv-1_v2_hl.git
+    DRV:asv-1_ll_drv.git
+    
+    and if
+        asv-1_v2_hl.git  have tag PROD/ASW-1/ITEM-0014/2017-xx-xx-xxxx
+        asv-1_ll_drv.git have tag PROD/ASW-1/ITEM-0014/2017-xx-xx-xxxx
+    then show table in table
+        | ASW-1 | #14 | HL | 2017-xx-xx-xxxx
+                        DRV| 2017-xx-xx-xxxx
