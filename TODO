@@ -1,0 +1,74 @@
+- intro page -> departments and devices only lists
+- rename version column "Хэш сумма" => "Версия ПО"
+- rename column "Устройство" => "Прибор"
+- add to column "Версия ПО" date and time of commit: <hash> <YYYY-MM-DD> <HH:MM>
+- JavaScript selection: sometimes several commits selected due same comments
+- change "БРА-135Ф" => "БРА-135F"
+- add setted up config files to srv-swdev repo (backup)
+- add link to ftp to redistributives in form:
+
+    ftp://srv-swdev/redist/bourevestnik.ru/<device_class_en>/<commit_hash>
+
+    - show only for "for all" versions
+    - link must be in columns "Version" with title "[R]" example
+
+        item 66 : .... : 491845 2017-04-22 16:33
+        for all : .... : 491845 2017-04-22 16:33 [R]
+    
+- add "metric" column after version column. Metric for tags A and B for one device class defined as:
+ 
+    INST(A, B) - install date and time diff:       -,0,+     A < B => "-",  A = B => "0"  A > B "+"    A relative to B
+    DIST(A, B) - direct path commits count diff: x,-,0,+ 
+    
+    - - lesser
+    0 - equals
+    + - greater
+    * - any
+    x - not exist
+    
+    DIST(A, B) = x => A and B in diff branches without direct way to eash other
+    
+    item specific branch name is in form "release/<device_class>/item-<id>"
+        
+    if A in item special branch : x => DIST(A,B) = '+'
+    if A in any other    branch : x => DIST(A,B) = '-'
+
+    DI(A, B)   B - is the BASE commit, A - testable
+    ===:==A is==:==================================
+    x* : ****** : see branch specialization
+    -+ : FORCED : A forced to install old version 
+    -* : OLD    : A < B
+    0* : OK     : A == B
+    +- : OK/EXP : Too scary to move base upper, but A is ok or EXPerimental
+    +* : OK     : A >= B
+    
+    Show in metric:
+        <RES> (d/c)
+        <RES> ::= 
+            OK     |    A new            (green)
+            OK/EXP |    A new and exp    (green)
+            FORCED |    A old but forced (yellow)
+            OLD         A old            (red)
+            
+    d - days between commits     (positive is A > B)
+    c - commits between commits  (positive is A > B)
+
+    for "item" or "order" lines -> A is line version, B - base version
+    for "all versions" lines -> A is line version, B - latest installed version to specific device
+    
+- production versions domains. Tag names are:
+
+    PROD/<device_class>/ITEM-<id>/<time_stamp>[/<domains>]
+    PROD/<device_class>/ORDER-<id>/<time_stamp>[/<domains>]
+    PROD/<device_class>/<time_stamp>[/<domains>]
+    
+    <device_class> ::= ASW-1 | ...
+    <id> ::= 0000 | 0001 | ...
+    <time_stamp> ::= YYYY-MM-DD-HHMM
+    
+    <domains> ::= <domain> | <domain>/<domains>
+    <domain> ::= "linux" | "dos" | ...
+    
+    
+    - show "for all" version for each found domains and for root domain
+    - check versions metrics with base in same domain or in upper domain (if same domain base is not exists)
