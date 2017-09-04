@@ -1,9 +1,9 @@
 - intro page -> departments and devices only lists
-- rename version column "Õıø ñóììà" => "Âåğñèÿ ÏÎ"
-- rename column "Óñòğîéñòâî" => "Ïğèáîğ"
-- add to column "Âåğñèÿ ÏÎ" date and time of commit: <hash> <YYYY-MM-DD> <HH:MM>
+- rename version column "Ğ¥ÑÑˆ ÑÑƒĞ¼Ğ¼Ğ°" => "Ğ’ĞµÑ€ÑĞ¸Ñ ĞŸĞ"
+- rename column "Ğ£ÑÑ‚Ñ€Ğ¾Ğ¹ÑÑ‚Ğ²Ğ¾" => "ĞŸÑ€Ğ¸Ğ±Ğ¾Ñ€"
+- add to column "Ğ’ĞµÑ€ÑĞ¸Ñ ĞŸĞ" date and time of commit: <hash> <YYYY-MM-DD> <HH:MM>
 - JavaScript selection: sometimes several commits selected due same comments
-- change "ÁĞÀ-135Ô" => "ÁĞÀ-135F"
+- change "Ğ‘Ğ Ğ-135Ğ¤" => "Ğ‘Ğ Ğ-135F"
 - add setted up config files to srv-swdev repo (backup)
 - add link to ftp to redistributives in form:
 
