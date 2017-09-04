@@ -158,11 +158,11 @@ FRAME_W         = "99%"
 # page table header
 MAIN_HEAD       = "Актуальные прошивки"
 DEPARTMENT      = "Отдел"
-DEVICE          = "Устройство"
+DEVICE          = "Прибор"
 ITEM            = "№"
 LAST_SET        = "Последняя установка"
 DATE            = "Дата установки"
-HASH_STR            = "Хэш-сумма"
+HASH_STR            = "Версия"
 HISTORY         = "История прошивок для устройства "
 DEPART_STR      = "Отдел: "
 
