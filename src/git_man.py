@@ -245,7 +245,11 @@ class GitMan:
         if parents_hash is None:
             return -1
         else:
-            return parents_hash
+            parents_hash = parents_hash.strip()
+            if parents_hash:
+                return parents_hash
+            else:
+                return -1
 
     def __gen_notes_by_tag_list(self, tag_list, out_queue):
         for tag in tag_list:

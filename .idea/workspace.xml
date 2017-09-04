@@ -5,7 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2c8eb497-6da4-44ad-8163-64862edfca81" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/TODO" afterPath="$PROJECT_DIR$/TODO" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/common.py" afterPath="$PROJECT_DIR$/src/common.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/git_man.py" afterPath="$PROJECT_DIR$/src/git_man.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/tag_checker.ini" afterPath="$PROJECT_DIR$/tag_checker.ini" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -75,11 +81,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="git_man.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="git_man.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/git_man.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="78">
-              <caret line="314" column="0" lean-forward="false" selection-start-line="314" selection-start-column="0" selection-end-line="314" selection-end-column="0" />
+            <state relative-caret-position="310">
+              <caret line="247" column="43" lean-forward="false" selection-start-line="247" selection-start-column="43" selection-end-line="247" selection-end-column="43" />
               <folding>
                 <element signature="e#261#437#0" expanded="false" />
                 <element signature="e#483#635#0" expanded="false" />
@@ -103,35 +109,35 @@
                 <element signature="e#5878#6125#0" expanded="false" />
                 <element signature="e#5936#6105#0" expanded="false" />
                 <element signature="e#5990#6105#0" expanded="false" />
-                <element signature="e#8864#8959#0" expanded="false" />
-                <element signature="e#11239#11259#0" expanded="false" />
-                <element signature="e#11318#11340#0" expanded="false" />
-                <element signature="e#11389#11412#0" expanded="false" />
-                <element signature="e#11478#11504#0" expanded="false" />
-                <element signature="e#11554#11578#0" expanded="false" />
-                <element signature="e#11650#11681#0" expanded="false" />
-                <element signature="e#11737#11767#0" expanded="false" />
-                <element signature="e#11844#11874#0" expanded="false" />
-                <element signature="e#11933#12072#0" expanded="false" />
-                <element signature="e#13511#15935#0" expanded="false" />
-                <element signature="e#13761#15405#0" expanded="false" />
-                <element signature="e#14054#15405#0" expanded="false" />
-                <element signature="e#14391#14894#0" expanded="false" />
-                <element signature="e#14505#14610#0" expanded="false" />
-                <element signature="e#14977#15405#0" expanded="false" />
-                <element signature="e#15091#15184#0" expanded="false" />
-                <element signature="e#15472#15791#0" expanded="false" />
-                <element signature="e#15537#15791#0" expanded="false" />
-                <element signature="e#15606#15791#0" expanded="false" />
-                <element signature="e#15873#15935#0" expanded="false" />
-                <element signature="e#16203#16366#0" expanded="false" />
-                <element signature="e#16554#16810#0" expanded="false" />
+                <marker date="1504536304439" expanded="false" signature="8976:9084" ph="..." />
+                <marker date="1504536304439" expanded="false" signature="11355:11384" ph="..." />
+                <marker date="1504536304439" expanded="false" signature="11434:11465" ph="..." />
+                <marker date="1504536304439" expanded="false" signature="11505:11537" ph="..." />
+                <marker date="1504536304439" expanded="false" signature="11594:11629" ph="..." />
+                <marker date="1504536304439" expanded="false" signature="11670:11703" ph="..." />
+                <marker date="1504536304439" expanded="false" signature="11766:11806" ph="..." />
+                <marker date="1504536304439" expanded="false" signature="11853:11892" ph="..." />
+                <marker date="1504536304439" expanded="false" signature="11960:11999" ph="..." />
+                <marker date="1504536304439" expanded="false" signature="12049:12197" ph="..." />
+                <marker date="1504536304439" expanded="false" signature="13607:16060" ph="..." />
+                <marker date="1504536304439" expanded="false" signature="13853:15530" ph="..." />
+                <marker date="1504536304439" expanded="false" signature="14142:15530" ph="..." />
+                <marker date="1504536304439" expanded="false" signature="14475:15019" ph="..." />
+                <marker date="1504536304439" expanded="false" signature="14631:14734" ph="..." />
+                <marker date="1504536304439" expanded="false" signature="15061:15530" ph="..." />
+                <marker date="1504536304439" expanded="false" signature="15217:15308" ph="..." />
+                <marker date="1504536304439" expanded="false" signature="15564:15916" ph="..." />
+                <marker date="1504536304439" expanded="false" signature="15625:15916" ph="..." />
+                <marker date="1504536304439" expanded="false" signature="15690:15916" ph="..." />
+                <marker date="1504536304439" expanded="false" signature="15965:16060" ph="..." />
+                <marker date="1504536304439" expanded="false" signature="16299:16465" ph="..." />
+                <marker date="1504536304439" expanded="false" signature="16650:16935" ph="..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
+      <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="544">
@@ -247,13 +253,13 @@
         <option value="$PROJECT_DIR$/TODO" />
         <option value="$PROJECT_DIR$/src/tag_model.py" />
         <option value="$PROJECT_DIR$/src/git_defs.py" />
-        <option value="$PROJECT_DIR$/src/git_man.py" />
         <option value="$PROJECT_DIR$/src/common.py" />
         <option value="$PROJECT_DIR$/src/web_gen.py" />
+        <option value="$PROJECT_DIR$/src/git_man.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="454" />
     <option name="y" value="197" />
     <option name="width" value="960" />
@@ -441,7 +447,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="454" y="197" width="1922" height="1059" extended-state="7" />
+    <frame x="454" y="197" width="1922" height="1059" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.099574015" sideWeight="0.5" order="1" side_tool="false" content_ui="combo" />
@@ -732,26 +738,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="544">
-          <caret line="32" column="31" lean-forward="false" selection-start-line="32" selection-start-column="31" selection-end-line="32" selection-end-column="31" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/tag_checker.ini">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="102">
           <caret line="6" column="11" lean-forward="false" selection-start-line="6" selection-start-column="11" selection-end-line="6" selection-end-column="11" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/TODO">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="187">
-          <caret line="11" column="13" lean-forward="false" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
           <folding />
         </state>
       </provider>
@@ -827,10 +817,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/TODO">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="11" column="13" lean-forward="false" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/git_man.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="78">
-          <caret line="314" column="0" lean-forward="false" selection-start-line="314" selection-start-column="0" selection-end-line="314" selection-end-column="0" />
+        <state relative-caret-position="310">
+          <caret line="247" column="43" lean-forward="false" selection-start-line="247" selection-start-column="43" selection-end-line="247" selection-end-column="43" />
           <folding>
             <element signature="e#261#437#0" expanded="false" />
             <element signature="e#483#635#0" expanded="false" />
@@ -854,30 +852,38 @@
             <element signature="e#5878#6125#0" expanded="false" />
             <element signature="e#5936#6105#0" expanded="false" />
             <element signature="e#5990#6105#0" expanded="false" />
-            <element signature="e#8864#8959#0" expanded="false" />
-            <element signature="e#11239#11259#0" expanded="false" />
-            <element signature="e#11318#11340#0" expanded="false" />
-            <element signature="e#11389#11412#0" expanded="false" />
-            <element signature="e#11478#11504#0" expanded="false" />
-            <element signature="e#11554#11578#0" expanded="false" />
-            <element signature="e#11650#11681#0" expanded="false" />
-            <element signature="e#11737#11767#0" expanded="false" />
-            <element signature="e#11844#11874#0" expanded="false" />
-            <element signature="e#11933#12072#0" expanded="false" />
-            <element signature="e#13511#15935#0" expanded="false" />
-            <element signature="e#13761#15405#0" expanded="false" />
-            <element signature="e#14054#15405#0" expanded="false" />
-            <element signature="e#14391#14894#0" expanded="false" />
-            <element signature="e#14505#14610#0" expanded="false" />
-            <element signature="e#14977#15405#0" expanded="false" />
-            <element signature="e#15091#15184#0" expanded="false" />
-            <element signature="e#15472#15791#0" expanded="false" />
-            <element signature="e#15537#15791#0" expanded="false" />
-            <element signature="e#15606#15791#0" expanded="false" />
-            <element signature="e#15873#15935#0" expanded="false" />
-            <element signature="e#16203#16366#0" expanded="false" />
-            <element signature="e#16554#16810#0" expanded="false" />
+            <marker date="1504536304439" expanded="false" signature="8976:9084" ph="..." />
+            <marker date="1504536304439" expanded="false" signature="11355:11384" ph="..." />
+            <marker date="1504536304439" expanded="false" signature="11434:11465" ph="..." />
+            <marker date="1504536304439" expanded="false" signature="11505:11537" ph="..." />
+            <marker date="1504536304439" expanded="false" signature="11594:11629" ph="..." />
+            <marker date="1504536304439" expanded="false" signature="11670:11703" ph="..." />
+            <marker date="1504536304439" expanded="false" signature="11766:11806" ph="..." />
+            <marker date="1504536304439" expanded="false" signature="11853:11892" ph="..." />
+            <marker date="1504536304439" expanded="false" signature="11960:11999" ph="..." />
+            <marker date="1504536304439" expanded="false" signature="12049:12197" ph="..." />
+            <marker date="1504536304439" expanded="false" signature="13607:16060" ph="..." />
+            <marker date="1504536304439" expanded="false" signature="13853:15530" ph="..." />
+            <marker date="1504536304439" expanded="false" signature="14142:15530" ph="..." />
+            <marker date="1504536304439" expanded="false" signature="14475:15019" ph="..." />
+            <marker date="1504536304439" expanded="false" signature="14631:14734" ph="..." />
+            <marker date="1504536304439" expanded="false" signature="15061:15530" ph="..." />
+            <marker date="1504536304439" expanded="false" signature="15217:15308" ph="..." />
+            <marker date="1504536304439" expanded="false" signature="15564:15916" ph="..." />
+            <marker date="1504536304439" expanded="false" signature="15625:15916" ph="..." />
+            <marker date="1504536304439" expanded="false" signature="15690:15916" ph="..." />
+            <marker date="1504536304439" expanded="false" signature="15965:16060" ph="..." />
+            <marker date="1504536304439" expanded="false" signature="16299:16465" ph="..." />
+            <marker date="1504536304439" expanded="false" signature="16650:16935" ph="..." />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="544">
+          <caret line="32" column="31" lean-forward="false" selection-start-line="32" selection-start-column="31" selection-end-line="32" selection-end-column="31" />
+          <folding />
         </state>
       </provider>
     </entry>
