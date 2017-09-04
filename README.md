@@ -8,10 +8,11 @@ Issues:
 
 Installing:
 - git clone git@srv-swdev:/opensource/device_tag_visualiser.git
+- cd device_tag_visualiser/
 - git checkout develop
 - sudo ./install.sh
-- go to /etc/ edit tag_checker.ini and tag_checker_translate
-- if need - change in install.sh cron timeout update
+- edit /etc/tag_checker.ini for set repo's and /etc/tag_checker_translate for set device's names translate
+- if need - change in install.sh cron timeout update(every hour at 0 minute - default)
 
 #### DEVELOPER INFO ####
 Main parts:
@@ -24,18 +25,9 @@ Main parts:
     - agregate all info about tags, repos, commits etc
 - checker(GitMan)
     - got throw repos, update, get tags, parce it's put info to model
+ # TODO : rewrite html_gen(api for more flexibility)
 - web configurator(WebGen)
     - create web page's:
         - main - last changes for all departments, devices and types(ITEM, ORDER, ALL)
         - for every device
         - for every item number
-
-Used git commands:
-GIT_VER         = "git --version"                           # get git ver
-CUR_BRANCH      = "git rev-parse --abbrev-ref HEAD"         # get current branch
-SW_BRANCH       = "git checkout "                           # switch branch to
-UPD_REPO        = "git pull"                                # update repo
-GET_TAGS        = "git tag"                                 # get all tags for cur branch
-GET_TAG_SSHA    = "git rev-parse --short "                  # get short SHA1 for tagged commit
-GET_COMM_DATE   = "git show -s --format=%cd --date=short "  # get commit date by hash
-GET_COMM_INFO   = "git log -{0!s} --format='{1!s}' "        # get commit info
