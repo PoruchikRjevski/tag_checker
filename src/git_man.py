@@ -189,11 +189,11 @@ class GitMan:
 
         return res
 
-    def __get_develop_branch_by_hash(self, hash):
+    def __get_develop_branch_by_hash(self, hash, t_logs):
         cmd = git_defs.GIT_CMD.format(git_defs.A_BRANCH
                                       + git_defs.A_CONTAINS.format(hash))
 
-        # out_log(self.__class__.__name__, "cmd: " + cmd)
+        t_logs.append(out_log_def(self.__class__.__name__, "cmd: " + cmd))
 
         out = run_cmd(cmd)
 
@@ -201,24 +201,24 @@ class GitMan:
 
         return out
 
-    def __get_last_commit_on_branch(self, branch):
+    def __get_last_commit_on_branch(self, branch, t_logs):
         cmd = git_defs.GIT_CMD.format(git_defs.A_LOG
                                       + git_defs.A_NN.format(str(common.GIT_AUTHOR_DEEP))
                                       + git_defs.A_FORMAT.format(git_defs.AA_SHASH)
                                       + " " + branch)
 
-        # out_log(self.__class__.__name__, "cmd: " + cmd)
+        t_logs.append(out_log_def(self.__class__.__name__, "cmd: " + cmd))
 
         return run_cmd(cmd)
 
-    def __get_parent_commit_hash(self, noteHash, lastCommHash):
+    def __get_parent_commit_hash(self, noteHash, lastCommHash, t_logs):
         cmd = common.GIT_CMD.format(common.GIT_REV_LIST.format(common.ABBREV_COMM
                                                                + noteHash + "..."
                                                                + lastCommHash
                                                                + " |"
                                                                + common.FORM_TAIL.format(str(common.GIT_PAR_SH_NEST))))
 
-        # out_log(self.__class__.__name__, "cmd: " + cmd)
+        t_logs.append(out_log_def(self.__class__.__name__, "cmd: " + cmd))
 
         out = run_cmd(cmd)
 
@@ -229,18 +229,18 @@ class GitMan:
 
         return out
 
-    def __get_parents_short_hash(self, note_hash):
-        branch = self.__get_develop_branch_by_hash(note_hash)
+    def __get_parents_short_hash(self, note_hash, t_logs):
+        branch = self.__get_develop_branch_by_hash(note_hash, t_logs)
         # out_log(self.__class__.__name__, "finded branch: " + str(branch))
         if branch is None:
             return -1
 
-        last_commit_s_hash = self.__get_last_commit_on_branch(branch)
+        last_commit_s_hash = self.__get_last_commit_on_branch(branch, t_logs)
         # out_log(self.__class__.__name__, "last commit short hash: " + str(last_commit_s_hash))
         if last_commit_s_hash is None:
             return -1
 
-        parents_hash = self.__get_parent_commit_hash(note_hash, last_commit_s_hash)
+        parents_hash = self.__get_parent_commit_hash(note_hash, last_commit_s_hash, t_logs)
         # out_log(self.__class__.__name__, "parent's hash: " + str(parents_hash))
         if parents_hash is None:
             return -1
@@ -278,7 +278,7 @@ class GitMan:
         t_logs.append(out_log_def(self.__class__.__name__, "Note commMsg: " + note.commMsg))
 
         # get pHash
-        note.pHash = self.__get_parents_short_hash(note.sHash)
+        note.pHash = self.__get_parents_short_hash(note.sHash, t_logs)
         if note.pHash == -1:
             note.pHash = note.sHash
         t_logs.append(out_log_def(self.__class__.__name__, "Note pHash: " + str(note.pHash)))
