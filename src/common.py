@@ -4,16 +4,19 @@ SCRIPTS_F_NAME  = "scripts.js"
 
 CL_MAIN_TABLE   = "main_table"
 CL_FOOT_INFO    = "foot_info"
+CL_FOOT_BACK    = "foot_back"
 CL_MT_H         = "mt_head"
 CL_MT_F         = "mt_foot"
 CL_TR_1         = "tr_1"
-CL_TR_2         = "tr_2"
+CL_TD_1         = "td_1"
+CL_TD_2         = "td_2"
 CL_TD_INC       = "td_inc_{:s}"
+CL_TD_VER       = "version"
 
 M_TABLE_COLSPAN = "5"
 MID_ROWS        = "2"
 BTM_ROWS        = "1"
-M_TABLE_H_NUM   = "3"
+M_TABLE_H_NUM   = "2"
 
 OUT_PATH        = "" # NON CONST
 MAIN_F_NAME     = "main.html"
@@ -52,6 +55,9 @@ DATE_TXT        = "Дата установки"
 HASH_TXT        = "Версия"
 TAG_TXT         = "Тэг: "
 CNT_TXT         = "В истории: "
+BACK_TXT        = "На главную"
+
+LEVEL_UP        = "../"
 
 
 
@@ -201,7 +207,6 @@ ITEM_NUM        = "Зав. № "
 ORDER_NUM       = "Заказ "
 
 # back link
-BACK            = "На главную"
 
 # footer
 REPO_STR        = "Репозиторий: "

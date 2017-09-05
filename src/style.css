@@ -18,10 +18,14 @@ a:active {
 
 table {
     border: 1px solid black;
+
     background-color: #aaaaaa;
+
     text-align: center;
+
     font-size: 14px;
     font-family: arial;
+
     margin-left: auto;
     margin-right: auto;
 }
@@ -35,6 +39,13 @@ th {
     padding: 5px;
 }
 
+h2 {
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 2%;
+}
+
 tr.mt_head {
     background-color: #333333;
 }
@@ -44,11 +55,19 @@ tr.mt_foot {
 }
 
 tr.tr_1 {
-    background-color: #eeeeee
+    background-color: #eeeeee;
 }
 
-tr.tr_2 {
-    background-color: #dddddd
+td.td_1 {
+    background-color: #eeeeee;
+}
+
+td.td_2 {
+    background-color: #dddddd;
+}
+
+.td_1.version, .td_2.version, .td_inc_0.version, .td_inc_1.version, .td_inc_2.version {
+    text-align: right;
 }
 
 td.td_inc_0 {
@@ -60,14 +79,19 @@ td.td_inc_1 {
 td.td_inc_2 {
     background-color: #bebebe
 }
+p.header {
 
-h3 {
-    color: white;
-    padding: 5%;
 }
 
 p.foot_info {
     text-align: center;
     font-size: 10px;
     font-family: arial;
+}
+
+p.foot_back {
+    text-align: center;
+    font-size: 12px;
+    font-family: arial;
+    font-weight: bold;
 }

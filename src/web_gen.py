@@ -21,7 +21,7 @@ class WebGenerator:
         out_log(self.__class__.__name__, "start gen index")
         index = HtmlGen(common.OUT_PATH, common.INDEX_F_NAME)
 
-        self.__gen_page_head(index)
+        self.__gen_page_head(index,)
         self.__gen_iframe(index)
         self.__gen_script(index, common.FRAME_ID)
         self.__gen_page_foot(index)
@@ -35,7 +35,6 @@ class WebGenerator:
 
         self.__gen_page_head(main)
         self.__gen_table_head(main)
-
         self.__gen_main_table_head(main)
 
         self.__gen_main_content(model, main)
@@ -47,13 +46,13 @@ class WebGenerator:
         main.close()
         out_log(self.__class__.__name__, "finish gen main")
 
-    def __gen_page_head(self, gen):
+    def __gen_page_head(self, gen, level=""):
         gen.w_o_tag(html_defs.T_HTML, "", True)
         gen.w_o_tag(html_defs.T_HEAD, "", True)
         gen.w_o_tag(html_defs.T_META, html_defs.A_CHARSET.format(common.DOC_CODE), True)
         gen.w_o_tag(html_defs.T_LINK,
                     html_defs.A_REL.format(html_defs.A_REL_SS)
-                    + html_defs.A_HREF.format(common.STYLE_F_NAME), True)
+                    + html_defs.A_HREF.format(level + common.STYLE_F_NAME), True)
         gen.w_c_tag(html_defs.T_HEAD)
         gen.w_o_tag(html_defs.T_BODY, "", True)
 
@@ -109,10 +108,9 @@ class WebGenerator:
                     html_defs.A_COLSPAN.format(common.M_TABLE_COLSPAN),
                     True)
 
-        gen.w_o_tag(html_defs.T_H.format(common.M_TABLE_H_NUM),
-                    "")
-        gen.w_txt(common.M_HEAD_TXT)
-        gen.w_c_tag(html_defs.T_H.format(common.M_TABLE_H_NUM))
+        gen.w_tag(html_defs.T_H.format(common.M_TABLE_H_NUM),
+                  common.M_HEAD_TXT,
+                  "")
 
         gen.w_c_tag(html_defs.T_TH)
         gen.w_c_tag(html_defs.T_TR)
@@ -170,7 +168,7 @@ class WebGenerator:
             for repo in repos:
                 for name, dev in repo.devices.items():
                     # generate device's own page
-                    # self.genOrdersPages(dep, dev, repo.link, repo.name)
+                    self.__gen_orders_pages(dep, dev, repo.link, repo.name)
 
                     # generate content for main page
                     first_dev = True
@@ -204,36 +202,17 @@ class WebGenerator:
                                              html_defs.A_TITLE.format(
                                                  common.CNT_TXT + str(dev.get_cnt_by_num(note.num))) +
                                              html_defs.A_CLASS.format(common.CL_TD_INC.format(str(type_class_id))),
-                                             html_defs.A_HREF.format(
-                                                 common.ORDERS_PATH + self.getOrderFileName(name, note.num)),
+                                             common.ORDERS_PATH + self.__get_order_file_name(name, note.num),
                                              self.__get_num_by_type(note.type, note.num))
 
-
-                        # tag date
-                        self.__gen_tag_date(file,
-                                            note.date,
-                                            html_defs.A_TITLE.format(common.TAG_TXT + note.tag)
-                                            + html_defs.A_CLASS.format(common.CL_TD_INC.format(str(type_class_id))))
-
-                        # commit hash
-                        link_hash = note.pHash
-                        if link_hash == -1:
-                            link_hash = note.sHash
-
-                        link_to_repo = common.LINK_TO_REPO.format(repo.name,
-                                                                  common.GW_SHORTLOG,
-                                                                  note.commMsg,
-                                                                  str(note.pHash))
-
-                        hash_title = html_defs.A_TITLE.format(self.getTitleForCommit(repo.link,
-                                                                                     note.author,note.commDate,
-                                                                                     note.commMsg))
-
-                        self.__gen_tag_commit_hash(file,
-                                                   html_defs.A_CLASS.format(common.CL_TD_INC.format(str(type_class_id)))
-                                                   + hash_title,
-                                                   link_to_repo,
-                                                   note.sHash + " " + note.commDate)
+                        # tag date and commit hash
+                        tag_date_class = html_defs.A_CLASS.format(common.CL_TD_INC.format(str(type_class_id)) +
+                                                                      " " + common.CL_TD_VER)
+                        self.__gen_common_columns(file,
+                                                  note,
+                                                  repo.link,
+                                                  repo.name,
+                                                  tag_date_class)
 
                         file.write_tag(0, html_defs.T_TR_C)
         out_log(self.__class__.__name__, "finish gen main content")
@@ -280,6 +259,129 @@ class WebGenerator:
                    html_defs.A_HREF.format(a_link))
         file.w_c_tag(html_defs.T_TD)
 
+    def __gen_orders_pages(self, dep, device, repo_link, repo_name):
+        out_log(self.__class__.__name__, "start gen items pages for device: " + device.name)
+
+        for key, val in device.orders.items():
+            page = HtmlGen(common.ORDERS_PATH, self.__get_order_file_name(device.name, val[0].num))
+
+            self.__gen_page_head(page, common.LEVEL_UP * 2)
+            self.__gen_table_head(page)
+
+            self.__gen_order_table_head(page,
+                                        [common.HISTORY, device.trName + " - " +
+                                         self.__get_num_by_type(val[0].type,
+                                                                val[0].num),
+                                         common.DEPART_STR + str(dep)])
+
+            self.__gen_order_content(page, val, repo_link, repo_name)
+
+            self.__gen_table_foot(page)
+            self.__gen_back_link(page, common.LEVEL_UP + common.LEVEL_UP)
+            self.__gen_page_foot_info(page)
+            self.__gen_page_foot(page)
+
+            page.close()
+
+        out_log(self.__class__.__name__, "finish gen items pages for device: " + device.name)
+
+    def __gen_order_content(self, page, notes, repo_link, repo_name):
+        type_class_id = common.CL_TD_1
+        date = notes[0].date
+        for note in notes:
+            if date != note.date:
+                date = note.date
+                type_class_id = self.__change_class_type(type_class_id)
+
+            page.w_o_tag(html_defs.T_TR,
+                         html_defs.A_CLASS.format(type_class_id))
+
+            # tag date and commit hash
+            tag_date_class = html_defs.A_CLASS.format(type_class_id + " " + common.CL_TD_VER)
+            self.__gen_common_columns(page,
+                                      note,
+                                      repo_link,
+                                      repo_name,
+                                      tag_date_class)
+
+            page.w_c_tag(html_defs.T_TR)
+
+    def __gen_common_columns(self, file, note, repo_link, repo_name, tag_date_class):
+        # tag date
+        self.__gen_tag_date(file,
+                            note.date,
+                            html_defs.A_TITLE.format(common.TAG_TXT + note.tag) + tag_date_class)
+
+        # commit hash
+        link_hash = note.pHash
+        if link_hash == -1:
+            link_hash = note.sHash
+
+        link_to_repo = common.LINK_TO_REPO.format(repo_name,
+                                                  common.GW_SHORTLOG,
+                                                  note.commMsg,
+                                                  str(note.pHash))
+
+        hash_title = html_defs.A_TITLE.format(self.__get_title_for_commit(repo_link,
+                                                                          note.author, note.commDate,
+                                                                          note.commMsg))
+
+        self.__gen_tag_commit_hash(file,
+                                   hash_title + tag_date_class,
+                                   link_to_repo,
+                                   note.sHash + " " + note.commDate)
+
+    def __change_class_type(self, type):
+        if type == common.CL_TD_1:
+            type = common.CL_TD_2
+        elif type == common.CL_TD_2:
+            type = common.CL_TD_1
+
+        return type
+
+    def __gen_back_link(self, gen, levels):
+        gen.w_o_tag(html_defs.T_P,
+                    html_defs.A_CLASS.format(common.CL_FOOT_BACK))
+        gen.w_tag(html_defs.T_A,
+                  common.BACK_TXT,
+                  html_defs.A_HREF.format(levels + common.MAIN_F_NAME))
+        gen.w_c_tag(html_defs.T_P)
+
+    def __gen_order_table_head(self, gen, text_list):
+        self.__gen_top_order_table_head(gen, text_list)
+        self.__gen_mid_table_head(gen)
+        self.__gen_mid_table_foot(gen)
+        self.__gen_bottom_table_head(gen)
+
+    def __gen_top_order_table_head(self, gen, text_list):
+        gen.w_o_tag(html_defs.T_TR,
+                    html_defs.A_CLASS.format(common.CL_MT_H),
+                    True)
+        gen.w_o_tag(html_defs.T_TH,
+                    html_defs.A_COLSPAN.format(common.M_TABLE_COLSPAN),
+                    True)
+
+        gen.w_o_tag(html_defs.T_H.format(common.M_TABLE_H_NUM),
+                    "",
+                    True)
+        for str in text_list:
+            gen.w_tag(html_defs.T_P,
+                      str,
+                      "")
+        gen.w_c_tag(html_defs.T_H.format(common.M_TABLE_H_NUM))
+
+        gen.w_c_tag(html_defs.T_TH)
+        gen.w_c_tag(html_defs.T_TR)
+
+    def __get_order_file_name(self, name, num):
+        return name + "_" + str(num) + common.FILE_EXT
+
+    def __get_title_for_commit(self, repo, author, commDate, commMsg):
+        return common.REPO_STR + repo + "\n" \
+               + common.AUTHOR_STR + author + "\n" \
+               + common.COMM_DATE_STR + commDate + "\n" \
+               + common.COMM_MSG_SHORT.format(commMsg)
+
     def generate_web(self, model):
         time_ch = TimeChecker()
         out_log(self.__class__.__name__, "start gen web")
@@ -290,224 +392,4 @@ class WebGenerator:
         time_ch.stop
 
         out_log(self.__class__.__name__, "finish gen web - " + time_ch.passed_time_str)
-
-
-
-    def getTitleForCommit(self, repo, author, commDate, commMsg):
-        return common.REPO_STR + repo + "\n" \
-               + common.AUTHOR_STR + author + "\n" \
-               + common.COMM_DATE_STR + commDate + "\n" \
-               + common.COMM_MSG_SHORT.format(commMsg)
-
-    def genDeviceName(self, file, name, span, link):
-        out_log(self.__class__.__name__, "mapped name: " + name)
-        self.genTd(file,
-                   name,
-                   html_defs.A_ROWSPAN.format(span))
-        # self.genTd(file,
-        #            name,
-        #            html_defs.A_ROWSPAN.format(span),
-        #            common.DEVICE_DIR + self.getDeviceFileName(link))
-
-    def genOrderNum(self, file, num, attr, link):
-        self.genTd(file, num, attr, link)
-
-
-    def genNoteDate(self, file, date, attr):
-        self.genTd(file,
-                   str(date),
-                   attr)
-
-    def genNoteHash(self, file, hash, attr, title, link):
-        self.genTd(file,
-                   hash,
-                   attr + html_defs.A_TITLE.format(title), link)
-
-
-    def genOrdersPages(self, dep, device, repoLink, repoName):
-        out_log(self.__class__.__name__, "start gen items pages for device: " + device.name)
-
-        for key, val in device.orders.items():
-            page = HtmlGen(common.ORDERS_PATH, self.getOrderFileName(device.name, val[0].num))
-
-            self.__gen_page_head(page)
-            self.__gen_table_head(page)
-
-            self.gen_order_table_head(page,
-                                      [common.HISTORY + device.trName + " - " + self.__get_num_by_type(val[0].type,
-                                                                                                       val[0].num),
-                                      common.DEPART_STR + str(dep)])
-
-            color = common.TABLE_TR_COL_1
-            date = val[0].date
-            for note in val:
-                if date != note.date:
-                    date = note.date
-                    color = self.changeColor(color)
-
-                page.write_tag(0, html_defs.T_TR_O,
-                               html_defs.A_ALIGN.format(common.ALIGN_C) +
-                               html_defs.A_BGCOLOR.format(color))
-
-                self.genNoteDate(page,
-                                 note.date,
-                                 html_defs.A_TITLE.format(common.TAG_TXT + note.tag)
-                                 + html_defs.A_BGCOLOR.format(color))
-                self.genNoteHash(page,
-                                 note.sHash,
-                                 html_defs.A_BGCOLOR.format(color),
-                                 self.getTitleForCommit(repoLink,
-                                                        note.author,
-                                                        note.commDate,
-                                                        note.commMsg),
-                                 common.LINK_TO_REPO.format(repoName,
-                                                            common.GW_SHORTLOG,
-                                                            note.commMsg,
-                                                            str(note.pHash)))
-
-                page.write_tag(0, html_defs.T_TR_C)
-
-            self.__gen_table_foot(page)
-            self.genBackLink(page, common.LEVEL_UP + common.LEVEL_UP)
-            self.__gen_page_foot_info(page)
-            self.__gen_page_foot(page)
-
-            page.close()
-
-        out_log(self.__class__.__name__, "finish gen items pages for device: " + device.name)
-
-    def getDeviceFileName(self, name):
-        return name + common.FILE_EXT
-
-    def getOrderFileName(self, name, num):
-        return name + "_" + str(num) + common.FILE_EXT
-
-    def decrement_color(self, color):
-        print(color[0])
-        if color[0] == "#":
-            color = color[1:]
-        temp = int(color, 16)
-
-        if temp >= common.COLOR_TOP_EDGE:
-            temp = common.COLOR_BTM_EDGE
-        else:
-            temp -= common.COLOR_STEP
-        return "#%06x" % temp
-
-    def changeColor(self, color):
-        if color == common.TABLE_TR_COL_1:
-            color = common.TABLE_TR_COL_2
-        elif color == common.TABLE_TR_COL_2:
-            color = common.TABLE_TR_COL_1
-
-        return color
-
-    # 0 - gen, 1 - text, 2 - adding, 4 - link
-    def genTd(self, *args):
-        if len(args) < 2:
-            return
-
-        if len(args) >= 3:
-            args[0].write_tag(0, html_defs.T_TD_O, args[2])
-        else:
-            args[0].write_tag(0, html_defs.T_TD_O)
-
-        if len(args) == 4:
-            args[0].write_tag(0, html_defs.T_A_O, html_defs.A_HREF.format(args[3]))
-
-        args[0].write_tag(0, args[1])
-
-        if len(args) == 4:
-            args[0].write_tag(0, html_defs.T_A_C)
-
-        args[0].write_tag(0, html_defs.T_TD_C)
-
-    # 0 -gen, 1 - text, 2- adding
-    def genFont(self, *args):
-        if len(args) < 2:
-            return
-
-        if len(args) >= 3:
-            args[0].write_tag(4, html_defs.T_FONT_O, args[2])
-        else:
-            args[0].write_tag(4, html_defs.T_FONT_O)
-
-        args[0].write_tag(4, args[1])
-
-        args[0].write_tag(4, html_defs.T_FONT_C)
-
-
-
-
-
-
-    def gen_top_table_head(self, gen, attrList):
-        gen.write_tag(3, html_defs.T_TR_O, html_defs.A_BGCOLOR.format(common.MAIN_T_HD_COL))  # TABLE_HD_COL
-        gen.write_tag(4, html_defs.T_TH_O, html_defs.A_COLSPAN.format(common.M_TABLE_COLSPAN))
-
-        for str in attrList:
-            gen.write_tag(4, html_defs.T_H3_O)
-            self.genFont(gen, str, html_defs.A_COLOR.format(common.WHITE))
-            gen.write_tag(4, html_defs.T_H3_C)
-
-        gen.write_tag(0, html_defs.T_TH_C)
-        gen.write_tag(0, html_defs.T_TR_C)
-
-
-    def genTopTableHead(self, gen, text):
-        gen.write_tag(0, html_defs.T_TR_O, html_defs.A_BGCOLOR.format(common.MAIN_T_HD_COL)) #TABLE_HD_COL
-        gen.write_tag(0, html_defs.T_TH_O, html_defs.A_COLSPAN.format(common.M_TABLE_COLSPAN))
-        gen.write_tag(0, html_defs.T_H3_O)
-        self.genFont(gen, text, html_defs.A_COLOR.format(common.WHITE))
-        gen.write_tag(0, html_defs.T_H3_C)
-        gen.write_tag(0, html_defs.T_H3_O)
-        self.genFont(gen, text, html_defs.A_COLOR.format(common.WHITE))
-        gen.write_tag(0, html_defs.T_H3_C)
-        gen.write_tag(0, html_defs.T_TH_C)
-        gen.write_tag(0, html_defs.T_TR_C)
-
-
-
-
-
-
-
-
-    def gen_device_table_head(self, *args):
-        if len(args) < 2:
-            return
-
-        self.gen_top_table_head(args[0], args[1:])
-        self.__gen_mid_table_head(args[0])
-        self.__gen_mid_common_table_body(args[0])
-        self.__gen_mid_table_foot(args[0])
-        self.__gen_bottom_table_head(args[0])
-
-
-    def genDeviceTableHead(self, gen, text):
-        self.genTopTableHead(gen, common.HISTORY + text)
-        self.__gen_mid_table_head(gen)
-        self.__gen_mid_common_table_body(gen)
-        self.__gen_mid_table_foot(gen)
-        self.__gen_bottom_table_head(gen)
-
-    def gen_order_table_head(self, gen, attrList):
-        self.gen_top_table_head(gen, attrList)
-        self.__gen_mid_table_head(gen)
-        self.__gen_mid_table_foot(gen)
-        self.__gen_bottom_table_head(gen)
-
-    def genOrderTableHead(self, gen, text):
-        self.genTopTableHead(gen, common.HISTORY + text)
-        self.__gen_mid_table_head(gen)
-        self.__gen_mid_table_foot(gen)
-        self.__gen_bottom_table_head(gen)
-
-    def genBackLink(self, gen, levels):
-        gen.write_tag(0, html_defs.T_P_O, html_defs.A_ALIGN.format(common.ALIGN_C))
-        gen.write_tag(0, html_defs.T_A_O, html_defs.A_HREF.format(levels + common.MAIN_F_NAME))
-        gen.write_tag(0, common.BACK)
-        gen.write_tag(0, html_defs.T_A_C)
-        gen.write_tag(0, html_defs.T_P_C)
-
 
