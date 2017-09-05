@@ -11,6 +11,8 @@ CONFIG_DIR="/etc/"
 CONFIG_FILE="tag_checker.ini"
 TRANSLATE_FILE="tag_checker_translate"
 NAME="tag_checker.py"
+SCRIPTS_FILE="scripts.js"
+STYLE_FILE="style.css"
 
 EXEC_F="run.sh"
 PREFIX_F="#!/bin/bash"
@@ -152,6 +154,9 @@ main() {
     #check_and_rem_f "$CONFIG_DIR$TRANSLATE_FILE"
     cp -rfn $CUR_DIR$TRANSLATE_FILE $CONFIG_DIR
     chmod 777 $CONFIG_DIR$TRANSLATE_FILE
+
+    cp -rfn $CUR_DIR$SRC_DIR$SCRIPTS_FILE $OUT_DIR
+    cp -rfn $CUR_DIR$SRC_DIR$STYLE_FILE $OUT_DIR
     
     create_exec_file
     
