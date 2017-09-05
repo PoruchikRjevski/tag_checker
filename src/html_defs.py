@@ -1,36 +1,72 @@
-HEAD   = "<html>" \
-              "<body>" \
-              "<table border=\"1\" bgcolor=\"#aaaaaa\" cellpadding=\"10%\" width=\"100%\" style=\"font-family:arial;font-size:13\">" \
-                     "<tr bgcolor=\"#cccccc\">" \
-                            "<th colspan=\"6\"><h3>Actual firmwares on devices.</h3></th>" \
-                     "</tr>" \
-                     "<tr bgcolor=\"#cccccc\">" \
-                            "<th rowspan=\"2\">Department</th>" \
-                            "<th rowspan=\"2\">Device</th>" \
-                            "<th rowspan=\"2\">Id</th>" \
-                            "<th rowspan=\"2\">Order</th>" \
-                            "<th colspan=\"2\">Last Set</th>" \
-                     "</tr>" \
-                     "<tr bgcolor=\"#cccccc\">" \
-                            "<th>Date</th>" \
-                            "<th>Short Hash</th>" \
-                     "</tr>"
+# new vision
+TAG                 = "<{:s}{:s}{:s}>" # 0 - / or not, 1 - tag name, 2 - attributes
 
-TR_HD   =            "<tr align=\"center\"  bgcolor=\"#eeeeee\">"
-TD_HD   =                   "<td {0!s}>"
-TD_FT   =                   "</td>"
-TR_FT   =            "</tr>"
+# prefix
+TAG_C               = "/"
 
-FOOT    =      "</table>" \
-              "</body>" \
-         "</html>"
+# addings
+CR                  = "\n\r"
 
-SUPA    = "rowspan=\"{0!s}\""
-LINK    = ""
+# tags
+T_HTML              = "html"
+T_HEAD              = "head"
+T_BODY              = "body"
+T_TABLE             = "table"
+T_FONT              = "font"
+T_TR                = "tr"
+T_TD                = "td"
+T_TH                = "th"
+T_H                 = "h{:s}" # size
+T_A                 = "a"
+T_P                 = "p"
+T_META              = "meta"
+T_IFRAME            = "iframe"
+T_SCRIPT            = "script"
+T_LINK              = "link"
+T_SPAN              = "span"
+
+# attributes
+A_CHARSET           = " charset=\"{:s}\""
+A_REL               = " rel=\"{:s}\""
+A_HREF              = " href=\"{:s}\""
+A_ID                = " id=\"{:s}\""
+A_STYLE             = " style=\"{:s}\""
+A_TYPE              = " type=\"{:s}\""
+A_SRC               = " src=\"{:s}\""
+A_CLASS             = " class=\"{:s}\""
+A_COLSPAN           = " colspan=\"{:s}\""
+A_ROWSPAN           = " rowspan=\"{:s}\""
+A_TITLE             = " title=\"{:s}\""
+
+
+# params
+A_REL_SS            = "stylesheet"
+A_ST_FONT_FAM       = "font-family:{:s};"
+A_ST_FONT_SZ        = "font-size:{:s};"
+A_ST_H              = "height:{:s};"
+A_ST_W              = "width:{:s};"
+A_ST_BORDER         = "border:{:s};"
+A_ST_POS            = "position:{:s};"
+
+A_T_JS              = "text/javascript"
+
+
+A_BGCOLOR           = "bgcolor=\"{0!s}\""
+A_BORDER            = "border=\"{0!s}\""
+A_WIDTH             = "width=\"{0!s}\""
+A_HEIGHT            = "height=\"{0!s}\""
+
+A_SIZE              = "size=\"{0!s}\""
+A_COLOR             = "color=\"{0!s}\""
+
+A_LINK              = "link=\"{0!s}\""
+A_ALINK             = "alink=\"{0!s}\""
+A_VLINK             = "vlink=\"{0!s}\""
 
 
 
-# -----------------------------------------------
+
+
 # tags
 T_HTML_O            = "<html>"
 T_HTML_C            = "</html>"
@@ -80,37 +116,9 @@ T_SCRIPT_O          = "<script {0!s}>"
 T_SCRIPT_C          = "</script>"
 
 # attributes
-A_ROWSPAN           = "rowspan=\"{0!s}\""
-A_COLSPAN           = "colspan=\"{0!s}\""
-A_ALIGN             = "align=\"{0!s}\""
-A_BGCOLOR           = "bgcolor=\"{0!s}\""
-A_BORDER            = "border=\"{0!s}\""
-A_CELLPADDING       = "cellpadding=\"{0!s}\""
-A_WIDTH             = "width=\"{0!s}\""
-A_HEIGHT            = "height=\"{0!s}\""
-A_STYLE             = "style=\"{0!s}\""
-A_ST_FONT_FAM       = "font-family:{0!s};"
-A_ST_FONT_SZ        = "font-size:{0!s};"
-A_ST_HEIGHT         = "height:{0!s};"
-A_ST_WIDTH          = "width:{0!s};"
-A_ST_BORDER         = "border:{0!s};"
-A_ST_POS            = "position:{0!s};"
-A_CHARSET           = "charset=\"{0!s}\""
-A_HREF              = "href=\"{0!s}\""
-A_SRC               = "src=\"{0!s}\""
-A_ID                = "id=\"{0!s}\""
-A_TITLE             = "title=\"{0!s}\""
-A_SIZE              = "size=\"{0!s}\""
-A_COLOR             = "color=\"{0!s}\""
-A_TYPE              = "type=\"{0!s}\""
-
-A_LINK              = "link=\"{0!s}\""
-A_ALINK             = "alink=\"{0!s}\""
-A_VLINK             = "vlink=\"{0!s}\""
 
 HTML_HEAD           = "<!DOCTYPE html>"
 
-JS_SCRIPT           = "text/javascript"
 
 NEXT_STR            = "\n\r"
 TAB_STR             = "\t"

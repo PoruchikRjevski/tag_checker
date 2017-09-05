@@ -145,7 +145,7 @@ class GitMan:
                                       + git_defs.A_DATE.format(git_defs.A_D_ISO)
                                       + " " + hash)
 
-        out_log(self.__class__.__name__, "cmd: " + cmd)
+        # out_log(self.__class__.__name__, "cmd: " + cmd)
 
         return run_cmd(cmd)
 
@@ -309,15 +309,13 @@ class GitMan:
         return res
 
     def __repair_commit_date(self, date):
-        temp = date.split(" ")
-        timeT = temp[1].split(":")
+        date_temp = date.split(" ")
+        time_temp = date_temp[1].split(":")
 
         res = ""
 
         try:
-            res += temp[0] + " " + timeT[0] + ":" + timeT[1]
-
-            print(res)
+            res += date_temp[0] + " " + time_temp[0] + ":" + time_temp[1]
         except Exception:
             out_err(self.__class__.__name__, "Bad date: " + date)
 
@@ -486,4 +484,4 @@ class GitMan:
 
         time_ch.stop
 
-        out_log(self.__class__.__name__, time_ch.passed_time_str)
+        out_log(self.__class__.__name__, "finish scanning - " + time_ch.passed_time_str)

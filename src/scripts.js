@@ -1,5 +1,5 @@
 // check when frame was reloaded
-var iframe = document.getElementById("pridurok");
+var iframe = document.getElementById("includer");
 iframe.onload = function() {
     var url = iframe.contentWindow.location.href;
 
@@ -12,7 +12,7 @@ iframe.onload = function() {
 
 // highlight commit
 function highlight(commit) {
-    var iframe = document.getElementById("pridurok");
+    var iframe = document.getElementById("includer");
     var inner = iframe.contentDocument || iframe.contentWindow.document;
 
 

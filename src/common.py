@@ -1,3 +1,61 @@
+# WEB_GEN
+STYLE_F_NAME    = "style.css"
+SCRIPTS_F_NAME  = "scripts.js"
+
+CL_MAIN_TABLE   = "main_table"
+CL_FOOT_INFO    = "foot_info"
+CL_MT_H         = "mt_head"
+CL_MT_F         = "mt_foot"
+CL_TR_1         = "tr_1"
+CL_TR_2         = "tr_2"
+CL_TD_INC       = "td_inc_{:s}"
+
+M_TABLE_COLSPAN = "5"
+MID_ROWS        = "2"
+BTM_ROWS        = "1"
+M_TABLE_H_NUM   = "3"
+
+OUT_PATH        = "" # NON CONST
+MAIN_F_NAME     = "main.html"
+INDEX_F_NAME    = "index.html"
+
+FRAME_ID        = "includer"
+FRAME_POS       = "absolute"
+FRAME_BORDER    = "none"
+FRAME_H         = "99%"
+FRAME_W         = "99%"
+FRAME_NOT       = "Bad browser"
+
+ALIGN_C         = "center"
+ALIGN_R         = "right"
+ALIGN_L         = "left"
+
+TABLE_CELLPAD   = "5%"
+
+FRAME_BAD_NAME  = "BAD_FRAME_NAME"
+
+# links
+LINK_TO_REPO    = "http://172.16.20.64/swver_hist/gitweb/?p=bourevest/{:s};a={:s};cm={:s};h={:s}"
+# http://172.16.20.64/gitweb/?p=bourevest/ase-2.git;a=shortlog;h=68b81e8557e56f63538e4ecff71cd84b9a5ba009
+GW_SHORTLOG     = "shortlog"
+GW_COMMIT       = "commit"
+
+# footer
+LAST_UPD_TXT    = "Последнее обновление: "
+CR_TXT          = "&copy;140 отдел. Буревестник."
+M_HEAD_TXT      = "Актуальные прошивки"
+DEP_TXT         = "Отдел"
+DEV_TXT         = "Прибор"
+ITEM_TXT        = "№"
+LAST_SET_TXT    = "Последняя установка"
+DATE_TXT        = "Дата установки"
+HASH_TXT        = "Версия"
+TAG_TXT         = "Тэг: "
+CNT_TXT         = "В истории: "
+
+
+
+
 # constants for checker
 TAG_CHECKER     = "tag_checker"
 CMD_WRAP        = "cmd_wrapper"
@@ -11,11 +69,7 @@ CONFIG_PATH     = "/etc/tag_checker.ini"
 TRANSLATE_PATH  = "/etc/tag_checker_translate"
 
 
-LINK_TO_REPO    = "http://172.16.20.64/swver_hist/gitweb/?p=bourevest/{:s};a={:s};cm={:s};h={:s}"
-# http://172.16.20.64/gitweb/?p=bourevest/ase-2.git;a=shortlog;h=68b81e8557e56f63538e4ecff71cd84b9a5ba009
 
-GW_SHORTLOG     = "shortlog"
-GW_COMMIT       = "commit"
 
 FILE_PREFIX     = "file://"
 
@@ -105,32 +159,21 @@ LIN_PATH        = "/tmp/tag_checker_log/"
 
 SUDO_CMD        = "sudo "
 
-# tag descr
-ORDER           = "PROD"
-DEVICE          = "APP"
-ITEM            = "ITEM"
 
 # web generator
-OUT_PATH        = ""
-INDEX_NAME      = "index.html"
-MAIN_NAME       = "main.html"
 DEVICE_DIR      = "devices/"
 DEVICE_PATH     = OUT_PATH + DEVICE_DIR
 ORDERS_DIR      = "orders/"
 ORDERS_PATH     = DEVICE_PATH + ORDERS_DIR
 FILE_EXT        = ".html"
 LEVEL_UP        = "../"
-SCRIPTS_NAME    = "js_scripts.js"
+SCRIPTS_NAME    = "scripts.js"
 
 BORDER_WIDTH    = "1"
 TABLE_WIDTH     = "100%"
 TABLE_COLOR     = "#aaaaaa"
-CELLPADDING     = "5%"
 FONT_FAM        = "arial"
 FONT_SZ         = "12"
-ALIGN_C         = "center"
-ALIGN_R         = "right"
-ALIGN_L         = "left"
 BLACK           = "black"
 WHITE           = "white"
 
@@ -145,25 +188,10 @@ COLOR_TOP_EDGE  = 0xffffff
 COLOR_BTM_EDGE  = 0x888888
 
 
-MAIN_TABLE_COLS = "5"
-MID_ROWS        = "2"
-BTM_ROWS        = "1"
 
-FRAME_ID        = "pridurok"
-FRAME_POS       = "absolute"
-FRAME_BORDER    = "none"
-FRAME_H         = "99%"
-FRAME_W         = "99%"
 
 
 # page table header
-MAIN_HEAD       = "Актуальные прошивки"
-DEPARTMENT      = "Отдел"
-DEVICE          = "Прибор"
-ITEM            = "№"
-LAST_SET        = "Последняя установка"
-DATE            = "Дата установки"
-HASH_STR        = "Версия"
 HISTORY         = "История прошивок для устройства "
 DEPART_STR      = "Отдел: "
 
@@ -176,11 +204,7 @@ ORDER_NUM       = "Заказ "
 BACK            = "На главную"
 
 # footer
-LAST_UPD        = "Последнее обновление: "
-COPYRIGHT       = "&copy;140 отдел. Буревестник."
 REPO_STR        = "Репозиторий: "
 AUTHOR_STR      = "Автор коммита: "
-TAG_STR         = "Тэг: "
-CNT_STR         = "В истории: "
 COMM_DATE_STR   = "Дата коммита: "
 COMM_MSG_SHORT  = "Сообщение коммита: {:s}"
