@@ -7,3 +7,4 @@
 *.py[cod]
 .idea/workspace.xml
 .idea/tasks.xml
+*.*.swp
