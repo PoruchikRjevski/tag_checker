@@ -320,6 +320,7 @@ class WebGenerator:
         link_to_repo = common.LINK_TO_REPO.format(repo_name,
                                                   common.GW_SHORTLOG,
                                                   note.commMsg,
+                                                  note.sHash,
                                                   str(note.pHash))
 
         hash_title = html_defs.A_TITLE.format(self.__get_title_for_commit(repo_link,

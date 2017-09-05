@@ -12,7 +12,7 @@
 + rename version column "Хэш сумма" => "Версия"
 + rename column "Устройство" => "Прибор"
 + add to column "Версия" date and time of commit: <hash> <YYYY-MM-DD> <HH:MM>
-- JavaScript selection: sometimes several commits selected due same comments
++ JavaScript selection: sometimes several commits selected due same comments
 + change "БРА-135Ф" => "БРА-135F"
 - add setted up config files to srv-swdev repo (backup)
 - add link to ftp to redistributives in form:
