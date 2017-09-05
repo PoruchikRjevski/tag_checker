@@ -1,0 +1,97 @@
+a:link {
+    text-decoration: none;
+    color: black;
+}
+
+a:visited {
+    text-decoration: none;
+    color: black;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a:active {
+    text-decoration: underline;
+}
+
+table {
+    border: 1px solid black;
+
+    background-color: #aaaaaa;
+
+    text-align: center;
+
+    font-size: 14px;
+    font-family: arial;
+
+    margin-left: auto;
+    margin-right: auto;
+}
+
+td {
+    padding: 5px;
+}
+
+th {
+    color: white;
+    padding: 5px;
+}
+
+h2 {
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 2%;
+}
+
+tr.mt_head {
+    background-color: #333333;
+}
+
+tr.mt_foot {
+    background-color: #555555;
+}
+
+tr.tr_1 {
+    background-color: #eeeeee;
+}
+
+td.td_1 {
+    background-color: #eeeeee;
+}
+
+td.td_2 {
+    background-color: #dddddd;
+}
+
+.td_1.version, .td_2.version, .td_inc_0.version, .td_inc_1.version, .td_inc_2.version {
+    text-align: right;
+}
+
+td.td_inc_0 {
+    background-color: #eeeeee
+}
+td.td_inc_1 {
+    background-color: #cecece
+}
+td.td_inc_2 {
+    background-color: #bebebe
+}
+p.header {
+
+}
+
+p.foot_info {
+    text-align: center;
+    font-size: 10px;
+    font-family: arial;
+}
+
+p.foot_back {
+    text-align: center;
+    font-size: 12px;
+    font-family: arial;
+    font-weight: bold;
+}
