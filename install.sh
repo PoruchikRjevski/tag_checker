@@ -155,7 +155,9 @@ main() {
     cp -rfn $CUR_DIR$TRANSLATE_FILE $CONFIG_DIR
     chmod 777 $CONFIG_DIR$TRANSLATE_FILE
 
+    check_and_rem_f "$OUT_DIR$SCRIPTS_FILE"
     cp -rfn $CUR_DIR$SRC_DIR$SCRIPTS_FILE $OUT_DIR
+    check_and_rem_f "$OUT_DIR$STYLE_FILE"
     cp -rfn $CUR_DIR$SRC_DIR$STYLE_FILE $OUT_DIR
     
     create_exec_file
