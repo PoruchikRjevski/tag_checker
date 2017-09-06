@@ -38,7 +38,7 @@ TABLE_CELLPAD   = "5%"
 FRAME_BAD_NAME  = "BAD_FRAME_NAME"
 
 # links
-LINK_TO_REPO    = "http://172.16.20.64/swver_hist/gitweb/?p=bourevest/{:s};a={:s};cm={:s};ch={:s};h={:s}"
+LINK_TO_REPO    = "http://172.16.20.64/swver_hist/gitweb/?p=bourevest/{:s};a={:s};ch={:s};h={:s}"
 # http://172.16.20.64/gitweb/?p=bourevest/ase-2.git;a=shortlog;h=68b81e8557e56f63538e4ecff71cd84b9a5ba009
 GW_SHORTLOG     = "shortlog"
 GW_COMMIT       = "commit"
