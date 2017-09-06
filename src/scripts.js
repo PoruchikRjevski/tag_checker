@@ -5,7 +5,7 @@ iframe.onload = function() {
 
     var hash = getHashFromUrl(url);
 
-    if (commit) {
+    if (hash) {
         highlight(hash);
     }
 }
