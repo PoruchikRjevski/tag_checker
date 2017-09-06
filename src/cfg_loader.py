@@ -1,6 +1,8 @@
+import os
 import configparser
 
-import common_defs
+import common_defs as c_d
+import global_vars as g_v
 from logger import *
 from tag_model import *
 
@@ -11,26 +13,46 @@ class CfgLoader:
     def __init__(self):
         out_log(self.__class__.__name__, "init")
         self.__cfg = configparser.ConfigParser()
-        self.__translateFile = common_defs.TRANSLATE_PATH
+        self.__trFilePathDef = ""
+        self.__cfgFilePathDef = ""
 
-    def read_file(self, file_name):
-        self.__cfg.read(file_name)
+        self.__gen_paths()
+        self.__set_default_out_path()
 
-    def fill_model(self, model):
+    def __gen_paths(self):
+        if g_v.CUR_PLATFORM == c_d.LINUX_P:
+            self.__cfgFilePathDef = os.path.join(c_d.LIN_CFG_P, c_d.CFG_F_NAME)
+            self.__trFilePathDef = os.path.join(c_d.LIN_CFG_P, c_d.TR_F_NAME)
+        elif g_v.CUR_PLATFORM == c_d.WINDOWS_P:
+            self.__cfgFilePathDef = os.path.join(c_d.WIN_CFG_P, c_d.CFG_F_NAME)
+            self.__trFilePathDef = os.path.join(c_d.WIN_CFG_P, c_d.TR_F_NAME)
+
+    def __read_file(self, file_name):
+        if file_name is None:
+            self.__cfg.read(self.__cfgFilePathDef)
+        else:
+            self.__cfg.read(file_name)
+
+    def __set_default_out_path(self):
+        if g_v.CUR_PLATFORM == c_d.LINUX_P:
+            g_v.OUT_PATH = c_d.LIN_OUT_P_DEF
+        elif g_v.CUR_PLATFORM == c_d.WINDOWS_P:
+            g_v.OUT_PATH = c_d.WIN_OUT_P_DEF
+
+    def __fill_model(self, model):
         deps = self.__cfg.sections()
 
-        common_defs.OUT_PATH = common_defs.LIN_OUT_P_DEF
         for i in deps:
             prefix = None
-            if i == common_defs.CONFIG:
-                if self.__cfg.has_option(i, common_defs.OUT_P):
-                    common_defs.OUT_PATH = self.__cfg.get(i, common_defs.OUT_P)
+            if i == c_d.CONFIG:
+                if self.__cfg.has_option(i, c_d.OUT_P):
+                    g_v.OUT_PATH = self.__cfg.get(i, c_d.OUT_P)
                 continue
 
-            if self.__cfg.has_option(i, common_defs.PREFIX):
-                prefix = self.__cfg.get(i, common_defs.PREFIX)
+            if self.__cfg.has_option(i, c_d.PREFIX):
+                prefix = self.__cfg.get(i, c_d.PREFIX)
 
-            repos_links = self.__cfg.get(i, common_defs.REPOS).split("\n")
+            repos_links = self.__cfg.get(i, c_d.REPOS).split("\n")
 
             repos_list = []
 
@@ -42,28 +64,27 @@ class CfgLoader:
 
             model.departments[i] = repos_list
 
-        out_log(self.__class__.__name__, "out path: " + common_defs.OUT_PATH)
+        out_log(self.__class__.__name__, "out path: " + g_v.OUT_PATH)
 
-    def load_mapped_dev_names(self, model):
-        f = open(common_defs.TRANSLATE_PATH)
+    def __load_tr_dev_names(self, model):
+        tr_f = open(self.__trFilePathDef)
 
-        if f:
-            file_text = f.readlines()
+        if tr_f:
+            file_text = tr_f.readlines()
 
             if file_text is not None:
                 for line in file_text:
                     name = line.split("=")[:1][-1]
                     tr_name = line.split("=")[1:][-1]
-                    model.mappedDevNames[name] = tr_name
+                    model.trDevNames[name] = tr_name
         else:
-            out_err(self.__class__.__name__, "can't open file with translates: " + common_defs.TRANSLATE_PATH)
+            out_err(self.__class__.__name__, "can't open file with translates: " + self.__trFilePathDef)
         
     def load_config(self, file_name, model):
-        self.read_file(file_name)
-        self.fill_model(model)
-
+        self.__read_file(file_name)
+        self.__fill_model(model)
         out_log(self.__class__.__name__, "config was loaded")
 
-        if self.__translateFile:
-            self.load_mapped_dev_names(model)
+        if self.__trFilePathDef:
+            self.__load_tr_dev_names(model)
             out_log(self.__class__.__name__, "mapped names was loaded")

@@ -1,19 +1,18 @@
 import os
 
-import common_defs
-from logger import out_log, out_err
-import html_defs
-
-DEF_DIR = "out/"
+import global_vars as g_v
+from logger import *
+import html_defs as h_d
 
 __all__ = ['HtmlGen']
 
+
 class HtmlGen:
     def __init__(self, path, name):
-        dir_p = common_defs.OUT_PATH
+        dir_p = g_v.OUT_PATH
 
         if not os.path.isabs(path):
-               dir_p = os.path.join(dir_p, path)
+            dir_p = os.path.join(dir_p, path)
         else:
             dir_p = path
 
@@ -23,9 +22,9 @@ class HtmlGen:
         self.file = open(file_path, 'w')
 
     def w_o_tag(self, tag, attr="", cr=False):
-        self.file.write(html_defs.TAG.format("", tag, attr))
+        self.file.write(h_d.TAG.format("", tag, attr))
         if cr:
-            self.file.write(html_defs.CR)
+            self.file.write(h_d.CR)
         self.file.flush()
 
     def w_txt(self, text):
@@ -33,8 +32,8 @@ class HtmlGen:
         self.file.flush()
 
     def w_c_tag(self, tag):
-        self.file.write(html_defs.TAG.format(html_defs.TAG_C, tag, ""))
-        self.file.write(html_defs.CR)
+        self.file.write(h_d.TAG.format(h_d.TAG_C, tag, ""))
+        self.file.write(h_d.CR)
         self.file.flush()
 
     def w_tag(self, tag, text, attr="", cr=False):
@@ -45,15 +44,3 @@ class HtmlGen:
     def close(self):
         self.file.flush()
         self.file.close()
-
-    # old vision
-    def write_tag(self, *args):
-        if len(args) >= 1:
-            for i in range(args[0]):
-                self.file.write(html_defs.TAB_STR)
-        if len(args) == 2:
-            self.file.write(args[1].format(""))
-        if len(args) == 3:
-            self.file.write(args[1].format(args[2]))
-        self.file.write(html_defs.NEXT_STR)
-        self.file.flush()

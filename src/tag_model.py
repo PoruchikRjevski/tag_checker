@@ -12,19 +12,19 @@ class TagModel:
         out_log(self.__class__.__name__, "init")
         self.__departments = OrderedDict()
 
-        self.__mappedDevNames = {}
+        self.__trDevNames = {}
 
-    def get_mappedDevName(self, key=None):
+    def get_trDevName(self, key=None):
         if key:
-            if key in self.__mappedDevNames:
-                return self.__mappedDevNames[key]
+            if key in self.__trDevNames:
+                return self.__trDevNames[key]
             else:
                 return key
-        return self.__mappedDevNames
+        return self.__trDevNames
 
     @property
-    def mappedDevNames(self):
-        return self.get_mappedDevName()
+    def trDevNames(self):
+        return self.get_trDevName()
 
     @property
     def departments(self):

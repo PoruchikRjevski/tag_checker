@@ -4,8 +4,9 @@ import multiprocessing
 from threading import Thread
 from queue import Queue
 
-import common_defs
-import git_defs
+import common_defs as c_d
+import global_vars as g_v
+import git_defs as g_d
 from cmd_wrap import *
 from tag_model import *
 from logger import *
@@ -31,9 +32,9 @@ class GitMan:
         out_log(self.__class__.__name__, "go to dir: " + link)
 
     def __get_current_branch(self):
-        cmd = git_defs.GIT_CMD.format(git_defs.A_REV_PARSE
-                                      + git_defs.A_ABBREV.format(git_defs.A_RP_REF)
-                                      + git_defs.REV_HEAD)
+        cmd = g_d.GIT_CMD.format(g_d.A_REV_PARSE
+                                 + g_d.A_ABBREV.format(g_d.A_RP_REF)
+                                 + g_d.REV_HEAD)
         out_log(self.__class__.__name__, "cmd: " + cmd)
         branch = run_cmd(cmd)
 
@@ -42,7 +43,7 @@ class GitMan:
         return branch
 
     def __switch_to_branch(self, branch):
-        cmd = git_defs.GIT_CMD.format(git_defs.A_CHECKOUT.format(branch))
+        cmd = g_d.GIT_CMD.format(g_d.A_CHECKOUT.format(branch))
 
         out_log(self.__class__.__name__, "cmd: " + cmd)
 
@@ -51,28 +52,28 @@ class GitMan:
     def __checkout_branch(self):
         branch = self.__get_current_branch()
 
-        if branch != common_defs.BR_DEV:
+        if branch != g_d.BRANCH_DEVELOP:
             self.lastBranch = branch
             self.needReturnBranch = True
-            self.__switch_to_branch(common_defs.BR_DEV)
+            self.__switch_to_branch(g_d.BRANCH_DEVELOP)
             out_log(self.__class__.__name__, "cur branch: " + self.__get_current_branch())
 
     def __update_repo(self):
-        cmd = git_defs.GIT_CMD.format(git_defs.A_PULL)
+        cmd = g_d.GIT_CMD.format(g_d.A_PULL)
 
         out_log(self.__class__.__name__, "cmd: " + cmd)
 
         run_cmd(cmd)
 
     def __get_tags(self):
-        cmd = git_defs.GIT_CMD.format(git_defs.A_TAG)
+        cmd = g_d.GIT_CMD.format(g_d.A_TAG)
 
         out_log(self.__class__.__name__, "cmd: " + cmd)
 
         return run_cmd(cmd)
 
     def __is_tag_valid(self, tag):
-        for inc in common_defs.PROD:
+        for inc in c_d.PROD:
             if inc in tag:
                 return True
 
@@ -106,7 +107,7 @@ class GitMan:
 
             note_out.type = tag_parts[2].split("-")[:-1][0]
 
-            if note_out.type not in common_defs.TYPES_L:
+            if note_out.type not in c_d.TYPES_L:
                 t_errs.append(out_err_def(self.__class__.__name__, "Bad item type: " + note_out.type))
                 return False
 
@@ -130,30 +131,30 @@ class GitMan:
         return True
 
     def __get_short_hash(self, tag):
-        cmd = git_defs.GIT_CMD.format(git_defs.A_REV_PARSE
-                                      + git_defs.A_SHORT
-                                      + " " + tag)
+        cmd = g_d.GIT_CMD.format(g_d.A_REV_PARSE
+                                 + g_d.A_SHORT
+                                 + " " + tag)
 
         # out_log(self.__class__.__name__, "cmd: " + cmd)
 
         return run_cmd(cmd)
 
     def __get_commit_date_by_short_hash(self, hash):
-        cmd = git_defs.GIT_CMD.format(git_defs.A_LOG
-                                      + git_defs.A_NN.format(str(1))
-                                      + git_defs.A_PRETTY.format(git_defs.A_P_FORMAT.format(git_defs.AA_COMMIT_DATE))
-                                      + git_defs.A_DATE.format(git_defs.A_D_ISO)
-                                      + " " + hash)
+        cmd = g_d.GIT_CMD.format(g_d.A_LOG
+                                 + g_d.A_NN.format(str(1))
+                                 + g_d.A_PRETTY.format(g_d.A_P_FORMAT.format(g_d.AA_COMMIT_DATE))
+                                 + g_d.A_DATE.format(g_d.A_D_ISO)
+                                 + " " + hash)
 
         # out_log(self.__class__.__name__, "cmd: " + cmd)
 
         return run_cmd(cmd)
 
     def __get_commit_author_by_short_hash(self, hash):
-        cmd = git_defs.GIT_CMD.format(git_defs.A_LOG
-                                      + git_defs.A_NN.format(str(common_defs.GIT_AUTHOR_DEEP))
-                                      + git_defs.A_FORMAT.format(git_defs.AA_AUTHOR)
-                                      + " " + hash)
+        cmd = g_d.GIT_CMD.format(g_d.A_LOG
+                                 + g_d.A_NN.format(str(c_d.GIT_AUTHOR_DEEP))
+                                 + g_d.A_FORMAT.format(g_d.AA_AUTHOR)
+                                 + " " + hash)
 
         # out_log(self.__class__.__name__, "cmd: " + cmd)
 
@@ -161,16 +162,16 @@ class GitMan:
 
     def __repair_commit_msg(self, msg):
         size = len(msg)
-        msg = msg[:common_defs.COMMIT_MSG_SIZE]
-        if size > common_defs.COMMIT_MSG_SIZE:
-            msg == " ..."
+        msg = msg[:c_d.COMMIT_MSG_SIZE]
+        if size > c_d.COMMIT_MSG_SIZE:
+            msg += " ..."
         return msg
 
     def __get_commit_msg_by_short_hash(self, hash):
-        cmd = git_defs.GIT_CMD.format(git_defs.A_LOG
-                                      + git_defs.A_NN.format(str(common_defs.GIT_AUTHOR_DEEP))
-                                      + git_defs.A_FORMAT.format(git_defs.AA_COMMIT_MSG)
-                                      + " " + hash)
+        cmd = g_d.GIT_CMD.format(g_d.A_LOG
+                                 + g_d.A_NN.format(str(c_d.GIT_AUTHOR_DEEP))
+                                 + g_d.A_FORMAT.format(g_d.AA_COMMIT_MSG)
+                                 + " " + hash)
 
         # out_log(self.__class__.__name__, "cmd: " + cmd)
 
@@ -180,7 +181,7 @@ class GitMan:
         res = None
 
         for branch in [branches]:
-            if git_defs.BRANCH_DEVELOP in branch:
+            if g_d.BRANCH_DEVELOP in branch:
                 res = branch
                 if "* " in res:
                     res = res.replace("* ", "")
@@ -190,8 +191,8 @@ class GitMan:
         return res
 
     def __get_develop_branch_by_hash(self, hash, t_logs):
-        cmd = git_defs.GIT_CMD.format(git_defs.A_BRANCH
-                                      + git_defs.A_CONTAINS.format(hash))
+        cmd = g_d.GIT_CMD.format(g_d.A_BRANCH
+                                 + g_d.A_CONTAINS.format(hash))
 
         t_logs.append(out_log_def(self.__class__.__name__, "cmd: " + cmd))
 
@@ -202,17 +203,17 @@ class GitMan:
         return out
 
     def __get_last_commit_on_branch(self, branch, t_logs):
-        cmd = git_defs.GIT_CMD.format(git_defs.A_LOG
-                                      + git_defs.A_NN.format(str(common_defs.GIT_AUTHOR_DEEP))
-                                      + git_defs.A_FORMAT.format(git_defs.AA_SHASH)
-                                      + " " + branch)
+        cmd = g_d.GIT_CMD.format(g_d.A_LOG
+                                 + g_d.A_NN.format(str(c_d.GIT_AUTHOR_DEEP))
+                                 + g_d.A_FORMAT.format(g_d.AA_SHASH)
+                                 + " " + branch)
 
         t_logs.append(out_log_def(self.__class__.__name__, "cmd: " + cmd))
 
         return run_cmd(cmd)
 
     def __get_parent_commit_hash(self, noteHash, lastCommHash, t_logs):
-        cmd = common_defs.GIT_CMD.format(common_defs.GIT_REV_LIST.format(common_defs.ABBREV_COMM
+        cmd = common_defs.GIT_CMD.format(common_defs.GIT_REV_LIST.format(g_d.ABBREV_COMM
                                                                          + noteHash + "..."
                                                                          + lastCommHash
                                                                          + " |"
@@ -272,7 +273,6 @@ class GitMan:
         t_logs.append(out_log_def(self.__class__.__name__, "Note short hash: " + note.sHash))
 
         note.commDate = self.__repair_commit_date(self.__get_commit_date_by_short_hash(note.sHash))
-        # out_log(self.__class__.__name__, "Note commit date: " + note.commDate)
         t_logs.append(out_log_def(self.__class__.__name__, "Note commit date: " + note.commDate))
 
         note.author = self.__get_commit_author_by_short_hash(note.sHash)
@@ -326,7 +326,7 @@ class GitMan:
             dev = Device()
             dev.add_order(note)
             dev.name = note.name
-            dev.trName = model.get_mappedDevName(note.name)
+            dev.trName = model.get_trDevName(note.name)
 
             repo.add_device(note.name, dev)
         else:
@@ -366,7 +366,7 @@ class GitMan:
 
     @property
     def check_git_installed(self):
-        out = run_cmd(git_defs.GIT_CMD.format(git_defs.A_VERSION))
+        out = run_cmd(g_d.GIT_CMD.format(g_d.A_VERSION))
 
         if "version" in str(out):
             return True
@@ -414,13 +414,13 @@ class GitMan:
                         tags_list = tags.split("\n")
                         n_queue = ThreadQueue()
 
-                        if common_defs.MULTITH:
+                        if g_v.MULTITH:
                             cpu_s = multiprocessing.cpu_count()
                             out_log(self.__class__.__name__, "cpu count: " + str(cpu_s))
 
                             threads = []
 
-                            if common_defs.FETCH_C_MT:
+                            if g_v.FETCH_C_MT:
                                 len_tl = len(tags_list)
                                 avg = len_tl/cpu_s
                                 pos = 0
@@ -436,7 +436,6 @@ class GitMan:
                                                               n_queue])
                                         thread.start()
                                         threads.append(thread)
-                                        # self.__gen_notes_by_tag_list(tags_list[int(pos):int(pos+avg)], n_queue)
                                         pos += avg
                                     else:
                                         thread = Thread(target=self.__gen_notes_by_tag_list,
@@ -444,7 +443,6 @@ class GitMan:
                                                               n_queue])
                                         thread.start()
                                         threads.append(thread)
-                                        # self.__gen_notes_by_tag_list(tags_list[int(pos):], n_queue)
                             else:
                                 for tag in tags.split("\n"):
                                     if self.__is_tag_valid(tag):
