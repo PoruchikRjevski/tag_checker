@@ -30,7 +30,7 @@ function highlight(commit, hash) {
 }
 
 // parce commit from url
-function getCommitFromUrl(url) {
+function getCommitFromUrl(url) { 
         var splitted = url.split(';');
 
         for (var i = 0; i < splitted.length; i++) {
