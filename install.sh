@@ -24,7 +24,7 @@ PYTHON="python3"
 check_and_rem_f() {    
     if [ -f "$1" ] 
     then
-        sudo rm -f $1
+        rm -f $1
     fi
 }
 
@@ -32,7 +32,7 @@ check_and_rem_f() {
 check_and_rem_d() {    
     if [ -d "$1" ] 
     then
-        sudo rm -rf $1
+        rm -rf $1
     fi
 }
 
@@ -40,7 +40,7 @@ check_and_rem_d() {
 check_and_make_d() {
     if [ ! -d "$1" ] 
     then
-        sudo mkdir -p $1
+        mkdir -p $1
     fi
 }
 
