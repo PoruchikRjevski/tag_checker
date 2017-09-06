@@ -8,12 +8,16 @@ __all__ = ['run_cmd']
 
 
 def run_cmd(cmd):
-    prefix = ""
+    command = ""
 
     if g_v.SUDOER:
-        prefix = c_d.SUDO_CMD
+        command = c_d.SUDO_CMD
 
-    proc = subprocess.Popen([prefix + cmd + '\n'],
+    command += cmd
+
+    out_log(c_d.CMD_WRAP, "cmd: " + command)
+
+    proc = subprocess.Popen([command + '\n'],
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE,
                             shell=True)

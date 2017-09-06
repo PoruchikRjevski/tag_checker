@@ -21,6 +21,8 @@ A_TAIL              = " | tail -{:s}"
 
 A_P_FORMAT          = "format:\"{:s}\""
 
+A_AB_COMMIT         = "commit"
+
 A_D_SHORT           = "short"
 A_D_ISO             = "iso"
 
