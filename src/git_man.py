@@ -215,13 +215,7 @@ class GitMan:
     def __get_parent_commit_hash(self, note_hash, last_commit_hash, t_logs):
         cmd = g_d.GIT_CMD.format(g_d.A_REV_LIST.format(g_d.A_ABBREV.format(g_d.A_AB_COMMIT)
                                                        + " " + note_hash + "..." + last_commit_hash
-                                                       + g_d.A_TAIL.format(c_d.GIT_PAR_SH_NEST)))
-
-        # cmd = common_defs.GIT_CMD.format(common_defs.GIT_REV_LIST.format(g_d.ABBREV_COMM
-        #                                                                  + note_hash + "..."
-        #                                                                  + last_commit_hash
-        #                                                                  + " |"
-        #                                                                  + common_defs.FORM_TAIL.format(str(common_defs.GIT_PAR_SH_NEST))))
+                                                       + g_d.A_TAIL.format(str(c_d.GIT_PAR_SH_NEST))))
 
         t_logs.append(out_log_def(self.__class__.__name__, "cmd: " + cmd))
 
