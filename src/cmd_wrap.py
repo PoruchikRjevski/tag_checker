@@ -1,6 +1,6 @@
 import subprocess
 
-import common
+import common_defs
 from logger import *
 
 __all__ = ['run_cmd']
@@ -9,8 +9,8 @@ __all__ = ['run_cmd']
 def run_cmd(cmd):
     prefix = ""
 
-    if common.SUDOER:
-        prefix = common.SUDO_CMD
+    if common_defs.SUDOER:
+        prefix = common_defs.SUDO_CMD
 
     proc = subprocess.Popen([prefix +cmd + '\n'],
                             stdout=subprocess.PIPE,
@@ -22,8 +22,8 @@ def run_cmd(cmd):
     u_err = err.decode("utf-8").strip()
 
     if u_err:
-        out_err(common.CMD_WRAP, "cmd: " + cmd)
-        out_err(common.CMD_WRAP, "err: " + u_err)
+        out_err(common_defs.CMD_WRAP, "cmd: " + cmd)
+        out_err(common_defs.CMD_WRAP, "err: " + u_err)
 
     return u_out
 

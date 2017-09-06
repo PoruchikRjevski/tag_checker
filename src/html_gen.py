@@ -1,6 +1,6 @@
 import os
 
-import common
+import common_defs
 from logger import out_log, out_err
 import html_defs
 
@@ -10,7 +10,7 @@ __all__ = ['HtmlGen']
 
 class HtmlGen:
     def __init__(self, path, name):
-        dir_p = common.OUT_PATH
+        dir_p = common_defs.OUT_PATH
 
         if not os.path.isabs(path):
                dir_p = os.path.join(dir_p, path)

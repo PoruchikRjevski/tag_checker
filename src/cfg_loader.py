@@ -1,6 +1,6 @@
 import configparser
 
-import common
+import common_defs
 from logger import *
 from tag_model import *
 
@@ -11,7 +11,7 @@ class CfgLoader:
     def __init__(self):
         out_log(self.__class__.__name__, "init")
         self.__cfg = configparser.ConfigParser()
-        self.__translateFile = common.TRANSLATE_PATH
+        self.__translateFile = common_defs.TRANSLATE_PATH
 
     def read_file(self, file_name):
         self.__cfg.read(file_name)
@@ -19,18 +19,18 @@ class CfgLoader:
     def fill_model(self, model):
         deps = self.__cfg.sections()
 
-        common.OUT_PATH = common.OUT_PATH_DEF
+        common_defs.OUT_PATH = common_defs.LIN_OUT_P_DEF
         for i in deps:
             prefix = None
-            if i == common.CONFIG:
-                if self.__cfg.has_option(i, common.OUT_P):
-                    common.OUT_PATH = self.__cfg.get(i, common.OUT_P)
+            if i == common_defs.CONFIG:
+                if self.__cfg.has_option(i, common_defs.OUT_P):
+                    common_defs.OUT_PATH = self.__cfg.get(i, common_defs.OUT_P)
                 continue
 
-            if self.__cfg.has_option(i, common.PREFIX):
-                prefix = self.__cfg.get(i, common.PREFIX)
+            if self.__cfg.has_option(i, common_defs.PREFIX):
+                prefix = self.__cfg.get(i, common_defs.PREFIX)
 
-            repos_links = self.__cfg.get(i, common.REPOS).split("\n")
+            repos_links = self.__cfg.get(i, common_defs.REPOS).split("\n")
 
             repos_list = []
 
@@ -42,10 +42,10 @@ class CfgLoader:
 
             model.departments[i] = repos_list
 
-        out_log(self.__class__.__name__, "out path: " + common.OUT_PATH)
+        out_log(self.__class__.__name__, "out path: " + common_defs.OUT_PATH)
 
     def load_mapped_dev_names(self, model):
-        f = open(common.TRANSLATE_PATH)
+        f = open(common_defs.TRANSLATE_PATH)
 
         if f:
             file_text = f.readlines()
@@ -56,7 +56,7 @@ class CfgLoader:
                     tr_name = line.split("=")[1:][-1]
                     model.mappedDevNames[name] = tr_name
         else:
-            out_err(self.__class__.__name__, "can't open file with translates: " + common.TRANSLATE_PATH)
+            out_err(self.__class__.__name__, "can't open file with translates: " + common_defs.TRANSLATE_PATH)
         
     def load_config(self, file_name, model):
         self.read_file(file_name)

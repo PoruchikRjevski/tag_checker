@@ -3,7 +3,7 @@ import os
 import sys
 from optparse import OptionParser
 
-import common
+import common_defs
 from cfg_loader import CfgLoader
 from tag_model import TagModel
 from git_man import GitMan
@@ -54,15 +54,15 @@ def set_options(parser):
 
 def check_options(opts):
     if opts.quiet:
-        common.QUIET = True
+        common_defs.QUIET = True
     if opts.log:
-        common.LOGGING = True
+        common_defs.LOGGING = True
     if opts.sudoer:
-        common.SUDOER = True
+        common_defs.SUDOER = True
     if opts.multithreading:
-        common.MULTITH = True
+        common_defs.MULTITH = True
     if opts.fetchcoremt:
-        common.FETCH_C_MT = True
+        common_defs.FETCH_C_MT = True
 
 
 def main():
@@ -79,35 +79,35 @@ def main():
     check_options(opts)
 
     # check platform
-    common.CUR_PLATFORM = sys.platform
+    common_defs.CUR_PLATFORM = sys.platform
 
     # init logger
     init_log()
 
-    out_log(common.TAG_CHECKER, "-q: " + str(common.QUIET))
-    out_log(common.TAG_CHECKER, "-l: " + str(common.LOGGING))
-    out_log(common.TAG_CHECKER, "-s: " + str(common.SUDOER))
-    out_log(common.TAG_CHECKER, "-d: " + str(opts.develop))
-    out_log(common.TAG_CHECKER, "-u: " + str(opts.update))
+    out_log(common_defs.TAG_CHECKER, "-q: " + str(common_defs.QUIET))
+    out_log(common_defs.TAG_CHECKER, "-l: " + str(common_defs.LOGGING))
+    out_log(common_defs.TAG_CHECKER, "-s: " + str(common_defs.SUDOER))
+    out_log(common_defs.TAG_CHECKER, "-d: " + str(opts.develop))
+    out_log(common_defs.TAG_CHECKER, "-u: " + str(opts.update))
 
     if len(args) != 1:
-        path = common.CONFIG_PATH
+        path = common_defs.CONFIG_PATH
     else:
         path = args[0]
 
-    out_log(common.TAG_CHECKER, "config path: " + path)
+    out_log(common_defs.TAG_CHECKER, "config path: " + path)
 
     # check is config file was existed
     if not is_conf_file_exist(path):
-       out_err(common.TAG_CHECKER, common.E_CFNE_STR)
-       sys.exit(common.EXIT_CFNE)
+       out_err(common_defs.TAG_CHECKER, common_defs.E_CFNE_STR)
+       sys.exit(common_defs.EXIT_CFNE)
 
     # main func
     git_man = GitMan()
     # check environment
     if not git_man.check_git_installed:
-        out_err(common.TAG_CHECKER, common.E_GNT_STR)
-        sys.exit(common.EXIT_GNT)
+        out_err(common_defs.TAG_CHECKER, common_defs.E_GNT_STR)
+        sys.exit(common_defs.EXIT_GNT)
 
     # create model
     tag_model = TagModel()
@@ -126,7 +126,7 @@ def main():
     web_gen.generate_web(tag_model)
 
     time_ch.stop
-    out_log(common.TAG_CHECKER, time_ch.passed_time_str)
+    out_log(common_defs.TAG_CHECKER, time_ch.passed_time_str)
 
 if __name__ == "__main__":
     main()

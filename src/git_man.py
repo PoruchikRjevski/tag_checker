@@ -4,7 +4,7 @@ import multiprocessing
 from threading import Thread
 from queue import Queue
 
-import common
+import common_defs
 import git_defs
 from cmd_wrap import *
 from tag_model import *
@@ -51,10 +51,10 @@ class GitMan:
     def __checkout_branch(self):
         branch = self.__get_current_branch()
 
-        if branch != common.BR_DEV:
+        if branch != common_defs.BR_DEV:
             self.lastBranch = branch
             self.needReturnBranch = True
-            self.__switch_to_branch(common.BR_DEV)
+            self.__switch_to_branch(common_defs.BR_DEV)
             out_log(self.__class__.__name__, "cur branch: " + self.__get_current_branch())
 
     def __update_repo(self):
@@ -72,7 +72,7 @@ class GitMan:
         return run_cmd(cmd)
 
     def __is_tag_valid(self, tag):
-        for inc in common.PROD:
+        for inc in common_defs.PROD:
             if inc in tag:
                 return True
 
@@ -106,7 +106,7 @@ class GitMan:
 
             note_out.type = tag_parts[2].split("-")[:-1][0]
 
-            if note_out.type not in common.TYPES_L:
+            if note_out.type not in common_defs.TYPES_L:
                 t_errs.append(out_err_def(self.__class__.__name__, "Bad item type: " + note_out.type))
                 return False
 
@@ -151,7 +151,7 @@ class GitMan:
 
     def __get_commit_author_by_short_hash(self, hash):
         cmd = git_defs.GIT_CMD.format(git_defs.A_LOG
-                                      + git_defs.A_NN.format(str(common.GIT_AUTHOR_DEEP))
+                                      + git_defs.A_NN.format(str(common_defs.GIT_AUTHOR_DEEP))
                                       + git_defs.A_FORMAT.format(git_defs.AA_AUTHOR)
                                       + " " + hash)
 
@@ -161,14 +161,14 @@ class GitMan:
 
     def __repair_commit_msg(self, msg):
         size = len(msg)
-        msg = msg[:common.COMMIT_MSG_SIZE]
-        if size > common.COMMIT_MSG_SIZE:
+        msg = msg[:common_defs.COMMIT_MSG_SIZE]
+        if size > common_defs.COMMIT_MSG_SIZE:
             msg == " ..."
         return msg
 
     def __get_commit_msg_by_short_hash(self, hash):
         cmd = git_defs.GIT_CMD.format(git_defs.A_LOG
-                                      + git_defs.A_NN.format(str(common.GIT_AUTHOR_DEEP))
+                                      + git_defs.A_NN.format(str(common_defs.GIT_AUTHOR_DEEP))
                                       + git_defs.A_FORMAT.format(git_defs.AA_COMMIT_MSG)
                                       + " " + hash)
 
@@ -203,7 +203,7 @@ class GitMan:
 
     def __get_last_commit_on_branch(self, branch, t_logs):
         cmd = git_defs.GIT_CMD.format(git_defs.A_LOG
-                                      + git_defs.A_NN.format(str(common.GIT_AUTHOR_DEEP))
+                                      + git_defs.A_NN.format(str(common_defs.GIT_AUTHOR_DEEP))
                                       + git_defs.A_FORMAT.format(git_defs.AA_SHASH)
                                       + " " + branch)
 
@@ -212,11 +212,11 @@ class GitMan:
         return run_cmd(cmd)
 
     def __get_parent_commit_hash(self, noteHash, lastCommHash, t_logs):
-        cmd = common.GIT_CMD.format(common.GIT_REV_LIST.format(common.ABBREV_COMM
-                                                               + noteHash + "..."
-                                                               + lastCommHash
-                                                               + " |"
-                                                               + common.FORM_TAIL.format(str(common.GIT_PAR_SH_NEST))))
+        cmd = common_defs.GIT_CMD.format(common_defs.GIT_REV_LIST.format(common_defs.ABBREV_COMM
+                                                                         + noteHash + "..."
+                                                                         + lastCommHash
+                                                                         + " |"
+                                                                         + common_defs.FORM_TAIL.format(str(common_defs.GIT_PAR_SH_NEST))))
 
         t_logs.append(out_log_def(self.__class__.__name__, "cmd: " + cmd))
 
@@ -414,13 +414,13 @@ class GitMan:
                         tags_list = tags.split("\n")
                         n_queue = ThreadQueue()
 
-                        if common.MULTITH:
+                        if common_defs.MULTITH:
                             cpu_s = multiprocessing.cpu_count()
                             out_log(self.__class__.__name__, "cpu count: " + str(cpu_s))
 
                             threads = []
 
-                            if common.FETCH_C_MT:
+                            if common_defs.FETCH_C_MT:
                                 len_tl = len(tags_list)
                                 avg = len_tl/cpu_s
                                 pos = 0

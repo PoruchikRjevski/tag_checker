@@ -26,16 +26,10 @@ table {
     text-align: center;
 
     font-size: 14px;
-    font-family: Consolas,monaco,monospace;
+    font-family: Consolas, monaco, monospace;
 
     margin-left: auto;
     margin-right: auto;
-
-}
-
-td {
-    padding: 5px;
-    text-align: left;
 }
 
 th {
@@ -50,16 +44,9 @@ h2 {
     padding: 2%;
 }
 
-tr.mt_head {
-    background-color: #333333;
-}
-
-tr.mt_foot {
-    background-color: #555555;
-}
-
-tr.tr_1 {
-    background-color: #eeeeee;
+td {
+    padding: 5px;
+    text-align: left;
 }
 
 td.td_1 {
@@ -77,12 +64,27 @@ td.td_2 {
 td.td_inc_0 {
     background-color: #eeeeee
 }
+
 td.td_inc_1 {
     background-color: #cecece
 }
+
 td.td_inc_2 {
     background-color: #bebebe
 }
+
+tr.mt_head {
+    background-color: #333333;
+}
+
+tr.mt_foot {
+    background-color: #555555;
+}
+
+tr.tr_1 {
+    background-color: #eeeeee;
+}
+
 p.header {
 
 }
