@@ -46,18 +46,23 @@ h2 {
 
 td {
     padding: 5px;
+    text-align: center;
+}
+
+.num {
+    padding: 5px;
     text-align: left;
 }
 
-td.td_1 {
+.td_1 {
     background-color: #eeeeee;
 }
 
-td.td_2 {
+.td_2 {
     background-color: #dddddd;
 }
 
-.td_1.version, .td_2.version, .td_inc_0.version, .td_inc_1.version, .td_inc_2.version {
+.version {
     text-align: left;
 }
 

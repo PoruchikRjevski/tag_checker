@@ -203,7 +203,8 @@ class WebGenerator:
                                       html_defs.A_TITLE.format(common_defs.CNT_TXT + str(dev.get_cnt_by_num(note.num))))
 
                         self.__gen_order_num(file,
-                                             html_defs.A_CLASS.format(common_defs.CL_TD_INC.format(str(type_class_id))),
+                                             html_defs.A_CLASS.format(common_defs.CL_TD_INC.format(str(type_class_id))
+                                                                      + " " + common_defs.CL_TD_NUM),
                                              [order_link])
 
                         # tag date and commit hash

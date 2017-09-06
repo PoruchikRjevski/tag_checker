@@ -24,6 +24,7 @@ CL_TD_1         = "td_1"
 CL_TD_2         = "td_2"
 CL_TD_INC       = "td_inc_{:s}"
 CL_TD_VER       = "version"
+CL_TD_NUM       = "num"
 
 M_TABLE_COLSPAN = "5"
 MID_ROWS        = "2"
