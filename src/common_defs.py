@@ -81,8 +81,8 @@ COMM_DATE_TXT       = "Дата коммита: "
 COMM_MSG_SH_TXT     = "Сообщение коммита: {:s}"
 
 T_FOR_ALL_TXT       = "для всех"
-T_ITEM_TXT          = "Зав. № "
-T_ORDER_TXT         = "Заказ "
+T_ITEM_TXT          = "Зав.&nbsp;&nbsp;№&nbsp;"
+T_ORDER_TXT         = "Заказ&nbsp;№&nbsp;"
 
 # CHECKER -----------------------------------------------------------
 TAG_CHECKER         = "tag_checker"
