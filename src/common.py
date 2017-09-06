@@ -40,6 +40,7 @@ FRAME_BAD_NAME  = "BAD_FRAME_NAME"
 # links
 LINK_TO_REPO    = "http://172.16.20.64/swver_hist/gitweb/?p=bourevest/{:s};a={:s};ch={:s};h={:s}"
 # http://172.16.20.64/gitweb/?p=bourevest/ase-2.git;a=shortlog;h=68b81e8557e56f63538e4ecff71cd84b9a5ba009
+LINK_TO_FTP     = "ftp://172.16.20.64/redist/bourevestnik.ru/{:s}/{:s}"
 GW_SHORTLOG     = "shortlog"
 GW_COMMIT       = "commit"
 
@@ -56,6 +57,8 @@ HASH_TXT        = "Версия"
 TAG_TXT         = "Тэг: "
 CNT_TXT         = "В истории: "
 BACK_TXT        = "На главную"
+LINK_FTP_TXT    = "Ссылка на дистрибутив"
+REDIST_TXT      = " [R]"
 
 LEVEL_UP        = "../"
 

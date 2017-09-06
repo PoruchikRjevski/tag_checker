@@ -1,19 +1,21 @@
 a:link {
     text-decoration: none;
-    color: black;
+    color: #000000;
 }
 
 a:visited {
     text-decoration: none;
-    color: black;
+    color: #000000;
 }
 
 a:hover {
-    text-decoration: underline;
+    text-decoration: none;
+    cursor: hand;
+    color: #777777;
 }
 
 a:active {
-    text-decoration: underline;
+    text-decoration: none;
 }
 
 table {
@@ -24,10 +26,11 @@ table {
     text-align: center;
 
     font-size: 14px;
-    font-family: arial;
+    font-family: Consolas,monaco,monospace; 
 
     margin-left: auto;
     margin-right: auto;
+
 }
 
 td {
@@ -67,7 +70,7 @@ td.td_2 {
 }
 
 .td_1.version, .td_2.version, .td_inc_0.version, .td_inc_1.version, .td_inc_2.version {
-    text-align: right;
+    text-align: left;
 }
 
 td.td_inc_0 {

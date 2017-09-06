@@ -15,7 +15,7 @@
 + JavaScript selection: sometimes several commits selected due same comments
 + change "БРА-135Ф" => "БРА-135F"
 - add setted up config files to srv-swdev repo (backup)
-- add link to ftp to redistributives in form:
++ add link to ftp to redistributives in form:
 
     ftp://srv-swdev/redist/bourevestnik.ru/<device_class_en>/<commit_hash>
 

@@ -198,12 +198,13 @@ class WebGenerator:
                             self.__gen_device_name(file, dev.trName, str(len(dev.lastOrders)))
 
                         # order num
+                        order_link = (self.__get_num_by_type(note.type, note.num),
+                                      common.ORDERS_PATH + self.__get_order_file_name(name, note.num),
+                                      html_defs.A_TITLE.format(common.CNT_TXT + str(dev.get_cnt_by_num(note.num))))
+
                         self.__gen_order_num(file,
-                                             html_defs.A_TITLE.format(
-                                                 common.CNT_TXT + str(dev.get_cnt_by_num(note.num))) +
                                              html_defs.A_CLASS.format(common.CL_TD_INC.format(str(type_class_id))),
-                                             common.ORDERS_PATH + self.__get_order_file_name(name, note.num),
-                                             self.__get_num_by_type(note.type, note.num))
+                                             [order_link])
 
                         # tag date and commit hash
                         tag_date_class = html_defs.A_CLASS.format(common.CL_TD_INC.format(str(type_class_id)) +
@@ -238,8 +239,8 @@ class WebGenerator:
 
         return res
 
-    def __gen_order_num(self, file, td_attr, a_link, text):
-        self.__gen_linked_td(file, td_attr, a_link, text)
+    def __gen_order_num(self, file, td_attr, links_c_list):
+        self.__gen_linked_td(file, td_attr, links_c_list)
 
     def __gen_tag_date(self, file, date, attr):
         file.w_tag(html_defs.T_TD,
@@ -247,16 +248,23 @@ class WebGenerator:
                    attr,
                    True)
 
-    def __gen_tag_commit_hash(self, file, td_attr, a_link, text):
-        self.__gen_linked_td(file, td_attr, a_link, text)
+    def __gen_tag_commit_version(self, file, td_attr, links_c_list):
+        self.__gen_linked_td(file, td_attr, links_c_list)
 
-    def __gen_linked_td(self, file, td_attr, a_link, text):
+    def __gen_linked_td(self, file, td_attr, links_c_list):
         file.w_o_tag(html_defs.T_TD,
                      td_attr,
                      True)
-        file.w_tag(html_defs.T_A,
-                   text,
-                   html_defs.A_HREF.format(a_link))
+
+        file.w_o_tag(html_defs.T_P)
+
+        for text, link, title in links_c_list:
+            file.w_tag(html_defs.T_A,
+                       text,
+                       html_defs.A_HREF.format(link) + title)
+
+        file.w_c_tag(html_defs.T_P)
+
         file.w_c_tag(html_defs.T_TD)
 
     def __gen_orders_pages(self, dep, device, repo_link, repo_name):
@@ -317,19 +325,29 @@ class WebGenerator:
         if link_hash == -1:
             link_hash = note.sHash
 
-        link_to_repo = common.LINK_TO_REPO.format(repo_name,
+
+        # list contains tuples (text, link, title)
+        links_list = []
+
+        repo_link_c = (note.sHash + " " + note.commDate,
+                       common.LINK_TO_REPO.format(repo_name,
                                                   common.GW_SHORTLOG,
                                                   note.sHash,
-                                                  str(note.pHash))
+                                                  str(note.pHash)),
+                       html_defs.A_TITLE.format(self.__get_title_for_commit(repo_link, note.author,
+                                                                            note.commDate, note.commMsg)))
 
-        hash_title = html_defs.A_TITLE.format(self.__get_title_for_commit(repo_link,
-                                                                          note.author, note.commDate,
-                                                                          note.commMsg))
+        links_list.append(repo_link_c)
 
-        self.__gen_tag_commit_hash(file,
-                                   hash_title + tag_date_class,
-                                   link_to_repo,
-                                   note.sHash + " " + note.commDate)
+        if note.type is common.TYPE_ALL:
+            ftp_link_c = (common.REDIST_TXT,
+                          common.LINK_TO_FTP.format(note.name, note.sHash),
+                          html_defs.A_TITLE.format(common.LINK_FTP_TXT))
+            links_list.append(ftp_link_c)
+
+        self.__gen_tag_commit_version(file,
+                                      tag_date_class,
+                                      links_list)
 
     def __change_class_type(self, type):
         if type == common.CL_TD_1:

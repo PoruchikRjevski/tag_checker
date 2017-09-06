@@ -22,7 +22,7 @@ class HtmlGen:
 
         self.file = open(file_path, 'w')
 
-    def w_o_tag(self, tag, attr, cr=False):
+    def w_o_tag(self, tag, attr="", cr=False):
         self.file.write(html_defs.TAG.format("", tag, attr))
         if cr:
             self.file.write(html_defs.CR)
@@ -37,7 +37,7 @@ class HtmlGen:
         self.file.write(html_defs.CR)
         self.file.flush()
 
-    def w_tag(self, tag, text, attr, cr=False):
+    def w_tag(self, tag, text, attr="", cr=False):
         self.w_o_tag(tag, attr, cr)
         self.w_txt(text)
         self.w_c_tag(tag)
