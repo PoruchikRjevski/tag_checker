@@ -19,6 +19,9 @@ class CfgLoader:
         self.__gen_paths()
         self.__set_default_out_path()
 
+    def is_conf_file_exist(file_name):
+        return os.path.exists(file_name)
+
     def __gen_paths(self):
         if g_v.CUR_PLATFORM == c_d.LINUX_P:
             self.__cfgFilePathDef = os.path.join(c_d.LIN_CFG_P, c_d.CFG_F_NAME)
@@ -28,10 +31,19 @@ class CfgLoader:
             self.__trFilePathDef = os.path.join(c_d.WIN_CFG_P, c_d.TR_F_NAME)
 
     def __read_file(self, file_name):
-        if file_name is None:
-            self.__cfg.read(self.__cfgFilePathDef)
-        else:
-            self.__cfg.read(file_name)
+        name = file_name
+
+        if name is "":
+            name = self.__cfgFilePathDef
+
+        if not os.path.exists(name):
+            out_err(self.__class__.__name__, c_d.E_CFNE_STR)
+            return c_d.EXIT_CFNE
+
+        self.__cfg.read(name)
+
+        return None
+
 
     def __set_default_out_path(self):
         if g_v.CUR_PLATFORM == c_d.LINUX_P:
@@ -81,7 +93,10 @@ class CfgLoader:
             out_err(self.__class__.__name__, "can't open file with translates: " + self.__trFilePathDef)
         
     def load_config(self, file_name, model):
-        self.__read_file(file_name)
+        res = self.__read_file(file_name)
+        if res is not None:
+            return res
+
         self.__fill_model(model)
         out_log(self.__class__.__name__, "config was loaded")
 

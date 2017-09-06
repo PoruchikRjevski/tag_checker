@@ -14,10 +14,6 @@ from logger import *
 from time_checker import *
 
 
-def is_conf_file_exist(file_name):
-    return os.path.exists(file_name)
-
-
 def set_options(parser):
     usage = "usage: %prog [options] [path_to_config]"
 
@@ -94,16 +90,11 @@ def main():
     out_log(c_d.TAG_CHECKER, "-u: " + str(opts.update))
 
     if len(args) != 1:
-        path = None
+        path = ""
     else:
         path = args[0]
 
     out_log(c_d.TAG_CHECKER, "config path: " + path)
-
-    # check is config file was existed
-    if not is_conf_file_exist(path):
-        out_err(c_d.TAG_CHECKER, c_d.E_CFNE_STR)
-        sys.exit(c_d.EXIT_CFNE)
 
     # main func
     git_man = GitMan()
@@ -117,7 +108,10 @@ def main():
 
     # load config
     cfg_loader = CfgLoader()
-    cfg_loader.load_config(path, tag_model)
+    res = cfg_loader.load_config(path, tag_model)
+
+    if res is not None:
+        sys.exit(res)
 
     # get tags and fill model
     git_man.update = opts.update
