@@ -180,10 +180,14 @@ class GitMan:
     def __find_develop_branche(self, branches):
         res = None
 
-        if not isinstance(branches, list):
-            branches = [branches]
+        b_tmp = None
 
-        for branch in branches:
+        if not isinstance(branches, list):
+            b_tmp = [branches]
+        else:
+            b_tmp = branches
+
+        for branch in b_tmp:
             print(branch)
             if g_d.BRANCH_DEVELOP in branch:
                 res = branch
