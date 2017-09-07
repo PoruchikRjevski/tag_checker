@@ -82,6 +82,8 @@ class GitMan:
         out_log("cur branch: " + self.__get_current_branch())
 
     def __parce_tag(self, note_out):
+        timer = TimeChecker()
+        timer.start
         tag_parts = note_out.tag.split("/")
 
         if len(tag_parts) < 3:
@@ -121,6 +123,9 @@ class GitMan:
         out_log("Note type: " + note_out.type)
         out_log("Note num: " + str(note_out.num))
         out_log("Note date: " + note_out.date)
+
+        timer.stop
+        out_log("finish parce tag - " + timer.passed_time_str)
 
         return True
 
@@ -293,8 +298,11 @@ class GitMan:
         res = ""
 
         try:
-            res += temp[0] + "-" + temp[1] + "-" + temp[2] + " "
-            res += temp[3][0] + temp[3][1] + ":" + temp[3][2] + temp[3][3]
+            res = "{:s}-{:s}-{:s} {:s}:{:s}".format(temp[0],
+                                                    temp[1],
+                                                    temp[2],
+                                                    temp[3][0:2],
+                                                    temp[3][2:4])
         except Exception:
             out_err("Bad date: " + date)
 
@@ -307,7 +315,9 @@ class GitMan:
         res = ""
 
         try:
-            res += date_temp[0] + " " + time_temp[0] + ":" + time_temp[1]
+            res = "{:s} {:s}:{:s}".format(date_temp[0],
+                                          time_temp[0],
+                                          time_temp[1])
         except Exception:
             out_err("Bad date: " + date)
 
