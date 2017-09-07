@@ -44,10 +44,6 @@ def set_options(parser):
                       action="store_true", dest="multithreading",
                       default=False,
                       help="exec script with multithreading")
-    parser.add_option("-f", "--fetchcoremt",
-                      action="store_true", dest="fetchcoremt",
-                      default=False,
-                      help="exec script with fetching threads to real cpu core's(need flag -m aslo)")
 
 
 def check_options(opts):
@@ -59,8 +55,6 @@ def check_options(opts):
         g_v.SUDOER = True
     if opts.multithreading:
         g_v.MULTITH = True
-    if opts.fetchcoremt:
-        g_v.FETCH_C_MT = True
 
 
 def main():
@@ -88,7 +82,6 @@ def main():
     out_log("-l: " + str(g_v.LOGGING))
     out_log("-s: " + str(g_v.SUDOER))
     out_log("-m: " + str(g_v.MULTITH))
-    out_log("-f: " + str(g_v.FETCH_C_MT))
     out_log("-d: " + str(opts.develop))
     out_log("-u: " + str(opts.update))
 

@@ -8,7 +8,7 @@ from queue import Queue
 import common_defs as c_d
 import global_vars as g_v
 
-__all__ = ['init_log', 'out_log', 'out_err', 'start_thread_logging', 'finish_thread_logging', 'out_threads_logs']
+__all__ = ['init_log', 'out_log', 'out_err', 'start_thread_logging', 'finish_thread_logging', 'out_deffered_logs']
 
 threads_list = []
 threads_list_f = []
@@ -46,7 +46,7 @@ def finish_thread_logging():
     threads_list_f.append(pid)
 
 
-def out_threads_logs():
+def out_deffered_logs():
     for pid in threads_list:
         if pid in threads_list_f:
             for out in threads_out[pid]:
@@ -64,7 +64,7 @@ def out_log(msg):
 
     out = gen_log_msg(msg, c_d.LOG_T)
 
-    if pid in threads_list:
+    if pid in threads_list and g_v.MULTITH:
         threads_out[pid].append(out)
     else:
         out_msg(out, c_d.LOG_T)
@@ -80,7 +80,7 @@ def out_err(msg):
 
     out = gen_log_msg(msg, c_d.ERR_T)
 
-    if pid in threads_list:
+    if pid in threads_list and g_v.MULTITH:
         threads_out[pid].append(out)
     else:
         out_msg(out, c_d.LOG_T)

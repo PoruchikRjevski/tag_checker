@@ -84,10 +84,6 @@ T_FOR_ALL_TXT       = "Для всех"
 T_ITEM_TXT          = "Зав.&nbsp;&nbsp;№&nbsp;"
 T_ORDER_TXT         = "Заказ&nbsp;№&nbsp;"
 
-# CHECKER -----------------------------------------------------------
-TAG_CHECKER         = "tag_checker"
-CMD_WRAP            = "cmd_wrapper"
-
 # exit codes and outputs
 EXIT_NORMAL         = 0                                         # all ok
 EXIT_GNT            = 1                                         # git not installed

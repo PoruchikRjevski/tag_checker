@@ -20,4 +20,4 @@ class TimeChecker:
 
     @property
     def passed_time_str(self):
-        return "exec time, s: " + str(round(self.__result, 4))
+        return "{:s}(sec)".format(str(round(self.__result, 4)))

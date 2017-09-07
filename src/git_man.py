@@ -238,11 +238,18 @@ class GitMan:
             else:
                 return -1
 
-    def __gen_notes_by_tag_list(self, tag_list, out_queue):
-        for tag in tag_list:
-            self.__gen_note_by_tag(tag, out_queue)
+    def __gen_notes_by_tag_list(self, tag_list):
+        notes = []
 
-    def __gen_note_by_tag(self, tag, out_queue=None):
+        for tag in tag_list:
+            notes.append(self.__gen_note_by_tag(tag))
+
+        return notes
+
+    def __gen_note_by_tag(self, tag):
+        timer = TimeChecker()
+        timer.start
+
         start_thread_logging()
 
         out_log("Gen note for tag: " + tag)
@@ -275,6 +282,8 @@ class GitMan:
             out_err("Bad tag: " + tag)
 
         finish_thread_logging()
+        timer.stop
+        out_log("Tag time: {:s}".format(timer.passed_time_str))
 
         return note
 
@@ -395,71 +404,28 @@ class GitMan:
 
                     if tags:
                         tags_list = tags.split("\n")
-                        n_queue = ThreadQueue()
+
+                        notes_list = []
 
                         if g_v.MULTITH:
                             cpu_ths = multiprocessing.cpu_count()
                             out_log("cpu count: " + str(cpu_ths))
-                            # thread pool
+
                             pool = ThreadPool(cpu_ths)
-                            notes_list = []
 
-                            threads = []
+                            notes_list = pool.map(self.__gen_note_by_tag, tags_list)
 
-                            if g_v.FETCH_C_MT:
-                                len_tl = len(tags_list)
-                                avg = len_tl/cpu_ths
-                                pos = 0
-                                out_log("avg: " + str(avg))
-                                for n_t in range(cpu_ths):
-                                    len_tl -= avg
-                                    last = len_tl/avg
-                                    out_log("last: " + str(last))
-                                    out_log("pos: " + str(pos))
-                                    if last > 1:
-                                        thread = Thread(target=self.__gen_notes_by_tag_list,
-                                                        args=[tags_list[int(pos):int(pos+avg)],
-                                                              n_queue])
-                                        thread.start()
-                                        threads.append(thread)
-                                        pos += avg
-                                    else:
-                                        thread = Thread(target=self.__gen_notes_by_tag_list,
-                                                        args=[tags_list[int(pos):],
-                                                              n_queue])
-                                        thread.start()
-                                        threads.append(thread)
-                            else:
-                                notes_list = pool.map(self.__gen_note_by_tag, tags_list)
-                                # for tag in tags.split("\n"):
-                                    # if self.__is_tag_valid(tag):
-                                        # threads
-                                        # thread = Thread(target=self.__gen_note_by_tag, args=[tag, n_queue])
-                                        # thread.start()
-                                        # threads.append(thread)
-
-                            # for res in threads:
-                            #     res.join()
-                            #     threads.remove(res)
-
-                            # thread pool
                             pool.close()
                             pool.join()
-                        else:
-                            notes_list = self.__gen_notes_by_tag_list(tags_list, n_queue)
 
-                        out_threads_logs()
+                            out_deffered_logs()
+                        else:
+                            notes_list = self.__gen_notes_by_tag_list(tags_list)
+
+                        # add notes
                         for note in notes_list:
                             if note.valid:
                                 self.__add_note(model, repo, note)
-
-                        # n_queue.logs
-                        # n_queue.errs
-                        # while not n_queue.notes.empty():
-                        #     note = n_queue.notes.get()
-                        #
-                        #     if note.valid:
-                        #         self.__add_note(model, repo, note)
 
                         # sort notes for devices and separate last updates
                         int_time_ch.start
