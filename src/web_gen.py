@@ -13,13 +13,13 @@ from time_checker import TimeChecker
 
 class WebGenerator:
     def __init__(self):
-        out_log(self.__class__.__name__, "init")
+        out_log("init")
 
     def __join_paths(self, first, sec):
         return os.path.join(first, sec)
 
     def __gen_index(self, model):
-        out_log(self.__class__.__name__, "start gen index")
+        out_log("start gen index")
         index = HtmlGen(g_v.OUT_PATH, c_d.INDEX_F_NAME)
 
         self.__gen_page_head(index,)
@@ -28,10 +28,10 @@ class WebGenerator:
         self.__gen_page_foot(index)
 
         index.close()
-        out_log(self.__class__.__name__, "finish gen index")
+        out_log("finish gen index")
 
     def __gen_pages(self, model):
-        out_log(self.__class__.__name__, "start gen main")
+        out_log("start gen main")
         main = HtmlGen(g_v.OUT_PATH, c_d.MAIN_F_NAME)
 
         self.__gen_page_head(main)
@@ -45,7 +45,7 @@ class WebGenerator:
         self.__gen_page_foot(main)
 
         main.close()
-        out_log(self.__class__.__name__, "finish gen main")
+        out_log("finish gen main")
 
     def __gen_page_head(self, gen, level=""):
         gen.w_o_tag(h_d.T_HTML, "", True)
@@ -153,7 +153,7 @@ class WebGenerator:
         gen.w_c_tag(h_d.T_TR)
 
     def __gen_main_content(self, model, file):
-        out_log(self.__class__.__name__, "start gen main content")
+        out_log("start gen main content")
 
         deps = model.departments
 
@@ -164,7 +164,7 @@ class WebGenerator:
             for repo in repos:
                 for name, dev in repo.devices.items():
                     all_notes += len(dev.lastOrders)
-                    out_log(self.__class__.__name__, "Notes for dev: " + name + " - " + str(all_notes))
+                    out_log("Notes for dev: " + name + " - " + str(all_notes))
 
             for repo in repos:
                 for name, dev in repo.devices.items():
@@ -217,7 +217,7 @@ class WebGenerator:
                                                   repo.name,
                                                   tag_date_class)
                         file.w_c_tag(h_d.T_TR)
-        out_log(self.__class__.__name__, "finish gen main content")
+        out_log("finish gen main content")
 
     def __gen_department(self, file, text, span):
         file.w_tag(h_d.T_TD,
@@ -270,7 +270,7 @@ class WebGenerator:
         file.w_c_tag(h_d.T_TD)
 
     def __gen_orders_pages(self, dep, device, repo_link, repo_name):
-        out_log(self.__class__.__name__, "start gen items pages for device: " + device.name)
+        out_log("start gen items pages for device: " + device.name)
 
         for key, val in device.orders.items():
             page = HtmlGen(c_d.ORDERS_PATH, self.__get_order_file_name(device.name, val[0].num))
@@ -293,7 +293,7 @@ class WebGenerator:
 
             page.close()
 
-        out_log(self.__class__.__name__, "finish gen items pages for device: " + device.name)
+        out_log("finish gen items pages for device: " + device.name)
 
     def __gen_order_content(self, page, notes, repo_link, repo_name):
         type_class_id = c_d.CL_TD_1
@@ -402,12 +402,12 @@ class WebGenerator:
 
     def generate_web(self, model):
         time_ch = TimeChecker()
-        out_log(self.__class__.__name__, "start gen web")
+        out_log("start gen web")
 
         time_ch.start
         self.__gen_index(model)
         self.__gen_pages(model)
         time_ch.stop
 
-        out_log(self.__class__.__name__, "finish gen web - " + time_ch.passed_time_str)
+        out_log("finish gen web - " + time_ch.passed_time_str)
 

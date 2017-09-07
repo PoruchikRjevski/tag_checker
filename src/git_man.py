@@ -16,7 +16,7 @@ from time_checker import *
 
 class GitMan:
     def __init__(self):
-        out_log(self.__class__.__name__, "init")
+        out_log("init")
         self.__update = False
         self.__swDevelop = False
         self.__lastBranch = None
@@ -24,29 +24,26 @@ class GitMan:
 
     def __is_dir_exist(self, link):
         if not os.path.isdir(link):
-            out_err(self.__class__.__name__, "can't find dir of repo: " + link)
+            out_err("can't find dir of repo: " + link)
             return False
         return True
 
     def __go_to_dir(self, link):
         os.chdir(link)
-        # out_log(self.__class__.__name__, "go to dir: " + link)
 
     def __get_current_branch(self):
         cmd = g_d.GIT_CMD.format(g_d.A_REV_PARSE
                                  + g_d.A_ABBREV.format(g_d.A_RP_REF)
                                  + g_d.REV_HEAD)
-        # out_log(self.__class__.__name__, "cmd: " + cmd)
+
         branch = run_cmd(cmd)
 
-        out_log(self.__class__.__name__, "cur branch: " + branch)
+        out_log("cur branch: " + branch)
 
         return branch
 
     def __switch_to_branch(self, branch):
         cmd = g_d.GIT_CMD.format(g_d.A_CHECKOUT.format(branch))
-
-        # out_log(self.__class__.__name__, "cmd: " + cmd)
 
         run_cmd(cmd)
 
@@ -57,19 +54,15 @@ class GitMan:
             self.lastBranch = branch
             self.needReturnBranch = True
             self.__switch_to_branch(g_d.BRANCH_DEVELOP)
-            out_log(self.__class__.__name__, "cur branch: " + self.__get_current_branch())
+            out_log("cur branch: " + self.__get_current_branch())
 
     def __update_repo(self):
         cmd = g_d.GIT_CMD.format(g_d.A_PULL)
-
-        # out_log(self.__class__.__name__, "cmd: " + cmd)
 
         run_cmd(cmd)
 
     def __get_tags(self):
         cmd = g_d.GIT_CMD.format(g_d.A_TAG)
-
-        # out_log(self.__class__.__name__, "cmd: " + cmd)
 
         return run_cmd(cmd)
 
@@ -81,14 +74,14 @@ class GitMan:
         return False
 
     def __switch_back_branch(self):
-        out_log(self.__class__.__name__, "cur branch: " + self.__get_current_branch())
+        out_log("cur branch: " + self.__get_current_branch())
 
         self.__switch_to_branch(self.__lastBranch)
         self.__needReturnBranch = False
 
-        out_log(self.__class__.__name__, "cur branch: " + self.__get_current_branch())
+        out_log("cur branch: " + self.__get_current_branch())
 
-    def __parce_tag(self, note_out, t_logs, t_errs):
+    def __parce_tag(self, note_out):
         tag_parts = note_out.tag.split("/")
 
         if len(tag_parts) < 3:
@@ -96,7 +89,7 @@ class GitMan:
 
         note_out.name = tag_parts[1]
 
-        t_logs.append(out_log_def(self.__class__.__name__, "Note name: " + note_out.name))
+        out_log("Note name: " + note_out.name)
 
         date = ""
         if len(tag_parts) == 3:
@@ -104,18 +97,18 @@ class GitMan:
         elif len(tag_parts) == 4:
             prenum = tag_parts[2].split("-")[-1:][0]
 
-            t_logs.append(out_log_def(self.__class__.__name__, "prenum: " + prenum))
+            out_log("prenum: " + prenum)
 
             note_out.type = tag_parts[2].split("-")[:-1][0]
 
             if note_out.type not in c_d.TYPES_L:
-                t_errs.append(out_err_def(self.__class__.__name__, "Bad item type: " + note_out.type))
+                out_err("Bad item type: " + note_out.type)
                 return False
 
             try:
                 note_out.num = int(prenum)
             except ValueError:
-                t_errs.append(out_err_def(self.__class__.__name__, "EXCEPT Bad item num: " + prenum))
+                out_err("EXCEPT Bad item num: " + prenum)
                 return False
 
             date = self.__repair_tag_date(tag_parts[3])
@@ -125,9 +118,9 @@ class GitMan:
         elif date:
             note_out.date = date
 
-        t_logs.append(out_log_def(self.__class__.__name__, "Note type: " + note_out.type))
-        t_logs.append(out_log_def(self.__class__.__name__, "Note num: " + str(note_out.num)))
-        t_logs.append(out_log_def(self.__class__.__name__, "Note date: " + note_out.date))
+        out_log("Note type: " + note_out.type)
+        out_log("Note num: " + str(note_out.num))
+        out_log("Note date: " + note_out.date)
 
         return True
 
@@ -135,8 +128,6 @@ class GitMan:
         cmd = g_d.GIT_CMD.format(g_d.A_REV_PARSE
                                  + g_d.A_SHORT
                                  + " " + tag)
-
-        # out_log(self.__class__.__name__, "cmd: " + cmd)
 
         return run_cmd(cmd)
 
@@ -147,8 +138,6 @@ class GitMan:
                                  + g_d.A_DATE.format(g_d.A_D_ISO)
                                  + " " + hash)
 
-        # out_log(self.__class__.__name__, "cmd: " + cmd)
-
         return run_cmd(cmd)
 
     def __get_commit_author_by_short_hash(self, hash):
@@ -156,8 +145,6 @@ class GitMan:
                                  + g_d.A_NN.format(str(c_d.GIT_AUTHOR_DEEP))
                                  + g_d.A_FORMAT.format(g_d.AA_AUTHOR)
                                  + " " + hash)
-
-        # out_log(self.__class__.__name__, "cmd: " + cmd)
 
         return run_cmd(cmd)
 
@@ -174,8 +161,6 @@ class GitMan:
                                  + g_d.A_FORMAT.format(g_d.AA_COMMIT_MSG)
                                  + " " + hash)
 
-        # out_log(self.__class__.__name__, "cmd: " + cmd)
-
         return run_cmd(cmd)
 
     def __find_develop_branche(self, branches):
@@ -189,7 +174,6 @@ class GitMan:
             b_tmp = branches
 
         for branch in b_tmp:
-            print(branch)
             if g_d.BRANCH_DEVELOP in branch:
                 res = branch
                 if "* " in res:
@@ -199,11 +183,9 @@ class GitMan:
 
         return res
 
-    def __get_develop_branch_by_hash(self, hash, t_logs):
+    def __get_develop_branch_by_hash(self, hash):
         cmd = g_d.GIT_CMD.format(g_d.A_BRANCH
                                  + g_d.A_CONTAINS.format(hash))
-
-        # t_logs.append(out_log_def(self.__class__.__name__, "cmd: " + cmd))
 
         out = run_cmd(cmd)
 
@@ -211,23 +193,19 @@ class GitMan:
 
         return out
 
-    def __get_last_commit_on_branch(self, branch, t_logs):
+    def __get_last_commit_on_branch(self, branch):
         cmd = g_d.GIT_CMD.format(g_d.A_LOG
                                  + g_d.A_NN.format(str(c_d.GIT_AUTHOR_DEEP))
                                  + g_d.A_FORMAT.format(g_d.AA_SHASH)
                                  + " " + branch)
 
-        # t_logs.append(out_log_def(self.__class__.__name__, "cmd: " + cmd))
-
         return run_cmd(cmd)
 
-    def __get_parent_commit_hash(self, note_hash, last_commit_hash, t_logs):
+    def __get_parent_commit_hash(self, note_hash, last_commit_hash):
         cmd = g_d.GIT_CMD.format(g_d.A_REV_LIST
                                  + g_d.A_ABBREV.format(g_d.A_AB_COMMIT)
                                  + " " + note_hash + "..." + last_commit_hash
                                  + g_d.A_TAIL.format(str(c_d.GIT_PAR_SH_NEST)))
-
-        # t_logs.append(out_log_def(self.__class__.__name__, "cmd: " + cmd))
 
         out = run_cmd(cmd)
 
@@ -238,19 +216,19 @@ class GitMan:
 
         return out
 
-    def __get_parents_short_hash(self, note_hash, t_logs):
-        branch = self.__get_develop_branch_by_hash(note_hash, t_logs)
-        # out_log(self.__class__.__name__, "finded branch: " + str(branch))
+    def __get_parents_short_hash(self, note_hash):
+        branch = self.__get_develop_branch_by_hash(note_hash)
+        out_log("finded branch: " + str(branch))
         if branch is None:
             return -1
 
-        last_commit_s_hash = self.__get_last_commit_on_branch(branch, t_logs)
-        # out_log(self.__class__.__name__, "last commit short hash: " + str(last_commit_s_hash))
+        last_commit_s_hash = self.__get_last_commit_on_branch(branch)
+        out_log("last commit short hash: " + str(last_commit_s_hash))
         if last_commit_s_hash is None:
             return -1
 
-        parents_hash = self.__get_parent_commit_hash(note_hash, last_commit_s_hash, t_logs)
-        # out_log(self.__class__.__name__, "parent's hash: " + str(parents_hash))
+        parents_hash = self.__get_parent_commit_hash(note_hash, last_commit_s_hash)
+        out_log("parent's hash: " + str(parents_hash))
         if parents_hash is None:
             return -1
         else:
@@ -265,46 +243,40 @@ class GitMan:
             self.__gen_note_by_tag(tag, out_queue)
 
     def __gen_note_by_tag(self, tag, out_queue=None):
-        t_logs = []
-        t_errs = []
-        out = out_queue
-        if out is None:
-            out = ThreadQueue()
+        start_thread_logging()
 
-        t_logs.append(out_log_def(self.__class__.__name__, "Gen note for tag: " + tag))
+        out_log("Gen note for tag: " + tag)
 
         note = Note()
         note.tag = tag
 
-        if self.__parce_tag(note, t_logs, t_errs):
+        if self.__parce_tag(note):
             note.sHash = self.__get_short_hash(tag)
-            t_logs.append(out_log_def(self.__class__.__name__, "Note short hash: " + note.sHash))
+            out_log("Note short hash: " + note.sHash)
 
             note.commDate = self.__repair_commit_date(self.__get_commit_date_by_short_hash(note.sHash))
-            t_logs.append(out_log_def(self.__class__.__name__, "Note commit date: " + note.commDate))
+            out_log("Note commit date: " + note.commDate)
 
             note.author = self.__get_commit_author_by_short_hash(note.sHash)
-            t_logs.append(out_log_def(self.__class__.__name__, "Note author: " + note.author))
+            out_log("Note author: " + note.author)
 
             msg = self.__get_commit_msg_by_short_hash(note.sHash)
             note.commMsg = self.__repair_commit_msg(msg)
-            t_logs.append(out_log_def(self.__class__.__name__, "Note commMsg: " + note.commMsg))
+            out_log("Note commMsg: " + note.commMsg)
 
             # get pHash
-            note.pHash = self.__get_parents_short_hash(note.sHash, t_logs)
+            note.pHash = self.__get_parents_short_hash(note.sHash)
             if note.pHash == -1:
                 note.pHash = note.sHash
-            t_logs.append(out_log_def(self.__class__.__name__, "Note pHash: " + str(note.pHash)))
+            out_log("Note pHash: " + str(note.pHash))
 
             note.valid = True
         else:
-            t_errs.append(out_err_def(self.__class__.__name__, "Bad tag: " + tag))
+            out_err("Bad tag: " + tag)
 
-        out.logs = t_logs
-        out.errs = t_errs
-        out.notes.put(note)
+        finish_thread_logging()
 
-        return out
+        return note
 
     def __repair_tag_date(self, date):
         temp = date.split("-")
@@ -315,7 +287,7 @@ class GitMan:
             res += temp[0] + "-" + temp[1] + "-" + temp[2] + " "
             res += temp[3][0] + temp[3][1] + ":" + temp[3][2] + temp[3][3]
         except Exception:
-            out_err(self.__class__.__name__, "Bad date: " + date)
+            out_err("Bad date: " + date)
 
         return res
 
@@ -328,7 +300,7 @@ class GitMan:
         try:
             res += date_temp[0] + " " + time_temp[0] + ":" + time_temp[1]
         except Exception:
-            out_err(self.__class__.__name__, "Bad date: " + date)
+            out_err("Bad date: " + date)
 
         return res
 
@@ -385,7 +357,7 @@ class GitMan:
         return False
 
     def scanning(self, model):
-        out_log(self.__class__.__name__, "start scanning")
+        out_log("start scanning")
 
         # create time checker
         time_ch = TimeChecker()
@@ -396,11 +368,11 @@ class GitMan:
         deps = model.departments
 
         for name, repos in deps.items():
-            out_log(self.__class__.__name__, "department: " + name)
+            out_log("department: " + name)
 
             for repo in repos:
                 link = repo.link
-                out_log(self.__class__.__name__, "repo: " + link)
+                out_log("repo: " + link)
 
                 # try go to dir link
                 self.__go_to_dir(link)
@@ -418,32 +390,32 @@ class GitMan:
                     int_time_ch.start
                     tags = self.__get_tags()
                     int_time_ch.stop
-                    out_log(self.__class__.__name__, "get all tags " + int_time_ch.passed_time_str)
-                    out_log(self.__class__.__name__, "Tags number: " + str(len(tags.split("\n"))))
+                    out_log("get all tags " + int_time_ch.passed_time_str)
+                    out_log("Tags number: " + str(len(tags.split("\n"))))
 
                     if tags:
                         tags_list = tags.split("\n")
                         n_queue = ThreadQueue()
 
                         if g_v.MULTITH:
-                            cpu_s = multiprocessing.cpu_count()
-                            out_log(self.__class__.__name__, "cpu count: " + str(cpu_s))
+                            cpu_ths = multiprocessing.cpu_count()
+                            out_log("cpu count: " + str(cpu_ths))
                             # thread pool
-                            pool = ThreadPool(cpu_s)
-                            res = []
+                            pool = ThreadPool(cpu_ths)
+                            notes_list = []
 
                             threads = []
 
                             if g_v.FETCH_C_MT:
                                 len_tl = len(tags_list)
-                                avg = len_tl/cpu_s
+                                avg = len_tl/cpu_ths
                                 pos = 0
-                                out_log(self.__class__.__name__, "avg: " + str(avg))
-                                for n_t in range(cpu_s):
+                                out_log("avg: " + str(avg))
+                                for n_t in range(cpu_ths):
                                     len_tl -= avg
                                     last = len_tl/avg
-                                    out_log(self.__class__.__name__, "last: " + str(last))
-                                    out_log(self.__class__.__name__, "pos: " + str(pos))
+                                    out_log("last: " + str(last))
+                                    out_log("pos: " + str(pos))
                                     if last > 1:
                                         thread = Thread(target=self.__gen_notes_by_tag_list,
                                                         args=[tags_list[int(pos):int(pos+avg)],
@@ -458,7 +430,7 @@ class GitMan:
                                         thread.start()
                                         threads.append(thread)
                             else:
-                                res = pool.map(self.__gen_note_by_tag, tags_list)
+                                notes_list = pool.map(self.__gen_note_by_tag, tags_list)
                                 # for tag in tags.split("\n"):
                                     # if self.__is_tag_valid(tag):
                                         # threads
@@ -474,16 +446,12 @@ class GitMan:
                             pool.close()
                             pool.join()
                         else:
-                            self.__gen_notes_by_tag_list(tags_list, n_queue)
+                            notes_list = self.__gen_notes_by_tag_list(tags_list, n_queue)
 
-                        for n in res:
-                            n.logs
-                            n.errs
-                            while not n.notes.empty():
-                                note = n.notes.get()
-
-                                if note.valid:
-                                    self.__add_note(model, repo, note)
+                        out_threads_logs()
+                        for note in notes_list:
+                            if note.valid:
+                                self.__add_note(model, repo, note)
 
                         # n_queue.logs
                         # n_queue.errs
@@ -496,14 +464,14 @@ class GitMan:
                         # sort notes for devices and separate last updates
                         int_time_ch.start
                         for dev_name, dev in repo.devices.items():
-                            out_log(self.__class__.__name__, "Sort history for: " + dev_name)
+                            out_log("Sort history for: " + dev_name)
                             dev.sort_orders()
-                            out_log(self.__class__.__name__, "Separate last notes for: " + dev_name)
+                            out_log("Separate last notes for: " + dev_name)
                             dev.fill_last()
                         int_time_ch.stop
-                        out_log(self.__class__.__name__, "sort " + int_time_ch.passed_time_str)
+                        out_log("sort " + int_time_ch.passed_time_str)
                     else:
-                        out_err(self.__class__.__name__, "no tags")
+                        out_err("no tags")
 
                     # return last branch if need
                     if self.needReturnBranch:
@@ -511,4 +479,4 @@ class GitMan:
 
         time_ch.stop
 
-        out_log(self.__class__.__name__, "finish scanning - " + time_ch.passed_time_str)
+        out_log("finish scanning - " + time_ch.passed_time_str)

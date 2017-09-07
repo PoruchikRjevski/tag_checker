@@ -2,6 +2,7 @@ import time
 
 __all__ = ['TimeChecker']
 
+
 class TimeChecker:
     def __init__(self):
         self.__first = 0

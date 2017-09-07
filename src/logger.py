@@ -1,12 +1,18 @@
 import datetime
 import inspect
 import os
+import threading
+from collections import OrderedDict
 from queue import Queue
 
 import common_defs as c_d
 import global_vars as g_v
 
-__all__ = ['init_log', 'out_log', 'out_err', 'out_log_def', 'out_err_def', 'release_log', 'release_err']
+__all__ = ['init_log', 'out_log', 'out_err', 'start_thread_logging', 'finish_thread_logging', 'out_threads_logs']
+
+threads_list = []
+threads_list_f = []
+threads_out = OrderedDict()
 
 
 def init_log():
@@ -25,78 +31,72 @@ def init_log():
     g_v.CUR_PATH = path
 
     open(g_v.CUR_PATH + c_d.LOG_T, 'w')
-    open(g_v.CUR_PATH + c_d.ERR_T, 'w')
+    # open(g_v.CUR_PATH + c_d.ERR_T, 'w')
+
+
+def start_thread_logging():
+    pid = str(threading.get_ident())
+    threads_list.append(pid)
+    threads_out[pid] = []
+
+
+def finish_thread_logging():
+    pid = str(threading.get_ident())
+    threads_list.remove(pid)
+    threads_list_f.append(pid)
+
+
+def out_threads_logs():
+    for pid in threads_list_f:
+        if pid in threads_out:
+            for out in threads_out[pid]:
+                out_msg(out, c_d.LOG_T)
 
 
 def write_msg(msg, path):
     if g_v.LOGGING:
-        f = open(g_v.CUR_PATH + path, 'a')
-        if f:
+        with open(g_v.CUR_PATH + path, 'a') as f:
             f.write(msg + "\n")
-            f.close()
 
 
-def out_log(who, msg):
-    out = gen_log_msg(who, msg, c_d.LOG_T)
-    write_msg(out, c_d.LOG_T)
+def out_log(msg):
+    pid = str(threading.get_ident())
 
+    out = gen_log_msg(msg, c_d.LOG_T)
+
+    if pid in threads_list:
+        threads_out[pid].append(out)
+    else:
+        out_msg(out, c_d.LOG_T)
+
+
+def out_msg(out, place):
+    write_msg(out, place)
     show_msg(out)
 
 
-def out_log_def(who, msg):
-    return gen_log_msg(who, msg, c_d.LOG_T)
+def out_err(msg):
+    pid = str(threading.get_ident())
 
+    out = gen_log_msg(msg, c_d.ERR_T)
 
-def release_log(msgs):
-    if not isinstance(msgs, str):
-        for msg in msgs:
-            write_msg(msg, c_d.LOG_T)
-            show_msg(msg)
+    if pid in threads_list:
+        threads_out[pid].append(out)
     else:
-        write_msg(msgs, c_d.LOG_T)
-        show_msg(msgs)
+        out_msg(out, c_d.LOG_T)
 
 
-def out_err(who, msg):
-    out = gen_log_msg(who, msg, c_d.ERR_T)
-    write_msg(out, c_d.ERR_T)
+def gen_log_msg(msg, type):
+    (c_name, c_line) = get_caller_info()
 
-    show_msg(out)
+    c_name += "()" + " " * (c_d.LOG_SYMB_CALLER - len(c_name))
+    c_line = " " * (c_d.LOG_SYMB_C_LINE - len(c_line)) + c_line
 
-
-def out_err_def(who, msg):
-    return gen_log_msg(who, msg, c_d.ERR_T)
-
-
-def release_err(msgs):
-    if not isinstance(msgs, str):
-        for msg in msgs:
-            write_msg(msg, c_d.ERR_T)
-            show_msg(msg)
-    else:
-        write_msg(msgs, c_d.ERR_T)
-        show_msg(msgs)
-
-
-def gen_log_msg(who, msg, type):
-    caller = caller_func()
-    c_line = caller_line()
-
-    caller += "()"
-
-    symbols = c_d.LOG_SYMB_CALLER - len(caller) - len(who)
-
-    caller += " " * symbols
-
-    symbols = c_d.LOG_SYMB_C_LINE - len(c_line)
-
-    c_line = " " * symbols + c_line
-
-    out = "[{:s}] : [{:s}] : [{:s}:{:s}] : [L: {:s}] : [{:s}] ".format(datetime.datetime.now().__str__(), type,
-                                                                       who, caller,
-                                                                       c_line, msg)
-
-    return out
+    return "[{:s}] : [{:s}] : [{:s}] : [L: {:s}] : [{:s}] ".format(datetime.datetime.now().__str__(),
+                                                                   type,
+                                                                   c_name,
+                                                                   c_line,
+                                                                   msg)
 
 
 def show_msg(msg):
@@ -104,13 +104,33 @@ def show_msg(msg):
         print(msg)
 
 
-def caller_func():
-    return str(inspect.stack()[3][3])
+def get_caller_info():
+    stack = inspect.stack()
 
-def caller_line():
-    frame = inspect.stack()[3][0]
-    info = inspect.getframeinfo(frame)
-    return str(info.lineno)
+    if len(stack) < 3:
+        return ""
+
+    parent_frame = stack[3][0]
+
+    # get line number
+    line_num = str(inspect.getframeinfo(parent_frame).lineno)
+
+    full_name = "{:s}:{:s}"
+    module_name = ""
+
+    # get class or module name
+    if 'self' in parent_frame.f_locals:
+        module_name = parent_frame.f_locals['self'].__class__.__name__
+    else:
+        module = inspect.getmodule(parent_frame)
+        if module:
+            module_name = module.__name__
+
+    full_name = full_name.format(module_name,
+                                 parent_frame.f_code.co_name)
+
+    return full_name, line_num
+
 
 def main():
     print("do nothing from there")

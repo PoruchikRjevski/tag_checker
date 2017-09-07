@@ -11,7 +11,7 @@ __all__ = ['CfgLoader']
 
 class CfgLoader:
     def __init__(self):
-        out_log(self.__class__.__name__, "init")
+        out_log("init")
         self.__cfg = configparser.ConfigParser()
         self.__trFilePathDef = ""
         self.__cfgFilePathDef = ""
@@ -37,7 +37,7 @@ class CfgLoader:
             name = self.__cfgFilePathDef
 
         if not os.path.exists(name):
-            out_err(self.__class__.__name__, c_d.E_CFNE_STR)
+            out_err(c_d.E_CFNE_STR)
             return c_d.EXIT_CFNE
 
         self.__cfg.read(name)
@@ -76,7 +76,7 @@ class CfgLoader:
 
             model.departments[i] = repos_list
 
-        out_log(self.__class__.__name__, "out path: " + g_v.OUT_PATH)
+        out_log("out path: " + g_v.OUT_PATH)
 
     def __load_tr_dev_names(self, model):
         tr_f = open(self.__trFilePathDef)
@@ -90,7 +90,7 @@ class CfgLoader:
                     tr_name = line.split("=")[1:][-1]
                     model.trDevNames[name] = tr_name
         else:
-            out_err(self.__class__.__name__, "can't open file with translates: " + self.__trFilePathDef)
+            out_err("can't open file with translates: " + self.__trFilePathDef)
         
     def load_config(self, file_name, model):
         res = self.__read_file(file_name)
@@ -98,8 +98,8 @@ class CfgLoader:
             return res
 
         self.__fill_model(model)
-        out_log(self.__class__.__name__, "config was loaded")
+        out_log("config was loaded")
 
         if self.__trFilePathDef:
             self.__load_tr_dev_names(model)
-            out_log(self.__class__.__name__, "mapped names was loaded")
+            out_log("mapped names was loaded")

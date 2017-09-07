@@ -84,26 +84,26 @@ def main():
     # init logger
     init_log()
 
-    out_log(c_d.TAG_CHECKER, "-q: " + str(g_v.QUIET))
-    out_log(c_d.TAG_CHECKER, "-l: " + str(g_v.LOGGING))
-    out_log(c_d.TAG_CHECKER, "-s: " + str(g_v.SUDOER))
-    out_log(c_d.TAG_CHECKER, "-m: " + str(g_v.MULTITH))
-    out_log(c_d.TAG_CHECKER, "-f: " + str(g_v.FETCH_C_MT))
-    out_log(c_d.TAG_CHECKER, "-d: " + str(opts.develop))
-    out_log(c_d.TAG_CHECKER, "-u: " + str(opts.update))
+    out_log("-q: " + str(g_v.QUIET))
+    out_log("-l: " + str(g_v.LOGGING))
+    out_log("-s: " + str(g_v.SUDOER))
+    out_log("-m: " + str(g_v.MULTITH))
+    out_log("-f: " + str(g_v.FETCH_C_MT))
+    out_log("-d: " + str(opts.develop))
+    out_log("-u: " + str(opts.update))
 
     if len(args) != 1:
         path = ""
     else:
         path = args[0]
 
-    out_log(c_d.TAG_CHECKER, "config path: " + path)
+    out_log("config path: " + path)
 
     # main func
     git_man = GitMan()
     # check environment
     if not git_man.check_git_installed:
-        out_err(c_d.TAG_CHECKER, c_d.E_GNT_STR)
+        out_err(c_d.E_GNT_STR)
         sys.exit(c_d.EXIT_GNT)
 
     # create model
@@ -126,7 +126,7 @@ def main():
     web_gen.generate_web(tag_model)
 
     time_ch.stop
-    out_log(c_d.TAG_CHECKER, "finish work - " +  time_ch.passed_time_str)
+    out_log("finish work - " +  time_ch.passed_time_str)
 
 if __name__ == "__main__":
     main()

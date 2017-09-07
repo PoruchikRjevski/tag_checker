@@ -9,7 +9,7 @@ __all__ = ['TagModel', 'Repo', 'Device', 'Note', 'ThreadQueue']
 # __departments contain [repos] by name of department
 class TagModel:
     def __init__(self):
-        out_log(self.__class__.__name__, "init")
+        out_log("init")
         self.__departments = OrderedDict()
 
         self.__trDevNames = {}

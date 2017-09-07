@@ -1,4 +1,5 @@
 import subprocess
+import threading
 
 import common_defs as c_d
 import global_vars as g_v
@@ -31,14 +32,18 @@ def run_cmd(cmd):
                             shell=True)
     (out, err) = proc.communicate()
     t_chckr.stop
-    out_log(c_d.CMD_WRAP, "cmd: {:s} | exec time: {:s}".format(command, t_chckr.passed_time_str))
+
+    out_log("cmd: {:s} | pid: {:s} | exec time: {:s}".format(command,
+                                                             str(threading.get_ident()),
+                                                             t_chckr.passed_time_str,))
 
     u_out = out.decode(c_d.DOC_CODE).strip()
     u_err = err.decode(c_d.DOC_CODE).strip()
 
+    # out_log("out: {:s}".format(u_out))
+
     if u_err:
-        out_err(c_d.CMD_WRAP, "cmd: " + cmd)
-        out_err(c_d.CMD_WRAP, "err: " + u_err)
+        out_err("err: {:s}".format(u_err))
 
     return u_out
 
