@@ -42,13 +42,13 @@ def start_thread_logging():
 
 def finish_thread_logging():
     pid = str(threading.get_ident())
-    threads_list.remove(pid)
+    # threads_list.remove(pid)
     threads_list_f.append(pid)
 
 
 def out_threads_logs():
-    for pid in threads_list_f:
-        if pid in threads_out:
+    for pid in threads_list:
+        if pid in threads_list_f:
             for out in threads_out[pid]:
                 out_msg(out, c_d.LOG_T)
 
