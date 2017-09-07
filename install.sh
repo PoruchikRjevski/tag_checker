@@ -66,12 +66,12 @@ create_exec_file() {
     chmod 777 $SETUP_DIR$EXEC_F
     
     echo $PREFIX_F > $SETUP_DIR$EXEC_F
-    echo $SETUP_DIR$NAME $quiet $log $upd $sud $dev $mt $fcm >> $SETUP_DIR$EXEC_F
+    echo $SETUP_DIR$NAME $quiet $log $upd $sud $dev $mt >> $SETUP_DIR$EXEC_F
 }
 
 # run script
 run_now() {
-    $SETUP_DIR$NAME $log $upd $sud $dev $mt $fcm
+    $SETUP_DIR$NAME $log $upd $sud $dev $mt
 }
 
 # ---------------------------------
@@ -105,15 +105,7 @@ main() {
     
     read -p "Run multithreading (y/n)? " answ
     case "$answ" in 
-      y|Y ) 
-      mt="-m"
-      
-      read -p "Run multithreading fetch to cpu' cores (y/n)? " answ
-      case "$answ" in 
-        y|Y ) fcm="-f";;
-        n|N ) ;;
-        * ) fcm="";;
-      esac
+      y|Y ) mt="-m"
       ;;
       n|N ) ;;
       * ) mt="";;
