@@ -12,6 +12,7 @@ from web_gen import WebGenerator
 
 from logger import *
 from time_checker import *
+from cmd_wrap import *
 
 
 def set_options(parser):
@@ -66,6 +67,8 @@ def main():
     # create time checker
     time_ch = TimeChecker()
     time_ch.start
+
+    # init_cmd_wrapper()
 
     # check options
     optParser = OptionParser()

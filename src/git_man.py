@@ -29,13 +29,13 @@ class GitMan:
 
     def __go_to_dir(self, link):
         os.chdir(link)
-        out_log(self.__class__.__name__, "go to dir: " + link)
+        # out_log(self.__class__.__name__, "go to dir: " + link)
 
     def __get_current_branch(self):
         cmd = g_d.GIT_CMD.format(g_d.A_REV_PARSE
                                  + g_d.A_ABBREV.format(g_d.A_RP_REF)
                                  + g_d.REV_HEAD)
-        out_log(self.__class__.__name__, "cmd: " + cmd)
+        # out_log(self.__class__.__name__, "cmd: " + cmd)
         branch = run_cmd(cmd)
 
         out_log(self.__class__.__name__, "cur branch: " + branch)
@@ -45,7 +45,7 @@ class GitMan:
     def __switch_to_branch(self, branch):
         cmd = g_d.GIT_CMD.format(g_d.A_CHECKOUT.format(branch))
 
-        out_log(self.__class__.__name__, "cmd: " + cmd)
+        # out_log(self.__class__.__name__, "cmd: " + cmd)
 
         run_cmd(cmd)
 
@@ -61,14 +61,14 @@ class GitMan:
     def __update_repo(self):
         cmd = g_d.GIT_CMD.format(g_d.A_PULL)
 
-        out_log(self.__class__.__name__, "cmd: " + cmd)
+        # out_log(self.__class__.__name__, "cmd: " + cmd)
 
         run_cmd(cmd)
 
     def __get_tags(self):
         cmd = g_d.GIT_CMD.format(g_d.A_TAG)
 
-        out_log(self.__class__.__name__, "cmd: " + cmd)
+        # out_log(self.__class__.__name__, "cmd: " + cmd)
 
         return run_cmd(cmd)
 
@@ -194,7 +194,7 @@ class GitMan:
         cmd = g_d.GIT_CMD.format(g_d.A_BRANCH
                                  + g_d.A_CONTAINS.format(hash))
 
-        t_logs.append(out_log_def(self.__class__.__name__, "cmd: " + cmd))
+        # t_logs.append(out_log_def(self.__class__.__name__, "cmd: " + cmd))
 
         out = run_cmd(cmd)
 
@@ -208,7 +208,7 @@ class GitMan:
                                  + g_d.A_FORMAT.format(g_d.AA_SHASH)
                                  + " " + branch)
 
-        t_logs.append(out_log_def(self.__class__.__name__, "cmd: " + cmd))
+        # t_logs.append(out_log_def(self.__class__.__name__, "cmd: " + cmd))
 
         return run_cmd(cmd)
 
@@ -218,7 +218,7 @@ class GitMan:
                                  + " " + note_hash + "..." + last_commit_hash
                                  + g_d.A_TAIL.format(str(c_d.GIT_PAR_SH_NEST)))
 
-        t_logs.append(out_log_def(self.__class__.__name__, "cmd: " + cmd))
+        # t_logs.append(out_log_def(self.__class__.__name__, "cmd: " + cmd))
 
         out = run_cmd(cmd)
 
