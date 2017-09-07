@@ -206,7 +206,7 @@ class GitMan:
 
         out = run_cmd(cmd)
 
-        out = self.__find_develop_branche(out)
+        out = self.__find_develop_branche(out.split('\n'))
 
         return out
 
