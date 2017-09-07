@@ -49,7 +49,7 @@ def finish_thread_logging():
 def out_deffered_logs():
     for pid in threads_list:
         if pid in threads_list_f:
-            out_msg(gen_log_msg("PID: {:s}".format(pid), c_d.LOG_T, 1), c_d.LOG_T)
+            out_msg(gen_log_msg("PID: {:s}".format(pid), c_d.LOG_T, 2), c_d.LOG_T)
             for out in threads_out[pid]:
                 out_msg(out, c_d.LOG_T)
 
