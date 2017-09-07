@@ -327,7 +327,7 @@ class WebGenerator:
         if link_hash == -1:
             link_hash = note.sHash
 
-        # list contains tuples (text, link, title)
+        # list contains tuples (text, link, attr)
         links_list = []
 
         repo_link_c = (note.sHash + " " + note.commDate,
@@ -341,7 +341,8 @@ class WebGenerator:
         if note.type is c_d.TYPE_ALL:
             ftp_link_c = (c_d.REDIST_TXT,
                           c_d.LINK_TO_FTP.format(note.name, note.sHash),
-                          h_d.A_TITLE.format(c_d.LINK_FTP_TXT))
+                          h_d.A_TITLE.format(c_d.LINK_FTP_TXT)
+                          + h_d.A_TARGET.format(h_d.A_TAR_BLANK))
             links_list.append(ftp_link_c)
 
         self.__gen_tag_commit_version(file,

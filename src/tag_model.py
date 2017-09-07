@@ -110,7 +110,7 @@ class Device:
 
     def sort_orders(self):
         for key, val in self.orders.items():
-            self.orders[key] = sorted(val, key=lambda note: note.date, reverse=True)
+            self.orders[key].sort(key=lambda note: note.date, reverse=True)
 
     def fill_last(self):
         for m_type in common_defs.TYPES_L:
@@ -118,7 +118,7 @@ class Device:
             for num, notes in self.orders.items():
                 if notes[0].type == m_type:
                     to_sort.append(notes[0])
-            to_sort = sorted(to_sort, key=lambda note: note.num, reverse=False)
+            to_sort.sort(key=lambda note: note.num, reverse=False)
             self.lastOrders = to_sort
 
 # struct with info for one tag

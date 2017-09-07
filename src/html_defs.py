@@ -37,6 +37,7 @@ A_CLASS             = " class=\"{:s}\""
 A_COLSPAN           = " colspan=\"{:s}\""
 A_ROWSPAN           = " rowspan=\"{:s}\""
 A_TITLE             = " title=\"{:s}\""
+A_TARGET            = " target=\"{:s}\""
 
 
 # params
@@ -49,6 +50,8 @@ A_ST_BORDER         = "border:{:s};"
 A_ST_POS            = "position:{:s};"
 
 A_T_JS              = "text/javascript"
+
+A_TAR_BLANK         = "_blank"
 
 
 A_BGCOLOR           = "bgcolor=\"{0!s}\""
