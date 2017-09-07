@@ -1,6 +1,7 @@
 import os
 
 import multiprocessing
+from multiprocessing.dummy import Pool as ThreadPool
 from threading import Thread
 from queue import Queue
 
@@ -263,44 +264,47 @@ class GitMan:
         for tag in tag_list:
             self.__gen_note_by_tag(tag, out_queue)
 
-    def __gen_note_by_tag(self, tag, out_queue):
+    def __gen_note_by_tag(self, tag, out_queue=None):
         t_logs = []
         t_errs = []
+        out = out_queue
+        if out is None:
+            out = ThreadQueue()
 
         t_logs.append(out_log_def(self.__class__.__name__, "Gen note for tag: " + tag))
 
         note = Note()
         note.tag = tag
 
-        if not self.__parce_tag(note, t_logs, t_errs):
+        if self.__parce_tag(note, t_logs, t_errs):
+            note.sHash = self.__get_short_hash(tag)
+            t_logs.append(out_log_def(self.__class__.__name__, "Note short hash: " + note.sHash))
+
+            note.commDate = self.__repair_commit_date(self.__get_commit_date_by_short_hash(note.sHash))
+            t_logs.append(out_log_def(self.__class__.__name__, "Note commit date: " + note.commDate))
+
+            note.author = self.__get_commit_author_by_short_hash(note.sHash)
+            t_logs.append(out_log_def(self.__class__.__name__, "Note author: " + note.author))
+
+            msg = self.__get_commit_msg_by_short_hash(note.sHash)
+            note.commMsg = self.__repair_commit_msg(msg)
+            t_logs.append(out_log_def(self.__class__.__name__, "Note commMsg: " + note.commMsg))
+
+            # get pHash
+            note.pHash = self.__get_parents_short_hash(note.sHash, t_logs)
+            if note.pHash == -1:
+                note.pHash = note.sHash
+            t_logs.append(out_log_def(self.__class__.__name__, "Note pHash: " + str(note.pHash)))
+
+            note.valid = True
+        else:
             t_errs.append(out_err_def(self.__class__.__name__, "Bad tag: " + tag))
-            return False
 
-        note.sHash = self.__get_short_hash(tag)
-        t_logs.append(out_log_def(self.__class__.__name__, "Note short hash: " + note.sHash))
+        out.logs = t_logs
+        out.errs = t_errs
+        out.notes.put(note)
 
-        note.commDate = self.__repair_commit_date(self.__get_commit_date_by_short_hash(note.sHash))
-        t_logs.append(out_log_def(self.__class__.__name__, "Note commit date: " + note.commDate))
-
-        note.author = self.__get_commit_author_by_short_hash(note.sHash)
-        t_logs.append(out_log_def(self.__class__.__name__, "Note author: " + note.author))
-
-        msg = self.__get_commit_msg_by_short_hash(note.sHash)
-        note.commMsg = self.__repair_commit_msg(msg)
-        t_logs.append(out_log_def(self.__class__.__name__, "Note commMsg: " + note.commMsg))
-
-        # get pHash
-        note.pHash = self.__get_parents_short_hash(note.sHash, t_logs)
-        if note.pHash == -1:
-            note.pHash = note.sHash
-        t_logs.append(out_log_def(self.__class__.__name__, "Note pHash: " + str(note.pHash)))
-
-        note.valid = True
-
-        out_queue.logs = t_logs
-        out_queue.errs = t_errs
-        out_queue.notes.put(note)
-        return True
+        return out
 
     def __repair_tag_date(self, date):
         temp = date.split("-")
@@ -424,6 +428,9 @@ class GitMan:
                         if g_v.MULTITH:
                             cpu_s = multiprocessing.cpu_count()
                             out_log(self.__class__.__name__, "cpu count: " + str(cpu_s))
+                            # thread pool
+                            pool = ThreadPool(cpu_s)
+                            res = []
 
                             threads = []
 
@@ -451,25 +458,40 @@ class GitMan:
                                         thread.start()
                                         threads.append(thread)
                             else:
-                                for tag in tags.split("\n"):
-                                    if self.__is_tag_valid(tag):
-                                        thread = Thread(target=self.__gen_note_by_tag, args=[tag, n_queue])
-                                        thread.start()
-                                        threads.append(thread)
+                                res = pool.map(self.__gen_note_by_tag, tags_list)
+                                # for tag in tags.split("\n"):
+                                    # if self.__is_tag_valid(tag):
+                                        # threads
+                                        # thread = Thread(target=self.__gen_note_by_tag, args=[tag, n_queue])
+                                        # thread.start()
+                                        # threads.append(thread)
 
-                            for res in threads:
-                                res.join()
-                                threads.remove(res)
+                            # for res in threads:
+                            #     res.join()
+                            #     threads.remove(res)
+
+                            # thread pool
+                            pool.close()
+                            pool.join()
                         else:
                             self.__gen_notes_by_tag_list(tags_list, n_queue)
 
-                        n_queue.logs
-                        n_queue.errs
-                        while not n_queue.notes.empty():
-                            note = n_queue.notes.get()
+                        for n in res:
+                            n.logs
+                            n.errs
+                            while not n.notes.empty():
+                                note = n.notes.get()
 
-                            if note.valid:
-                                self.__add_note(model, repo, note)
+                                if note.valid:
+                                    self.__add_note(model, repo, note)
+
+                        # n_queue.logs
+                        # n_queue.errs
+                        # while not n_queue.notes.empty():
+                        #     note = n_queue.notes.get()
+                        #
+                        #     if note.valid:
+                        #         self.__add_note(model, repo, note)
 
                         # sort notes for devices and separate last updates
                         int_time_ch.start
