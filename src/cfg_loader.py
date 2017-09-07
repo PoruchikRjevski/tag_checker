@@ -97,6 +97,7 @@ class CfgLoader:
         if res is not None:
             return res
 
+        out_log("start load config")
         self.__fill_model(model)
         out_log("config was loaded")
 

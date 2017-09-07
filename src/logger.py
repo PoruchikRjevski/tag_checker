@@ -49,6 +49,7 @@ def finish_thread_logging():
 def out_deffered_logs():
     for pid in threads_list:
         if pid in threads_list_f:
+            out_msg(gen_log_msg("PID: {:s}".format(pid), c_d.LOG_T, 1), c_d.LOG_T)
             for out in threads_out[pid]:
                 out_msg(out, c_d.LOG_T)
 
@@ -62,7 +63,7 @@ def write_msg(msg, path):
 def out_log(msg):
     pid = str(threading.get_ident())
 
-    out = gen_log_msg(msg, c_d.LOG_T)
+    out = gen_log_msg(msg, c_d.LOG_T, 3)
 
     if pid in threads_list and g_v.MULTITH:
         threads_out[pid].append(out)
@@ -78,7 +79,7 @@ def out_msg(out, place):
 def out_err(msg):
     pid = str(threading.get_ident())
 
-    out = gen_log_msg(msg, c_d.ERR_T)
+    out = gen_log_msg(msg, c_d.ERR_T, 3)
 
     if pid in threads_list and g_v.MULTITH:
         threads_out[pid].append(out)
@@ -86,8 +87,8 @@ def out_err(msg):
         out_msg(out, c_d.LOG_T)
 
 
-def gen_log_msg(msg, type):
-    (c_name, c_line) = get_caller_info()
+def gen_log_msg(msg, type, level):
+    (c_name, c_line) = get_caller_info(level)
 
     c_name += "()" + " " * (c_d.LOG_SYMB_CALLER - len(c_name))
     c_line = " " * (c_d.LOG_SYMB_C_LINE - len(c_line)) + c_line
@@ -104,13 +105,13 @@ def show_msg(msg):
         print(msg)
 
 
-def get_caller_info():
+def get_caller_info(level):
     stack = inspect.stack()
 
-    if len(stack) < 3:
+    if len(stack) < level:
         return ""
 
-    parent_frame = stack[3][0]
+    parent_frame = stack[level][0]
 
     # get line number
     line_num = str(inspect.getframeinfo(parent_frame).lineno)
