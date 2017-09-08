@@ -411,6 +411,7 @@ class GitMan:
                     int_time_ch.stop
                     out_log("get all tags " + int_time_ch.passed_time_str)
                     out_log("Tags number: " + str(len(tags.split("\n"))))
+                    out_log("Tags: " + tags)
 
                     if tags:
                         tags_list = tags.split("\n")
