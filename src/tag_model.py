@@ -4,7 +4,7 @@ from queue import Queue
 import common_defs
 from logger import *
 
-__all__ = ['TagModel', 'Repo', 'Device', 'Note', 'ThreadQueue']
+__all__ = ['TagModel', 'Repo', 'Device', 'Note']
 
 # __departments contain [repos] by name of department
 class TagModel:
@@ -135,39 +135,6 @@ class Note:
         self.commMsg = None
         self.author = None
         self.valid = False
-
-
-# queue includes notes and logs queue for multithread true order out
-class ThreadQueue():
-    def __init__(self):
-        self.__notes = Queue()
-        self.__logs = Queue()
-        self.__errs = Queue()
-
-    @property
-    def notes(self):
-        return self.__notes
-
-    @notes.setter
-    def notes(self, note):
-        self.__notes.put(note)
-
-    @property
-    def logs(self):
-        while not self.__logs.empty():
-            release_log(self.__logs.get())
-
-    @logs.setter
-    def logs(self, msgs):
-        self.__logs.put(msgs)
-
-    @property
-    def errs(self):
-        while not self.__errs.empty():
-            release_err(self.__errs.get())
-
-    @errs.setter
-    def errs(self, msgs):
-        self.__errs.put(msgs)
+        self.platform = ""
 
 

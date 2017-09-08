@@ -81,6 +81,25 @@ class GitMan:
 
         out_log("cur branch: " + self.__get_current_branch())
 
+    def __parce_tag_part(self, tag_part, pos, note_out):
+        splitted = tag_part.split("-")
+
+        if len(splitted) == 1 and pos == 1:
+            note_out.name = tag_part
+            out_log("name: " + note_out.name)
+        elif len(splitted) == 1 and pos != 1:
+            note_out.platform = tag_part
+        elif len(splitted) == 2:
+            type = tag_part.split('-')[0]
+            out_log("type: " + str(type))
+            id = tag_part.split('-')[1]
+            out_log("id: " + str(id))
+
+
+        elif len(splitted) == 4:
+            note_out.date = self.__repair_tag_date(tag_part)
+            out_log("date: " + note_out.date)
+
     def __parce_tag(self, note_out):
         timer = TimeChecker()
         timer.start
@@ -89,45 +108,63 @@ class GitMan:
         if len(tag_parts) < 3:
             return False
 
-        note_out.name = tag_parts[1]
+        for part in tag_parts:
+            self.__parce_tag_part(part, tag_parts.index(part), note_out)
 
-        out_log("Note name: " + note_out.name)
 
-        date = ""
-        if len(tag_parts) == 3:
-            date = self.__repair_tag_date(tag_parts[2])
-        elif len(tag_parts) == 4:
-            prenum = tag_parts[2].split("-")[-1:][0]
 
-            out_log("prenum: " + prenum)
-
-            note_out.type = tag_parts[2].split("-")[:-1][0]
-
-            if note_out.type not in c_d.TYPES_L:
-                out_err("Bad item type: " + note_out.type)
-                return False
-
-            try:
-                note_out.num = int(prenum)
-            except ValueError:
-                out_err("EXCEPT Bad item num: " + prenum)
-                return False
-
-            date = self.__repair_tag_date(tag_parts[3])
-
-        if not date:
-            return False
-        elif date:
-            note_out.date = date
-
-        out_log("Note type: " + note_out.type)
-        out_log("Note num: " + str(note_out.num))
-        out_log("Note date: " + note_out.date)
-
-        timer.stop
-        out_log("finish parce tag - " + timer.passed_time_str)
-
-        return True
+        # old trash
+        # note_out.name = tag_parts[1]
+        #
+        # out_log("Note name: " + note_out.name)
+        #
+        # date = ""
+        #
+        #
+        #
+        # sp_sec = tag_parts[2].split('-')
+        # if len(sp_sec) == 2:
+        #
+        #     pass
+        # elif len(sp_sec) == 4:
+        #     date = self.__repair_tag_date(tag_parts[2])
+        #
+        #
+        # date = ""
+        # if len(tag_parts) == 3:
+        #     date = self.__repair_tag_date(tag_parts[2])
+        # elif len(tag_parts) == 4:
+        #     prenum = tag_parts[2].split("-")[-1:][0]
+        #
+        #     out_log("prenum: " + prenum)
+        #
+        #     note_out.type = tag_parts[2].split("-")[:-1][0]
+        #
+        #     if note_out.type not in c_d.TYPES_L:
+        #         out_err("Bad item type: " + note_out.type)
+        #         return False
+        #
+        #     try:
+        #         note_out.num = int(prenum)
+        #     except ValueError:
+        #         out_err("EXCEPT Bad item num: " + prenum)
+        #         return False
+        #
+        #     date = self.__repair_tag_date(tag_parts[3])
+        #
+        # if not date:
+        #     return False
+        # elif date:
+        #     note_out.date = date
+        #
+        # out_log("Note type: " + note_out.type)
+        # out_log("Note num: " + str(note_out.num))
+        # out_log("Note date: " + note_out.date)
+        #
+        # timer.stop
+        # out_log("finish parce tag - " + timer.passed_time_str)
+        #
+        # return True
 
     def __get_short_hash(self, tag):
         cmd = g_d.GIT_CMD.format(g_d.A_REV_PARSE
@@ -247,7 +284,8 @@ class GitMan:
         notes = []
 
         for tag in tag_list:
-            notes.append(self.__gen_note_by_tag(tag))
+            if self.__is_tag_valid(tag):
+                notes.append(self.__gen_note_by_tag(tag))
 
         return notes
 
@@ -255,7 +293,8 @@ class GitMan:
         timer = TimeChecker()
         timer.start
 
-        start_thread_logging()
+        if g_v.MULTITH:
+            start_thread_logging()
 
         out_log("Gen note for tag: " + tag)
 
@@ -286,7 +325,8 @@ class GitMan:
         else:
             out_err("Bad tag: " + tag)
 
-        finish_thread_logging()
+        if g_v.MULTITH:
+            finish_thread_logging()
         timer.stop
         out_log("Tag time: {:s}".format(timer.passed_time_str))
 
