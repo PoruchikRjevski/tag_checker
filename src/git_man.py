@@ -112,8 +112,6 @@ class GitMan:
             note_out.platform = tag_part
             out_log("platform: " + note_out.platform)
 
-            state[0] = W_BREAK
-
         # end
         if state[0] == W_BREAK:
             return False
