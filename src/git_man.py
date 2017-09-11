@@ -323,10 +323,10 @@ class GitMan:
 
     def __add_note(self, model, repo, note):
         if note.name not in repo.devices:
-            dev = Device()
+            dev = Device_ex()
             dev.add_order(note)
             dev.name = note.name
-            dev.trName = model.get_trDevName(note.name)
+            dev.trName = model.get_tr_dev_name(note.name)
 
             repo.add_device(note.name, dev)
         else:

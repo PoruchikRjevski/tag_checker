@@ -51,7 +51,7 @@ class CfgLoader:
         elif g_v.CUR_PLATFORM == c_d.WINDOWS_P:
             g_v.OUT_PATH = c_d.WIN_OUT_P_DEF
 
-    def __fill_model(self, model):
+    def __fill_model_ex(self, model):
         deps = self.__cfg.sections()
 
         for i in deps:
@@ -69,7 +69,7 @@ class CfgLoader:
             repos_list = []
 
             for j in repos_links:
-                repo = Repo()
+                repo = Repo_ex()
                 repo.name = j
                 repo.link = prefix + j
                 repos_list.append(repo)
@@ -77,6 +77,46 @@ class CfgLoader:
             model.departments[i] = repos_list
 
         if g_v.DEBUG: out_log("out path: " + g_v.OUT_PATH)
+
+    def __fill_model(self, model):
+        blocks = self.__cfg.sections()
+
+        for blk in blocks:
+            if blk == c_d.CONFIG:
+                if self.__cfg.has_option(blk, c_d.OUT_P):
+                    g_v.OUT_PATH = self.__cfg.get(blk, c_d.OUT_P)
+                continue
+
+            prefix = ""
+            if self.__cfg.has_option(blk, c_d.PREFIX):
+                prefix = self.__cfg.get(blk, c_d.PREFIX)
+
+            repos_links = self.__cfg.get(blk, c_d.REPOS).split("\n")
+
+            if repos_links:
+                dep = Department(blk)
+
+                for repo_name in repos_links:
+                    repo = Repo(repo_name)
+
+                    pre_link = ""
+                    splitted = repo_name.split(":")
+                    if isinstance(splitted, list) and len(splitted) == 2:
+                        repo.prefix = splitted[0]
+                        pre_link = splitted[1]
+
+                        dep.soft_types[splitted[0]] = []
+                    else:
+                        pre_link = repo_name
+
+                    repo.link = prefix + pre_link
+                    dep.repos.append(repo)
+
+                model.departments[blk] = dep
+
+
+        if g_v.DEBUG: out_log("out path: " + g_v.OUT_PATH)
+
 
     def __load_tr_dev_names(self, model):
         tr_f = open(self.__trFilePathDef)
@@ -88,7 +128,7 @@ class CfgLoader:
                 for line in file_text:
                     name = line.split("=")[:1][-1]
                     tr_name = line.split("=")[1:][-1]
-                    model.trDevNames[name] = tr_name
+                    model.tr_dev_names[name] = tr_name
         else:
             out_err("can't open file with translates: " + self.__trFilePathDef)
         

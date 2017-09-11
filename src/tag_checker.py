@@ -90,7 +90,7 @@ def main():
     if g_v.DEBUG: out_log("config path: " + path)
 
     # main func
-    if g_v.DEBUG: out_log("start work", True)
+    if g_v.DEBUG: out_log("start work")
 
     git_man = GitMan()
     # check environment
@@ -109,11 +109,11 @@ def main():
         sys.exit(res)
 
     # get tags and fill model
-    git_man.scanning(tag_model)
+    # git_man.scanning(tag_model)
 
     # generate web
-    web_gen = WebGenerator()
-    web_gen.generate_web(tag_model)
+    # web_gen = WebGenerator()
+    # web_gen.generate_web(tag_model)
 
     time_ch.stop
     out_log("finish work - " + time_ch.passed_time_str)
