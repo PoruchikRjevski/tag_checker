@@ -20,10 +20,6 @@ def set_options(parser):
 
     parser.set_usage(usage)
 
-    parser.add_option("-u", "--update",
-                      action="store_true", dest="update",
-                      default=False,
-                      help="update repo's before checking tags")
     parser.add_option("-l", "--log",
                       action="store_true", dest="log",
                       default=False,
@@ -32,10 +28,6 @@ def set_options(parser):
                       action="store_true", dest="quiet",
                       default=False,
                       help="don't print status messages to stdout")
-    parser.add_option("-d", "--develop",
-                      action="store_true", dest="develop",
-                      default=False,
-                      help="checkout branch to develop before scan")
     parser.add_option("-s", "--sudoer",
                       action="store_true", dest="sudoer",
                       default=False,
@@ -82,8 +74,6 @@ def main():
     out_log("-l: " + str(g_v.LOGGING))
     out_log("-s: " + str(g_v.SUDOER))
     out_log("-m: " + str(g_v.MULTITH))
-    out_log("-d: " + str(opts.develop))
-    out_log("-u: " + str(opts.update))
 
     if len(args) != 1:
         path = ""
@@ -110,8 +100,6 @@ def main():
         sys.exit(res)
 
     # get tags and fill model
-    git_man.update = opts.update
-    git_man.swDevelop = opts.develop
     git_man.scanning(tag_model)
 
     # generate web

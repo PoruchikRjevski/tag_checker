@@ -66,12 +66,12 @@ create_exec_file() {
     chmod 777 $SETUP_DIR$EXEC_F
     
     echo $PREFIX_F > $SETUP_DIR$EXEC_F
-    echo $SETUP_DIR$NAME $quiet $log $upd $sud $dev $mt >> $SETUP_DIR$EXEC_F
+    echo $SETUP_DIR$NAME $quiet $log $sud $mt >> $SETUP_DIR$EXEC_F
 }
 
 # run script
 run_now() {
-    $SETUP_DIR$NAME $log $upd $sud $dev $mt
+    $SETUP_DIR$NAME $log $sud $mt
 }
 
 # ---------------------------------
@@ -109,20 +109,6 @@ main() {
       ;;
       n|N ) ;;
       * ) mt="";;
-    esac
-    
-    read -p "Update repo's before scan (y/n)? " answ
-    case "$answ" in 
-      y|Y ) upd="-u";;
-      n|N ) ;;
-      * ) upd="";;
-    esac
-
-    read -p "Switch branch to develop (y/n)? " answ
-    case "$answ" in 
-      y|Y ) dev="-d";;
-      n|N ) ;;
-      * ) dev="";;
     esac
     
     # COPY

@@ -22,8 +22,6 @@ P_PROD, P_DEV, P_ITEM, P_DATE, P_PLATFORM = range(5)
 class GitMan:
     def __init__(self):
         out_log("init")
-        self.__update = False
-        self.__swDevelop = False
         self.__lastBranch = None
         self.__needReturnBranch = False
 
@@ -52,20 +50,6 @@ class GitMan:
 
         run_cmd(cmd)
 
-    def __checkout_branch(self):
-        branch = self.__get_current_branch()
-
-        if branch != g_d.BRANCH_DEVELOP:
-            self.lastBranch = branch
-            self.needReturnBranch = True
-            self.__switch_to_branch(g_d.BRANCH_DEVELOP)
-            out_log("cur branch: " + self.__get_current_branch())
-
-    def __update_repo(self):
-        cmd = g_d.GIT_CMD.format(g_d.A_PULL)
-
-        run_cmd(cmd)
-
     def __get_tags(self):
         cmd = g_d.GIT_CMD.format(g_d.A_TAG)
 
@@ -78,19 +62,10 @@ class GitMan:
 
         return False
 
-    def __switch_back_branch(self):
-        out_log("cur branch: " + self.__get_current_branch())
-
-        self.__switch_to_branch(self.__lastBranch)
-        self.__needReturnBranch = False
-
-        out_log("cur branch: " + self.__get_current_branch())
-
     def __parce_tag_sm(self, tag_part, pos, note_out, state):
         # offset
         if state[0] == W_OFFSET:
             parts = tag_part.split("-")
-            print("parts: ", parts)
             if len(parts) == 2 and pos == P_ITEM:
                 state[0] = W_ITEM
             elif len(parts) == 4 and pos >= P_ITEM:
@@ -381,38 +356,6 @@ class GitMan:
             repo.add_to_device(note.name, note)
 
     @property
-    def update(self):
-        return self.__update
-
-    @update.setter
-    def update(self, update):
-        self.__update = update
-
-    @property
-    def swDevelop(self):
-        return self.__swDevelop
-
-    @swDevelop.setter
-    def swDevelop(self, develop):
-        self.__swDevelop = develop
-
-    @property
-    def lastBranch(self):
-        return self.__lastBranch
-
-    @lastBranch.setter
-    def lastBranch(self, last_branch):
-        self.__lastBranch = last_branch
-
-    @property
-    def needReturnBranch(self):
-        return self.__needReturnBranch
-
-    @needReturnBranch.setter
-    def needReturnBranch(self, flag):
-        self.__needReturnBranch = flag
-
-    @property
     def check_git_installed(self):
         out = run_cmd(g_d.GIT_CMD.format(g_d.A_VERSION))
 
@@ -443,14 +386,6 @@ class GitMan:
                 self.__go_to_dir(link)
 
                 if self.__is_dir_exist(link):
-                    # check branch if need
-                    if self.swDevelop:
-                        self.__checkout_branch()
-
-                    # update if need
-                    if self.update:
-                        self.__update_repo()
-
                     # do dirty work
                     int_time_ch.start
                     tags = self.__get_tags()
@@ -499,10 +434,6 @@ class GitMan:
                         out_log("sort " + int_time_ch.passed_time_str)
                     else:
                         out_err("no tags")
-
-                    # return last branch if need
-                    if self.needReturnBranch:
-                        self.__switch_back_branch()
 
         time_ch.stop
 
