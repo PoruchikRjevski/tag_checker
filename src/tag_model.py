@@ -84,7 +84,7 @@ class Repo:
     def __init__(self, name=""):
         self.__name = name
         self.__link = ""
-        self.__prefix = ""
+        self.__soft_type = ""
 
     @property
     def name(self):
@@ -106,11 +106,11 @@ class Repo:
 
     @property
     def prefix(self):
-        return self.__prefix
+        return self.__soft_type
 
     @prefix.setter
     def prefix(self, prefix):
-        self.__prefix = prefix
+        self.__soft_type = prefix
 
 
 class Device:
@@ -140,6 +140,7 @@ class Item:
     describes one item
     """
     def __init__(self):
+        self.dev_name = ""
         self.item_num = -1
         self.item_type = c_d.TYPE_ALL
         self.tag = ""
