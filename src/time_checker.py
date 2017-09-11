@@ -1,65 +1,45 @@
 import time
 
-__all__ = ['TimeChecker']
+__all__ = ['start', 'stop', 'get_pass_time']
 
 
 MIN_ID = 0
 MAX_ID = 250
-last_id = 0
+last_id = [0]
 
-t_id_list = {}
+times_dict = {}
 
-#
-# def gen_id():
-#     if last_id == MAX_ID:
-#         last_id = MIN_ID
-#     else:
-#         while last_id not in t_id_list.keys():
-#             last_id += 1
+free_ids = []
 
 
-def get_token():
-    pass
-    # generate id with respective to t_id_list including
-    # write to t_id_list 0 by id key
+def start():
+    start_t = time.time()
 
+    id = -1
+    if free_ids:
+        id = free_ids.pop(0)
+    else:
+        last_id[0] += 1
+        id = last_id[0]
 
-def start(id):
-    pass
-    # write to t_id_list start time by id key
+    times_dict[id] = start_t
+
+    return id
 
 
 def stop(id):
-    pass
-    # write to t_id_list diff betw stop and start time by id key
+    stop_t = time.time()
+    if id in times_dict:
+        res = stop_t - times_dict[id]
+
+        times_dict[id] = res
 
 
-def get_passed_time_str():
-    pass
+def get_pass_time(id):
+    if id in times_dict:
+        time = "{:s}(sec)".format(str(round(times_dict[id], 4)))
+        del times_dict[id]
+    else:
+        time = "id is not available"
 
-def start():
-    pass
-    # gen id with respective to t_id_list including
-    # add item to t_id_list with start value
-
-
-
-
-class TimeChecker:
-    def __init__(self):
-        self.__first = 0
-        self.__result = 0
-
-    @property
-    def start(self):
-        self.__first = time.time()
-        return None
-
-    @property
-    def stop(self):
-        self.__result = time.time() - self.__first
-        return None
-
-    @property
-    def passed_time_str(self):
-        return "{:s}(sec)".format(str(round(self.__result, 4)))
+    return time

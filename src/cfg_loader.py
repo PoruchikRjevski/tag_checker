@@ -114,7 +114,6 @@ class CfgLoader:
 
                 model.departments[blk] = dep
 
-
         if g_v.DEBUG: out_log("out path: " + g_v.OUT_PATH)
 
 

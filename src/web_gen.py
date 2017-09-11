@@ -7,9 +7,9 @@ import html_defs as h_d
 import version as v
 
 from html_gen import HtmlGen
-from tag_model import TagModel, Device_ex, Note, Repo_ex
+from tag_model import *
 from logger import out_log, out_err
-from time_checker import TimeChecker
+from time_checker import *
 
 
 class WebGenerator:

@@ -56,9 +56,7 @@ def check_options(opts):
 
 
 def main():
-    # create time checker
-    time_ch = TimeChecker()
-    time_ch.start
+    main_t = start()
 
     # init_cmd_wrapper()
 
@@ -102,8 +100,12 @@ def main():
     tag_model = TagModel()
 
     # load config
+    load_t = start()
     cfg_loader = CfgLoader()
     res = cfg_loader.load_config(path, tag_model)
+    stop(load_t)
+    out_log("finish load: {:s}".format(get_pass_time(load_t)))
+
 
     if res is not None:
         sys.exit(res)
@@ -115,8 +117,9 @@ def main():
     # web_gen = WebGenerator()
     # web_gen.generate_web(tag_model)
 
-    time_ch.stop
-    out_log("finish work - " + time_ch.passed_time_str)
+
+    stop(main_t)
+    out_log("finish work: {:s}".format(get_pass_time(main_t)))
 
     if g_v.MULTITH:
         out_deffered_logs()

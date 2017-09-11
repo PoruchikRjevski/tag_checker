@@ -344,6 +344,19 @@ class GitMan:
     def scanning(self, model):
         if g_v.DEBUG: out_log("start scanning")
 
+        time_ch = TimeChecker()
+        time_ch.start
+
+
+
+        time_ch.stop
+
+        out_log("finish scanning - " + time_ch.passed_time_str)
+
+
+    def scanning_ex(self, model):
+        if g_v.DEBUG: out_log("start scanning")
+
         # create time checker
         time_ch = TimeChecker()
         int_time_ch = TimeChecker()
