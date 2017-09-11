@@ -109,6 +109,9 @@ def main():
     time_ch.stop
     out_log("finish work - " +  time_ch.passed_time_str)
 
+    if g_v.MULTITH:
+        out_deffered_logs()
+
 if __name__ == "__main__":
     main()
 

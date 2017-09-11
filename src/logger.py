@@ -50,16 +50,17 @@ def finish_thread_logging():
 
 def out_deffered_logs():
     for pid in threads_list:
-        if pid in threads_list_f:
-            if pid in threads_logs.keys():
-                out_msg(gen_log_msg("PID: {:s}".format(pid), c_d.LOG_T, 2), c_d.LOG_T)
-                for out in threads_logs[pid]:
-                    out_msg(out, c_d.LOG_T)
+        if pid in threads_logs.keys():
+            out_msg(gen_log_msg("", c_d.LOG_T, 2), c_d.LOG_T)
+            out_msg(gen_log_msg("PID: {:s}".format(pid), c_d.LOG_T, 2), c_d.LOG_T)
+            for out in threads_logs[pid]:
+                out_msg(out, c_d.LOG_T)
 
-            if pid in threads_errs.keys():
-                out_msg(gen_log_msg("PID: {:s}".format(pid), c_d.ERR_T, 2), c_d.ERR_T)
-                for out in threads_errs[pid]:
-                    out_msg(out, c_d.ERR_T)
+        if pid in threads_errs.keys():
+            out_msg(gen_log_msg("", c_d.ERR_T, 2), c_d.ERR_T)
+            out_msg(gen_log_msg("PID: {:s}".format(pid), c_d.ERR_T, 2), c_d.ERR_T)
+            for out in threads_errs[pid]:
+                out_msg(out, c_d.ERR_T)
 
 
 def write_msg(msg, path):
@@ -73,10 +74,16 @@ def out_log(msg):
 
     out = gen_log_msg(msg, c_d.LOG_T, 3)
 
-    if pid in threads_list and g_v.MULTITH:
+    if g_v.MULTITH:
+        check_pid(pid)
+
         threads_logs[pid].append(out)
     else:
         out_msg(out, c_d.LOG_T)
+    # if pid in threads_list and g_v.MULTITH:
+    #     threads_logs[pid].append(out)
+    # else:
+
 
 
 def out_msg(out, place):
@@ -84,15 +91,29 @@ def out_msg(out, place):
     show_msg(out)
 
 
+def check_pid(pid):
+    if pid not in threads_list:
+        threads_list.append(pid)
+        threads_logs[pid] = []
+        threads_errs[pid] = []
+
+
 def out_err(msg):
     pid = str(threading.get_ident())
 
     out = gen_log_msg(msg, c_d.ERR_T, 3)
 
-    if pid in threads_list and g_v.MULTITH:
+    if g_v.MULTITH:
+        check_pid(pid)
+
         threads_errs[pid].append(out)
     else:
         out_msg(out, c_d.ERR_T)
+
+    # if pid in threads_list and g_v.MULTITH:
+    #     threads_errs[pid].append(out)
+    # else:
+    #     out_msg(out, c_d.ERR_T)
 
 
 def gen_log_msg(msg, type, level):

@@ -122,7 +122,7 @@ class GitMan:
         timer = TimeChecker()
         timer.start
 
-        out_log("start parce tag: " + note_out.tag)
+        out_log("start parce tag")
 
         tag_parts = note_out.tag.split("/")
 
@@ -267,8 +267,8 @@ class GitMan:
 
         res_flag = True
 
-        if g_v.MULTITH:
-            start_thread_logging()
+        # if g_v.MULTITH:
+            # start_thread_logging()
 
         out_log("Gen note for tag: " + tag)
 
@@ -303,8 +303,8 @@ class GitMan:
         timer.stop
         out_log("Tag time: {:s}".format(timer.passed_time_str))
 
-        if g_v.MULTITH:
-            finish_thread_logging()
+        # if g_v.MULTITH:
+        #     finish_thread_logging()
 
         if res_flag:
             return (res_flag, note)
@@ -394,9 +394,7 @@ class GitMan:
                         tags_list = tags.split("\n")
 
                         out_log("Tags number: " + str(len(tags_list)))
-                        out_log("Tags:")
-                        for t in tags_list:
-                            print(t)
+                        out_log("Tags: " + str(tags_list))
 
                         notes_list = []
 
@@ -410,8 +408,6 @@ class GitMan:
 
                             pool.close()
                             pool.join()
-
-                            out_deffered_logs()
                         else:
                             notes_list = self.__gen_notes_by_tag_list(tags_list)
 
