@@ -13,6 +13,11 @@ from tag_model import *
 from logger import *
 from time_checker import *
 
+# parce state machine environment
+W_START, W_DEV, W_OFFSET, W_ITEM, W_DATE, W_DOMEN, W_BREAK = range(7)
+P_PROD, P_DEV, P_ITEM, P_DATE, P_PLATFORM = range(5)
+# true tag seq: P_PROD/P_DEV/P_ITEM(?)/P_DATE/P_PLATFORM(?)
+
 
 class GitMan:
     def __init__(self):
@@ -81,90 +86,85 @@ class GitMan:
 
         out_log("cur branch: " + self.__get_current_branch())
 
-    def __parce_tag_part(self, tag_part, pos, note_out):
-        splitted = tag_part.split("-")
+    def __parce_tag_sm(self, tag_part, pos, note_out, state):
+        # offset
+        if state[0] == W_OFFSET:
+            parts = tag_part.split("-")
+            print("parts: ", parts)
+            if len(parts) == 2 and pos == P_ITEM:
+                state[0] = W_ITEM
+            elif len(parts) == 4 and pos >= P_ITEM:
+                state[0] = W_DATE
+            else:
+                state[0] = W_BREAK
 
-        if len(splitted) == 1 and pos == 1:
+        # main
+        if state[0] == W_START:
+            if self.__is_tag_valid(note_out.tag):
+                out_log("tag is valid")
+                state[0] = W_DEV
+            else:
+                out_log("tag is not valid")
+                state[0] = W_BREAK
+        elif state[0] == W_DEV:
             note_out.name = tag_part
+            state[0] = W_OFFSET
             out_log("name: " + note_out.name)
-        elif len(splitted) == 1 and pos != 1:
-            note_out.platform = tag_part
-        elif len(splitted) == 2:
-            type = tag_part.split('-')[0]
-            out_log("type: " + str(type))
-            id = tag_part.split('-')[1]
-            out_log("id: " + str(id))
+        elif state[0] == W_ITEM:
+            parts = tag_part.split("-")
+            note_out.type = parts[0]
 
+            try:
+                note_out.num = int(parts[1])
+            except ValueError:
+                out_err("EXCEPT Bad item num: " + parts[1])
+                state[0] = W_BREAK
+            else:
+                if note_out.type not in c_d.TYPES_L:
+                    out_err("Bad item type: " + note_out.type)
+                    state[0] = W_BREAK
+                else:
+                    out_log("type: " + note_out.type)
+                    out_log("num: " + str(note_out.num))
 
-        elif len(splitted) == 4:
+            state[0] = W_DATE
+        elif state[0] == W_DATE:
             note_out.date = self.__repair_tag_date(tag_part)
             out_log("date: " + note_out.date)
+
+            state[0] = W_DOMEN
+        elif state[0] == W_DOMEN:
+            note_out.platform = tag_part
+            out_log("platform: " + note_out.platform)
+
+            state[0] = W_BREAK
+
+        # end
+        if state[0] == W_BREAK:
+            return False
+        else:
+            return True
 
     def __parce_tag(self, note_out):
         timer = TimeChecker()
         timer.start
+
+        out_log("start parce tag: " + note_out.tag)
+
         tag_parts = note_out.tag.split("/")
 
         if len(tag_parts) < 3:
             return False
 
+        state = [W_START]
         for part in tag_parts:
-            self.__parce_tag_part(part, tag_parts.index(part), note_out)
+            if not self.__parce_tag_sm(part, tag_parts.index(part), note_out, state):
+                return False
 
+        timer.stop
+        out_log("finish parce tag - " + timer.passed_time_str)
 
-
-        # old trash
-        # note_out.name = tag_parts[1]
-        #
-        # out_log("Note name: " + note_out.name)
-        #
-        # date = ""
-        #
-        #
-        #
-        # sp_sec = tag_parts[2].split('-')
-        # if len(sp_sec) == 2:
-        #
-        #     pass
-        # elif len(sp_sec) == 4:
-        #     date = self.__repair_tag_date(tag_parts[2])
-        #
-        #
-        # date = ""
-        # if len(tag_parts) == 3:
-        #     date = self.__repair_tag_date(tag_parts[2])
-        # elif len(tag_parts) == 4:
-        #     prenum = tag_parts[2].split("-")[-1:][0]
-        #
-        #     out_log("prenum: " + prenum)
-        #
-        #     note_out.type = tag_parts[2].split("-")[:-1][0]
-        #
-        #     if note_out.type not in c_d.TYPES_L:
-        #         out_err("Bad item type: " + note_out.type)
-        #         return False
-        #
-        #     try:
-        #         note_out.num = int(prenum)
-        #     except ValueError:
-        #         out_err("EXCEPT Bad item num: " + prenum)
-        #         return False
-        #
-        #     date = self.__repair_tag_date(tag_parts[3])
-        #
-        # if not date:
-        #     return False
-        # elif date:
-        #     note_out.date = date
-        #
-        # out_log("Note type: " + note_out.type)
-        # out_log("Note num: " + str(note_out.num))
-        # out_log("Note date: " + note_out.date)
-        #
-        # timer.stop
-        # out_log("finish parce tag - " + timer.passed_time_str)
-        #
-        # return True
+        return True
 
     def __get_short_hash(self, tag):
         cmd = g_d.GIT_CMD.format(g_d.A_REV_PARSE
@@ -284,14 +284,15 @@ class GitMan:
         notes = []
 
         for tag in tag_list:
-            if self.__is_tag_valid(tag):
-                notes.append(self.__gen_note_by_tag(tag))
+            notes.append(self.__gen_note_by_tag(tag))
 
         return notes
 
     def __gen_note_by_tag(self, tag):
         timer = TimeChecker()
         timer.start
+
+        res_flag = True
 
         if g_v.MULTITH:
             start_thread_logging()
@@ -324,13 +325,18 @@ class GitMan:
             note.valid = True
         else:
             out_err("Bad tag: " + tag)
+            res_flag = False
 
-        if g_v.MULTITH:
-            finish_thread_logging()
         timer.stop
         out_log("Tag time: {:s}".format(timer.passed_time_str))
 
-        return note
+        if g_v.MULTITH:
+            finish_thread_logging()
+
+        if res_flag:
+            return (res_flag, note)
+        else:
+            return (res_flag, None)
 
     def __repair_tag_date(self, date):
         temp = date.split("-")
@@ -477,8 +483,9 @@ class GitMan:
                             notes_list = self.__gen_notes_by_tag_list(tags_list)
 
                         # add notes
-                        for note in notes_list:
-                            if note.valid:
+                        for note_t in notes_list:
+                            (flag, note) = note_t
+                            if flag and note.valid:
                                 self.__add_note(model, repo, note)
 
                         # sort notes for devices and separate last updates

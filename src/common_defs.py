@@ -125,6 +125,13 @@ TYPE_ALL            = "ALL"
 
 TYPES_L             = [TYPE_ITEM, TYPE_ORDER, TYPE_ALL]
 
+D_UNK               = "UNKNOWN"
+D_LIN               = "LINUX"
+D_WIN               = "WIN"
+D_DOS               = "DOS"
+
+DOMENS_L            = [D_LIN, D_WIN, D_DOS]
+
 # PLATFORMS ---------------------------------------------------------
 WINDOWS_P           = "windows"
 LINUX_P             = "linux"

@@ -128,7 +128,7 @@ class Note:
         self.tag = None
         self.name = None
         self.num = -1
-        self.date = -1
+        self.date = ""
         self.sHash = -1
         self.pHash = -1
         self.commDate = -1
