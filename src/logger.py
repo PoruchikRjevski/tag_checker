@@ -51,16 +51,18 @@ def finish_thread_logging():
 def out_deffered_logs():
     for pid in threads_list:
         if pid in threads_logs.keys():
-            out_msg(gen_log_msg("", c_d.LOG_T, 2), c_d.LOG_T)
-            out_msg(gen_log_msg("PID: {:s}".format(pid), c_d.LOG_T, 2), c_d.LOG_T)
-            for out in threads_logs[pid]:
-                out_msg(out, c_d.LOG_T)
+            if threads_logs[pid]:
+                out_msg(gen_log_msg("", c_d.LOG_T, 2), c_d.LOG_T)
+                out_msg(gen_log_msg("PID: {:s}".format(pid), c_d.LOG_T, 2), c_d.LOG_T)
+                for out in threads_logs[pid]:
+                    out_msg(out, c_d.LOG_T)
 
         if pid in threads_errs.keys():
-            out_msg(gen_log_msg("", c_d.ERR_T, 2), c_d.ERR_T)
-            out_msg(gen_log_msg("PID: {:s}".format(pid), c_d.ERR_T, 2), c_d.ERR_T)
-            for out in threads_errs[pid]:
-                out_msg(out, c_d.ERR_T)
+            if threads_errs[pid]:
+                out_msg(gen_log_msg("", c_d.ERR_T, 2), c_d.ERR_T)
+                out_msg(gen_log_msg("PID: {:s}".format(pid), c_d.ERR_T, 2), c_d.ERR_T)
+                for out in threads_errs[pid]:
+                    out_msg(out, c_d.ERR_T)
 
 
 def write_msg(msg, path):

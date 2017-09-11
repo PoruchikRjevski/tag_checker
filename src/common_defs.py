@@ -75,6 +75,8 @@ REDIST_TXT          = " [R]"
 HISTORY_TXT         = "История прошивок для устройства "
 DEPART_TXT          = "Отдел: "
 
+VER_TXT             = "ПО версии: {:s}.{:s}.{:s}"
+
 REPO_TXT            = "Репозиторий: "
 AUTHOR_TXT          = "Автор коммита: "
 COMM_DATE_TXT       = "Дата коммита: "

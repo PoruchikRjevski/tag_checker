@@ -4,6 +4,7 @@ import os
 import common_defs as c_d
 import global_vars as g_v
 import html_defs as h_d
+import version as v
 
 from html_gen import HtmlGen
 from tag_model import TagModel, Device, Note, Repo
@@ -91,6 +92,9 @@ class WebGenerator:
                   h_d.A_CLASS.format(c_d.CL_FOOT_INFO))
         gen.w_tag(h_d.T_P,
                   c_d.CR_TXT,
+                  h_d.A_CLASS.format(c_d.CL_FOOT_INFO))
+        gen.w_tag(h_d.T_P,
+                  c_d.VER_TXT.format(v.V_MAJ, v.V_MIN, v.V_R),
                   h_d.A_CLASS.format(c_d.CL_FOOT_INFO))
 
     def __gen_main_table_head(self, gen):
@@ -410,5 +414,5 @@ class WebGenerator:
         self.__gen_pages(model)
         time_ch.stop
 
-        if g_v.DEBUG: out_log("finish gen web - " + time_ch.passed_time_str)
+        out_log("finish gen web - " + time_ch.passed_time_str)
 
