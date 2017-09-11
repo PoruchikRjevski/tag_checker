@@ -66,12 +66,12 @@ create_exec_file() {
     chmod 777 $SETUP_DIR$EXEC_F
     
     echo $PREFIX_F > $SETUP_DIR$EXEC_F
-    echo $SETUP_DIR$NAME $quiet $log $sud $mt >> $SETUP_DIR$EXEC_F
+    echo $SETUP_DIR$NAME $quiet $log $sud $mt $deb >> $SETUP_DIR$EXEC_F
 }
 
 # run script
 run_now() {
-    $SETUP_DIR$NAME $log $sud $mt
+    $SETUP_DIR$NAME $log $sud $mt $deb
 }
 
 # ---------------------------------
@@ -109,6 +109,14 @@ main() {
       ;;
       n|N ) ;;
       * ) mt="";;
+    esac
+
+    read -p "Run debug out (y/n)? " answ
+    case "$answ" in 
+      y|Y ) deb="-m"
+      ;;
+      n|N ) ;;
+      * ) deb="";;
     esac
     
     # COPY

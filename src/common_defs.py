@@ -115,6 +115,8 @@ GIT_AUTHOR_DEEP     = 1         # deep for searching commits info
 
 COMMIT_MSG_SIZE     = 30        # edge for commit msg size
 
+GIT_VER             = "version"
+
 # TAG MODEL ---------------------------------------------------------
 PROD                = ("PROD", "ROD")
 WRONG_NUM           = ("xxxx", "XXXX")

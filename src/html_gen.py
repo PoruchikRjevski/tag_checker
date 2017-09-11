@@ -17,7 +17,7 @@ class HtmlGen:
             dir_p = path
 
         file_path = os.path.join(dir_p, name)
-        out_log("create file: " + file_path)
+        if g_v.DEBUG: out_log("create file: " + file_path)
 
         self.file = open(file_path, 'w')
 

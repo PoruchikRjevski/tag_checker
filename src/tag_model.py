@@ -1,7 +1,8 @@
 from collections import OrderedDict
 from queue import Queue
 
-import common_defs
+import common_defs as c_d
+import global_vars as g_v
 from logger import *
 
 __all__ = ['TagModel', 'Repo', 'Device', 'Note']
@@ -9,7 +10,7 @@ __all__ = ['TagModel', 'Repo', 'Device', 'Note']
 # __departments contain [repos] by name of department
 class TagModel:
     def __init__(self):
-        out_log("init")
+        if g_v.DEBUG: out_log("init")
         self.__departments = OrderedDict()
 
         self.__trDevNames = {}
@@ -43,8 +44,8 @@ class Repo:
     @name.setter
     def name(self, name):
         self.__name = name
-        if common_defs.REPO_SUFFIX not in name:
-            self.__name += common_defs.REPO_SUFFIX
+        if c_d.REPO_SUFFIX not in name:
+            self.__name += c_d.REPO_SUFFIX
 
     @property
     def link(self):
@@ -113,7 +114,7 @@ class Device:
             self.orders[key].sort(key=lambda note: note.date, reverse=True)
 
     def fill_last(self):
-        for m_type in common_defs.TYPES_L:
+        for m_type in c_d.TYPES_L:
             to_sort = []
             for num, notes in self.orders.items():
                 if notes[0].type == m_type:
@@ -124,7 +125,7 @@ class Device:
 # struct with info for one tag
 class Note:
     def __init__(self):
-        self.type = common_defs.TYPE_ALL
+        self.type = c_d.TYPE_ALL
         self.tag = None
         self.name = None
         self.num = -1

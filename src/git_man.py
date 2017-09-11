@@ -21,7 +21,7 @@ P_PROD, P_DEV, P_ITEM, P_DATE, P_PLATFORM = range(5)
 
 class GitMan:
     def __init__(self):
-        out_log("init")
+        if g_v.DEBUG: out_log("init")
         self.__lastBranch = None
         self.__needReturnBranch = False
 
@@ -33,22 +33,6 @@ class GitMan:
 
     def __go_to_dir(self, link):
         os.chdir(link)
-
-    def __get_current_branch(self):
-        cmd = g_d.GIT_CMD.format(g_d.A_REV_PARSE
-                                 + g_d.A_ABBREV.format(g_d.A_RP_REF)
-                                 + g_d.REV_HEAD)
-
-        branch = run_cmd(cmd)
-
-        out_log("cur branch: " + branch)
-
-        return branch
-
-    def __switch_to_branch(self, branch):
-        cmd = g_d.GIT_CMD.format(g_d.A_CHECKOUT.format(branch))
-
-        run_cmd(cmd)
 
     def __get_tags(self):
         cmd = g_d.GIT_CMD.format(g_d.A_TAG)
@@ -76,15 +60,15 @@ class GitMan:
         # main
         if state[0] == W_START:
             if self.__is_tag_valid(note_out.tag):
-                out_log("tag is valid")
+                if g_v.DEBUG: out_log("tag is valid")
                 state[0] = W_DEV
             else:
-                out_log("tag is not valid")
+                if g_v.DEBUG: out_log("tag is not valid")
                 state[0] = W_BREAK
         elif state[0] == W_DEV:
             note_out.name = tag_part
             state[0] = W_OFFSET
-            out_log("name: " + note_out.name)
+            if g_v.DEBUG: out_log("name: " + note_out.name)
         elif state[0] == W_ITEM:
             parts = tag_part.split("-")
             note_out.type = parts[0]
@@ -99,18 +83,19 @@ class GitMan:
                     out_err("Bad item type: " + note_out.type)
                     state[0] = W_BREAK
                 else:
-                    out_log("type: " + note_out.type)
-                    out_log("num: " + str(note_out.num))
+                    if g_v.DEBUG:
+                        out_log("type: " + note_out.type)
+                        out_log("num: " + str(note_out.num))
 
             state[0] = W_DATE
         elif state[0] == W_DATE:
             note_out.date = self.__repair_tag_date(tag_part)
-            out_log("date: " + note_out.date)
+            if g_v.DEBUG: out_log("date: " + note_out.date)
 
             state[0] = W_DOMEN
         elif state[0] == W_DOMEN:
             note_out.platform = tag_part
-            out_log("platform: " + note_out.platform)
+            if g_v.DEBUG: out_log("platform: " + note_out.platform)
 
         # end
         if state[0] == W_BREAK:
@@ -122,7 +107,7 @@ class GitMan:
         timer = TimeChecker()
         timer.start
 
-        out_log("start parce tag")
+        if g_v.DEBUG: out_log("start parce tag")
 
         tag_parts = note_out.tag.split("/")
 
@@ -135,7 +120,7 @@ class GitMan:
                 return False
 
         timer.stop
-        out_log("finish parce tag - " + timer.passed_time_str)
+        if g_v.DEBUG: out_log("finish parce tag - " + timer.passed_time_str)
 
         return True
 
@@ -233,17 +218,17 @@ class GitMan:
 
     def __get_parents_short_hash(self, note_hash):
         branch = self.__get_develop_branch_by_hash(note_hash)
-        out_log("finded branch: " + str(branch))
+        if g_v.DEBUG: out_log("finded branch: " + str(branch))
         if branch is None:
             return -1
 
         last_commit_s_hash = self.__get_last_commit_on_branch(branch)
-        out_log("last commit short hash: " + str(last_commit_s_hash))
+        if g_v.DEBUG: out_log("last commit short hash: " + str(last_commit_s_hash))
         if last_commit_s_hash is None:
             return -1
 
         parents_hash = self.__get_parent_commit_hash(note_hash, last_commit_s_hash)
-        out_log("parent's hash: " + str(parents_hash))
+        if g_v.DEBUG: out_log("parent's hash: " + str(parents_hash))
         if parents_hash is None:
             return -1
         else:
@@ -267,33 +252,30 @@ class GitMan:
 
         res_flag = True
 
-        # if g_v.MULTITH:
-            # start_thread_logging()
-
-        out_log("Gen note for tag: " + tag)
+        if g_v.DEBUG: out_log("Gen note for tag: " + tag)
 
         note = Note()
         note.tag = tag
 
         if self.__parce_tag(note):
             note.sHash = self.__get_short_hash(tag)
-            out_log("Note short hash: " + note.sHash)
+            if g_v.DEBUG: out_log("Note short hash: " + note.sHash)
 
             note.commDate = self.__repair_commit_date(self.__get_commit_date_by_short_hash(note.sHash))
-            out_log("Note commit date: " + note.commDate)
+            if g_v.DEBUG: out_log("Note commit date: " + note.commDate)
 
             note.author = self.__get_commit_author_by_short_hash(note.sHash)
-            out_log("Note author: " + note.author)
+            if g_v.DEBUG: out_log("Note author: " + note.author)
 
             msg = self.__get_commit_msg_by_short_hash(note.sHash)
             note.commMsg = self.__repair_commit_msg(msg)
-            out_log("Note commMsg: " + note.commMsg)
+            if g_v.DEBUG: out_log("Note commMsg: " + note.commMsg)
 
             # get pHash
             note.pHash = self.__get_parents_short_hash(note.sHash)
             if note.pHash == -1:
                 note.pHash = note.sHash
-            out_log("Note pHash: " + str(note.pHash))
+            if g_v.DEBUG: out_log("Note pHash: " + str(note.pHash))
 
             note.valid = True
         else:
@@ -301,10 +283,7 @@ class GitMan:
             res_flag = False
 
         timer.stop
-        out_log("Tag time: {:s}".format(timer.passed_time_str))
-
-        # if g_v.MULTITH:
-        #     finish_thread_logging()
+        if g_v.DEBUG: out_log("Tag time: {:s}".format(timer.passed_time_str))
 
         if res_flag:
             return (res_flag, note)
@@ -357,13 +336,13 @@ class GitMan:
     def check_git_installed(self):
         out = run_cmd(g_d.GIT_CMD.format(g_d.A_VERSION))
 
-        if "version" in str(out):
+        if c_d.GIT_VER in str(out):
             return True
 
         return False
 
     def scanning(self, model):
-        out_log("start scanning")
+        if g_v.DEBUG: out_log("start scanning")
 
         # create time checker
         time_ch = TimeChecker()
@@ -374,11 +353,12 @@ class GitMan:
         deps = model.departments
 
         for name, repos in deps.items():
-            out_log("department: " + name)
+            if g_v.DEBUG: out_log("department: " + name)
 
             for repo in repos:
                 link = repo.link
-                out_log("repo: " + link)
+
+                if g_v.DEBUG: out_log("repo: " + link)
 
                 # try go to dir link
                 self.__go_to_dir(link)
@@ -388,19 +368,22 @@ class GitMan:
                     int_time_ch.start
                     tags = self.__get_tags()
                     int_time_ch.stop
-                    out_log("get all tags " + int_time_ch.passed_time_str)
+
+                    if g_v.DEBUG: out_log("get all tags " + int_time_ch.passed_time_str)
 
                     if tags:
                         tags_list = tags.split("\n")
 
-                        out_log("Tags number: " + str(len(tags_list)))
-                        out_log("Tags: " + str(tags_list))
+                        if g_v.DEBUG:
+                            if g_v.DEBUG:
+                                out_log("Tags number: " + str(len(tags_list)))
+                                out_log("Tags: " + str(tags_list))
 
                         notes_list = []
 
                         if g_v.MULTITH:
                             cpu_ths = multiprocessing.cpu_count()
-                            out_log("cpu count: " + str(cpu_ths))
+                            if g_v.DEBUG: out_log("cpu count: " + str(cpu_ths))
 
                             pool = ThreadPool(cpu_ths)
 
@@ -420,12 +403,16 @@ class GitMan:
                         # sort notes for devices and separate last updates
                         int_time_ch.start
                         for dev_name, dev in repo.devices.items():
-                            out_log("Sort history for: " + dev_name)
+                            if g_v.DEBUG: out_log("Sort history for: " + dev_name)
+
                             dev.sort_orders()
-                            out_log("Separate last notes for: " + dev_name)
+
+                            if g_v.DEBUG: out_log("Separate last notes for: " + dev_name)
+
                             dev.fill_last()
                         int_time_ch.stop
-                        out_log("sort " + int_time_ch.passed_time_str)
+
+                        if g_v.DEBUG: out_log("sort " + int_time_ch.passed_time_str)
                     else:
                         out_err("no tags")
 

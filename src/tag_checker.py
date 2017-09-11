@@ -36,6 +36,10 @@ def set_options(parser):
                       action="store_true", dest="multithreading",
                       default=False,
                       help="exec script with multithreading")
+    parser.add_option("-d", "--debug",
+                      action="store_true", dest="debug_out",
+                      default=False,
+                      help="run debug out")
 
 
 def check_options(opts):
@@ -47,6 +51,8 @@ def check_options(opts):
         g_v.SUDOER = True
     if opts.multithreading:
         g_v.MULTITH = True
+    if opts.debug_out:
+        g_v.DEBUG = True
 
 
 def main():
@@ -70,19 +76,22 @@ def main():
     # init logger
     init_log()
 
-    out_log("-q: " + str(g_v.QUIET))
-    out_log("-l: " + str(g_v.LOGGING))
-    out_log("-s: " + str(g_v.SUDOER))
-    out_log("-m: " + str(g_v.MULTITH))
+    if g_v.DEBUG:
+        out_log("-q: " + str(g_v.QUIET))
+        out_log("-l: " + str(g_v.LOGGING))
+        out_log("-s: " + str(g_v.SUDOER))
+        out_log("-m: " + str(g_v.MULTITH))
 
     if len(args) != 1:
         path = ""
     else:
         path = args[0]
 
-    out_log("config path: " + path)
+    if g_v.DEBUG: out_log("config path: " + path)
 
     # main func
+    if g_v.DEBUG: out_log("start work", True)
+
     git_man = GitMan()
     # check environment
     if not git_man.check_git_installed:
@@ -107,7 +116,7 @@ def main():
     web_gen.generate_web(tag_model)
 
     time_ch.stop
-    out_log("finish work - " +  time_ch.passed_time_str)
+    out_log("finish work - " + time_ch.passed_time_str)
 
     if g_v.MULTITH:
         out_deffered_logs()

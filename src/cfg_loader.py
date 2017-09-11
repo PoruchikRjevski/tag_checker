@@ -11,7 +11,7 @@ __all__ = ['CfgLoader']
 
 class CfgLoader:
     def __init__(self):
-        out_log("init")
+        if g_v.DEBUG: out_log("init")
         self.__cfg = configparser.ConfigParser()
         self.__trFilePathDef = ""
         self.__cfgFilePathDef = ""
@@ -76,7 +76,7 @@ class CfgLoader:
 
             model.departments[i] = repos_list
 
-        out_log("out path: " + g_v.OUT_PATH)
+        if g_v.DEBUG: out_log("out path: " + g_v.OUT_PATH)
 
     def __load_tr_dev_names(self, model):
         tr_f = open(self.__trFilePathDef)
@@ -97,10 +97,13 @@ class CfgLoader:
         if res is not None:
             return res
 
-        out_log("start load config")
+        if g_v.DEBUG: out_log("start load config")
+
         self.__fill_model(model)
-        out_log("config was loaded")
+
+        if g_v.DEBUG: out_log("config was loaded")
 
         if self.__trFilePathDef:
             self.__load_tr_dev_names(model)
-            out_log("mapped names was loaded")
+
+            if g_v.DEBUG: out_log("mapped names was loaded")

@@ -2,6 +2,7 @@ QUIET               = False         # global flag for out or not log and err mes
 LOGGING             = False         # global flag for out or not log and err to files
 SUDOER              = False         # global flag for exec shell cmd by sudo
 MULTITH             = False         # global flag for exec by multithreading
+DEBUG               = False
 
 OUT_PATH            = ""
 
