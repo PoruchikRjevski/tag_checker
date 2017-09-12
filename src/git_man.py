@@ -55,6 +55,7 @@ class GitMan:
             elif len(parts) == 4 and pos >= P_ITEM:
                 state[0] = W_DATE
             else:
+                out_err("Parce error. Bad item num or date.")
                 state[0] = W_BREAK
 
         # main
@@ -86,8 +87,7 @@ class GitMan:
                     if g_v.DEBUG:
                         out_log("type: " + item_out.item_type)
                         out_log("num: " + str(item_out.item_num))
-
-            state[0] = W_DATE
+                state[0] = W_DATE
         elif state[0] == W_DATE:
             item_out.tag_date = self.__repair_tag_date(tag_part)
             if g_v.DEBUG: out_log("date: " + item_out.tag_date)
@@ -112,6 +112,7 @@ class GitMan:
         tag_parts = items_out.tag.split("/")
 
         if len(tag_parts) < 3:
+            out_err("bad tag size: {:s}".format(str(len(tag_parts))))
             return False
 
         state = [W_START]
@@ -358,7 +359,7 @@ class GitMan:
                 if g_v.DEBUG:
                     out_log("repo: \"{:s}\"".format(repo.name))
                     out_log("repo-link: \"{:s}\"".format(repo.link))
-                    out_log("repo-soft-type: \"{:s}\"".format(repo.prefix))
+                    out_log("repo-soft-type: \"{:s}\"".format(repo.soft_type))
 
                 if self.__is_dir_exist(repo.link):
                     self.__go_to_dir(repo.link)

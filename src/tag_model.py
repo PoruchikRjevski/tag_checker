@@ -48,12 +48,14 @@ class Department:
     __repos                 is [Repo...]
     __items                 is [Item...]
     __devices               is [den_1...dev_n]
+    __soft_types            is [type...]
     """
     def __init__(self, name=""):
         self.__name = name
         self.__repos = []
         self.__items = []
         self.__devices = []
+        self.__soft_types = [""]
 
     @property
     def repos(self):
@@ -68,6 +70,10 @@ class Department:
         return self.__devices
 
     @property
+    def soft_types(self):
+        return self.__soft_types
+
+    @property
     def name(self):
         return self.__name
 
@@ -80,7 +86,7 @@ class Repo:
     """
     __name                  is repo name
     __link                  is link to location
-    __prefix                is belong to type of soft
+    __soft_type             is belong to type of soft
     """
     def __init__(self):
         self.__name = ""

@@ -143,6 +143,9 @@ class WebGenerator:
         gen.w_tag(h_d.T_TH,
                   c_d.ITEM_TXT,
                   h_d.A_ROWSPAN.format(c_d.MID_ROWS))
+        gen.w_tag(h_d.T_TH,
+                  c_d.SOFT_TYPE_TXT,
+                  h_d.A_ROWSPAN.format(c_d.MID_ROWS))
 
     def __gen_mid_table_foot(self, gen):
         gen.w_tag(h_d.T_TH,
@@ -316,6 +319,12 @@ class WebGenerator:
     def __gen_order_num(self, file, td_attr, link_attrs):
         self.__gen_linked_td(file, td_attr, link_attrs)
 
+    def __gen_item_soft_type(self, file, type, attr):
+        file.w_tag(h_d.T_TD,
+                   type,
+                   attr,
+                   True)
+
     def __gen_tag_date(self, file, date, attr):
         file.w_tag(h_d.T_TD,
                    date,
@@ -409,7 +418,7 @@ class WebGenerator:
                 first = False
                 date = item.tag_date
             else:
-                if date != item.tag_date:
+                if date not in item.tag_date:
                     date = item.tag_date
                     type_class_id = self.__change_class_type(type_class_id)
 
@@ -425,7 +434,8 @@ class WebGenerator:
                                       tag_date_class)
 
     def __gen_device_content(self, file, model, dep_name, dev_name):
-        dev_items = [item for item in model.departments[dep_name].items if item.dev_name == dev_name]
+        dep = model.departments[dep_name]
+        dev_items = [item for item in dep.items if item.dev_name == dev_name]
 
         type_class_id = 0
         for type in c_d.TYPES_L:
@@ -434,32 +444,55 @@ class WebGenerator:
             unic_nums = [key for key in dict.fromkeys([item.item_num for item in typed_items]).keys()]
 
             for num in unic_nums:
+                first_s_t = True
                 nummed_items = [item for item in typed_items if item.item_num == num]
 
-                ld_item = max(nummed_items, key=lambda item: item.cm_date)
+                soft_type_by_num = []
+                for n_item in nummed_items:
+                    s_type = dep.repos[n_item.repo_i].soft_type
+                    if s_type not in soft_type_by_num:
+                        soft_type_by_num.append(s_type)
 
-                file.w_o_tag(h_d.T_TR,
-                             h_d.A_CLASS.format(str(type_class_id)))
-                # order num
-                order_link_attrs = (self.__get_num_by_type(ld_item.item_type, ld_item.item_num),
-                                    os.path.join(c_d.ORDERS_DIR,
-                                                 self.__get_order_file_name(dev_name, ld_item.item_num)),
-                                    h_d.A_TITLE.format(c_d.CNT_TXT + str(len(nummed_items))))
+                print("num: :{:s} len: {:s}".format(str(num), str(len(soft_type_by_num))))
 
-                self.__gen_order_num(file,
-                                     h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
-                                                        + " " + c_d.CL_TD_NUM),
-                                     [order_link_attrs])
+                for soft_t in dep.soft_types:
+                    s_typed_items = [item for item in nummed_items if dep.repos[item.repo_i].soft_type == soft_t]
 
-                # tag date and commit hash
-                tag_date_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id)) +
-                                                    " " + c_d.CL_TD_VER)
-                repo = model.departments[dep_name].repos[ld_item.repo_i]
-                self.__gen_common_columns(file,
-                                          repo,
-                                          ld_item,
-                                          tag_date_class)
-                file.w_c_tag(h_d.T_TR)
+                    if not s_typed_items:
+                        continue
+
+                    ld_item = max(nummed_items, key=lambda item: item.tag_date)
+
+                    file.w_o_tag(h_d.T_TR,
+                                 h_d.A_CLASS.format(str(type_class_id)))
+                    # order num
+                    if first_s_t:
+                        first_s_t = False
+                        order_link_attrs = (self.__get_num_by_type(ld_item.item_type, ld_item.item_num),
+                                            os.path.join(c_d.ORDERS_DIR,
+                                                         self.__get_order_file_name(dev_name, ld_item.item_num)),
+                                            h_d.A_TITLE.format(c_d.CNT_TXT + str(len(nummed_items))))
+
+                        self.__gen_order_num(file,
+                                             h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
+                                                                + " " + c_d.CL_TD_NUM)
+                                             + h_d.A_ROWSPAN.format(str(len(soft_type_by_num))),
+                                             [order_link_attrs])
+
+                    tag_date_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id)) +
+                                                        " " + c_d.CL_TD_VER)
+                    # order soft type
+                    self.__gen_item_soft_type(file,
+                                              soft_t,
+                                              tag_date_class)
+
+                    # tag date and commit hash
+                    repo = model.departments[dep_name].repos[ld_item.repo_i]
+                    self.__gen_common_columns(file,
+                                              repo,
+                                              ld_item,
+                                              tag_date_class)
+                    file.w_c_tag(h_d.T_TR)
 
                 # generate page for item
                 self.__gen_items_page(model, dep_name, dev_name, repo, num, type, nummed_items)

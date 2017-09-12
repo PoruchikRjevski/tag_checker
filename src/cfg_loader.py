@@ -102,8 +102,10 @@ class CfgLoader:
                     pre_link = ""
                     splitted = repo_name.split(":")
                     if isinstance(splitted, list) and len(splitted) == 2:
-                        repo.prefix = splitted[0]
+                        repo.soft_type = splitted[0]
                         pre_link = splitted[1]
+                        if repo.soft_type not in dep.soft_types:
+                            dep.soft_types.append(repo.soft_type)
                     else:
                         pre_link = repo_name
 
