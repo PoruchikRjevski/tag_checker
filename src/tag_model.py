@@ -31,6 +31,12 @@ class TagModel:
     def tr_dev_names(self):
         return self.get_tr_dev_name()
 
+    def get_tr_dev(self, dev_name):
+        if dev_name in self.__tr_dev_names:
+            return self.__tr_dev_names[dev_name]
+        else:
+            return dev_name
+
     @property
     def departments(self):
         return self.__departments
@@ -40,31 +46,26 @@ class Department:
     """
     __name                  is name of department from config
     __repos                 is [Repo...]
-    __domains               is {domain, [dev_indexes]}
-    __soft_types            is {soft_type, [dev_indexes]}
+    __items                 is [Item...]
+    __devices               is [den_1...dev_n]
     """
     def __init__(self, name=""):
         self.__name = name
         self.__repos = []
+        self.__items = []
         self.__devices = []
-        self.__domains = {}
-        self.__soft_types = {}
 
     @property
     def repos(self):
         return self.__repos
 
     @property
+    def items(self):
+        return self.__items
+
+    @property
     def devices(self):
         return self.__devices
-
-    @property
-    def domains(self):
-        return self.__domains
-
-    @property
-    def soft_types(self):
-        return self.__soft_types
 
     @property
     def name(self):
@@ -81,8 +82,8 @@ class Repo:
     __link                  is link to location
     __prefix                is belong to type of soft
     """
-    def __init__(self, name=""):
-        self.__name = name
+    def __init__(self):
+        self.__name = ""
         self.__link = ""
         self.__soft_type = ""
 
@@ -105,12 +106,12 @@ class Repo:
         self.__link = link
 
     @property
-    def prefix(self):
+    def soft_type(self):
         return self.__soft_type
 
-    @prefix.setter
-    def prefix(self, prefix):
-        self.__soft_type = prefix
+    @soft_type.setter
+    def soft_type(self, soft_type):
+        self.__soft_type = soft_type
 
 
 class Device:

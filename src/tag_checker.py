@@ -104,7 +104,7 @@ def main():
     load_t = start()
     res = cfg_loader.load_config(path, tag_model)
     stop(load_t)
-    out_log("finish load config: {:s}".format(get_pass_time(load_t)))
+    out_log("load config time: {:s}".format(get_pass_time(load_t)))
 
     if res is not None:
         sys.exit(res)
@@ -113,11 +113,14 @@ def main():
     scan_t = start()
     git_man.scanning(tag_model)
     stop(scan_t)
-    out_log("finish scan and fill model: {:s}".format(get_pass_time(scan_t)))
+    out_log("scan time: {:s}".format(get_pass_time(scan_t)))
 
     # generate web
-    # web_gen = WebGenerator()
-    # web_gen.generate_web(tag_model)
+    web_gen_t = start()
+    web_gen = WebGenerator()
+    web_gen.generate_web(tag_model)
+    stop(web_gen_t)
+    out_log("web gen time: {:s}".format(get_pass_time(web_gen_t)))
 
     stop(main_t)
     out_log("finish work: {:s}".format(get_pass_time(main_t)))

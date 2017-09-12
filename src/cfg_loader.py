@@ -97,19 +97,18 @@ class CfgLoader:
                 dep = Department(blk)
 
                 for repo_name in repos_links:
-                    repo = Repo(repo_name)
+                    repo = Repo()
 
                     pre_link = ""
                     splitted = repo_name.split(":")
                     if isinstance(splitted, list) and len(splitted) == 2:
                         repo.prefix = splitted[0]
                         pre_link = splitted[1]
-
-                        dep.soft_types[splitted[0]] = []
                     else:
                         pre_link = repo_name
 
                     repo.link = prefix + pre_link
+                    repo.name = pre_link
                     dep.repos.append(repo)
 
                 model.departments[blk] = dep

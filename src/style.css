@@ -1,3 +1,24 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.wrapper {
+    display: table;
+    height: 100%;
+    margin: 0 auto;
+}
+
+.content {
+    display: table-row;
+    height: 100%;
+    width: 50%;
+}
+
+.footer {
+}
+
 a:link {
     text-decoration: none;
     color: #000000;
@@ -30,6 +51,8 @@ table {
 
     margin-left: auto;
     margin-right: auto;
+
+    width: 100%;
 }
 
 th {
@@ -94,7 +117,8 @@ p.header {
 
 }
 
-p.foot_info {
+
+.foot_info {
     text-align: center;
     font-size: 10px;
     font-family: arial;
@@ -105,4 +129,5 @@ p.foot_back {
     font-size: 12px;
     font-family: arial;
     font-weight: bold;
+
 }

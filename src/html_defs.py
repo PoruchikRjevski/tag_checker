@@ -24,6 +24,7 @@ T_IFRAME            = "iframe"
 T_SCRIPT            = "script"
 T_LINK              = "link"
 T_SPAN              = "span"
+T_DIV               = "div"
 
 # attributes
 A_CHARSET           = " charset=\"{:s}\""

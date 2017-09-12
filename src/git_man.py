@@ -79,7 +79,7 @@ class GitMan:
                 out_err("EXCEPT Bad item num: " + parts[1])
                 state[0] = W_BREAK
             else:
-                if item_out.type not in c_d.TYPES_L:
+                if item_out.item_type not in c_d.TYPES_L:
                     out_err("Bad item type: " + item_out.item_type)
                     state[0] = W_BREAK
                 else:
@@ -323,21 +323,8 @@ class GitMan:
 
         return res
 
-    def __add_note_ex(self, model, repo, note):
-        if note.name not in repo.devices:
-            dev = Device_ex()
-            dev.add_order(note)
-            dev.name = note.name
-            dev.trName = model.get_tr_dev_name(note.name)
-
-            repo.add_device(note.name, dev)
-        else:
-            repo.add_to_device(note.name, note)
-
-    def __add_item(self, model, repo, item):
-        pass
-
-    def __do_work(self, tags_list, items_out):
+    def __do_work(self, tags_list):
+        items_out = []
         if g_v.MULTITH:
             cpu_ths = multiprocessing.cpu_count()
             if g_v.DEBUG: out_log("cpu count: " + str(cpu_ths))
@@ -350,6 +337,8 @@ class GitMan:
             pool.join()
         else:
             items_out = self.__gen_notes_by_tag_list(tags_list)
+
+        return items_out
 
     @property
     def check_git_installed(self):
@@ -383,18 +372,16 @@ class GitMan:
                         out_log("Tags number: " + str(len(tags_list)))
                         out_log("Tags: " + str(tags_list))
 
-                    items_list = []
-
-                    self.__do_work(tags_list, items_list)
+                    items_list = self.__do_work(tags_list)
 
                     # add items
                     for item_t in items_list:
                         (flag, item) = item_t
                         if flag and item.valid:
-                            self.__add_item(model, dep_obj.repos.index(repo), item)
-
-
-
+                            item.repo_i = dep_obj.repos.index(repo)
+                            dep_obj.items.append(item)
+                            if item.dev_name not in dep_obj.devices:
+                                dep_obj.devices.append(item.dev_name)
 
         if g_v.DEBUG: out_log("stop scanning")
 
