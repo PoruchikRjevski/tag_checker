@@ -149,8 +149,10 @@ class WebGenerator:
 
     def __gen_mid_common_table_body(self, gen):
         gen.w_tag(h_d.T_TH,
-                  c_d.ITEM_TXT,
+                  c_d.SOFT_TYPE_TXT,
                   h_d.A_ROWSPAN.format(c_d.MID_ROWS) + h_d.A_CLASS.format(c_d.CL_BORDER))
+
+    def __gen_mid_table_mid(self, gen):
         gen.w_tag(h_d.T_TH,
                   c_d.SOFT_TYPE_TXT,
                   h_d.A_ROWSPAN.format(c_d.MID_ROWS) + h_d.A_CLASS.format(c_d.CL_BORDER))
@@ -284,7 +286,7 @@ class WebGenerator:
 
         if g_v.DEBUG: out_log("finish gen pages for device: " + dev_name)
 
-    def __gen_items_page(self, model, dep_name, dev_name, repo, item_num, type, items):
+    def __gen_items_page(self, model, dep_name, dev_name, repos, item_num, type, items):
         if g_v.DEBUG: out_log("start gen item page: " + str(item_num))
 
         page = HtmlGen(c_d.ORDERS_PATH, self.__get_order_file_name(dev_name, item_num))
@@ -293,12 +295,12 @@ class WebGenerator:
         self.__gen_content_start(page)
         self.__gen_table_head(page)
 
-        self.__gen_order_table_head(page,
+        self.__gen_items_table_head(page,
                                     [c_d.HISTORY_TXT + " \"" + model.get_tr_dev(dev_name) + "\"" + " - "
                                      + " \"" + self.__get_num_by_type(type, item_num) + "\"",
                                      c_d.DEPART_TXT + str(dep_name)])
 
-        self.__gen_items_content(page, repo, items)
+        self.__gen_items_content(page, repos, items)
 
         self.__gen_table_foot(page)
         self.__gen_back_link(page,
@@ -311,7 +313,7 @@ class WebGenerator:
 
         if g_v.DEBUG: out_log("finish gen item page: " + str(item_num))
 
-    def __gen_items_content(self, page, repo, items):
+    def __gen_items_content(self, page, repos, items):
         type_class_id = c_d.CL_TD_1
 
         first = True
@@ -331,11 +333,21 @@ class WebGenerator:
             page.w_o_tag(h_d.T_TR,
                          h_d.A_CLASS.format(type_class_id))
 
+            # order soft type
+            soft_type_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
+                                                 + " " + c_d.CL_TEXT_CENTER
+                                                 + " " + c_d.CL_BORDER)
+            self.__gen_item_soft_type(page,
+                                      repos[item.repo_i].soft_type,
+                                      soft_type_class)
+
             # tag date and commit hash
             self.__gen_common_columns(page,
-                                      repo,
+                                      repos[item.repo_i],
                                       item,
                                       type_class_id)
+
+            page.w_c_tag(h_d.T_TR)
 
     def __gen_device_content(self, file, model, dep_name, dev_name):
         dep = model.departments[dep_name]
@@ -357,15 +369,13 @@ class WebGenerator:
                     if s_type not in soft_type_by_num:
                         soft_type_by_num.append(s_type)
 
-                print("num: :{:s} len: {:s}".format(str(num), str(len(soft_type_by_num))))
-
                 for soft_t in dep.soft_types:
                     s_typed_items = [item for item in nummed_items if dep.repos[item.repo_i].soft_type == soft_t]
 
                     if not s_typed_items:
                         continue
 
-                    ld_item = max(nummed_items, key=lambda item: item.tag_date)
+                    ld_item = max(s_typed_items, key=lambda item: item.tag_date)
 
                     file.w_o_tag(h_d.T_TR,
                                  h_d.A_CLASS.format(str(type_class_id)))
@@ -384,10 +394,10 @@ class WebGenerator:
                                              + h_d.A_ROWSPAN.format(str(len(soft_type_by_num))),
                                              [order_link_attrs])
 
+                    # order soft type
                     soft_type_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
                                                          + " " + c_d.CL_TEXT_CENTER
                                                          + " " + c_d.CL_BORDER)
-                    # order soft type
                     self.__gen_item_soft_type(file,
                                               soft_t,
                                               soft_type_class)
@@ -401,7 +411,7 @@ class WebGenerator:
                     file.w_c_tag(h_d.T_TR)
 
                 # generate page for item
-                self.__gen_items_page(model, dep_name, dev_name, repo, num, type, nummed_items)
+                self.__gen_items_page(model, dep_name, dev_name, model.departments[dep_name].repos, num, type, nummed_items)
 
             type_class_id += 1
 
@@ -465,13 +475,15 @@ class WebGenerator:
     def __gen_device_table_head(self, gen, text_list):
         self.__gen_top_dev_order_table_head(gen, text_list, c_d.D_TABLE_COLSPAN)
         self.__gen_mid_table_head(gen)
+        self.__gen_mid_table_mid(gen)
         self.__gen_mid_common_table_body(gen)
         self.__gen_mid_table_foot(gen)
         self.__gen_bottom_table_head(gen)
 
-    def __gen_order_table_head(self, gen, text_list):
-        self.__gen_top_dev_order_table_head(gen, text_list, c_d.M_TABLE_COLSPAN)
+    def __gen_items_table_head(self, gen, text_list):
+        self.__gen_top_dev_order_table_head(gen, text_list, c_d.M_TABLE_CS_ITEM)
         self.__gen_mid_table_head(gen)
+        self.__gen_mid_table_mid(gen)
         self.__gen_mid_table_foot(gen)
         self.__gen_bottom_table_head(gen)
 

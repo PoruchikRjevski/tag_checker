@@ -36,6 +36,7 @@ CL_BACK_CIRLE       = "back_circle"
 
 D_TABLE_COLSPAN     = "4"
 M_TABLE_COLSPAN     = "2"
+M_TABLE_CS_ITEM     = "3"
 MID_ROWS            = "2"
 BTM_ROWS            = "1"
 M_TABLE_H_NUM       = "2"
@@ -132,6 +133,8 @@ GIT_AUTHOR_DEEP     = 1         # deep for searching commits info
 COMMIT_MSG_SIZE     = 30        # edge for commit msg size
 
 GIT_VER             = "version"
+
+BAD_DATE            = "BAD DATE"
 
 # TAG MODEL ---------------------------------------------------------
 PROD                = ("PROD", "ROD")

@@ -300,6 +300,13 @@ class GitMan:
         else:
             return (res_flag, None)
 
+    def __is_numeric(self, part):
+        try:
+            int(part)
+            return True
+        except ValueError:
+            return False
+
     def __repair_tag_date(self, date):
         temp = date.split("-")
 
@@ -313,7 +320,11 @@ class GitMan:
             for p in temp:
                 if temp.index(p) == 3:
                     break
-                date[temp.index(p)] = p
+
+                if self.__is_numeric(p):
+                    date[temp.index(p)] = p
+                else:
+                    return c_d.BAD_DATE
             if len(temp) == 4:
                 if len(temp[3]) == 4:
                     date[3] = temp[3][0:2]
@@ -330,7 +341,7 @@ class GitMan:
 
             except Exception:
                 out_err("Bad date: " + date)
-                res = ""
+                return c_d.BAD_DATE
 
         return res
 
