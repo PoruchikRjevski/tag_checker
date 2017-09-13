@@ -17,7 +17,7 @@ def run_cmd(cmd):
 
     command += cmd
 
-    if g_v.DEBUG: out_log(c_d.CMD_WRAP, "cmd: " + command)
+    if g_v.DEBUG: out_log("cmd: " + command)
 
     cmd_run_t = start()
     proc = subprocess.Popen([command + '\n'],

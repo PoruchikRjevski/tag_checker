@@ -127,7 +127,8 @@ class CfgLoader:
             if file_text is not None:
                 for line in file_text:
                     name = line.split("=")[:1][-1]
-                    tr_name = line.split("=")[1:][-1]
+                    tr_name = line.split("=")[1:][-1].rstrip().lstrip()
+
                     model.tr_dev_names[name] = tr_name
         else:
             out_err("can't open file with translates: " + self.__trFilePathDef)

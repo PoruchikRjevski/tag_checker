@@ -20,9 +20,14 @@ class WebGenerator:
         if g_v.DEBUG: out_log("start gen index")
         index = HtmlGen(g_v.OUT_PATH, c_d.INDEX_F_NAME)
 
-        self.__gen_page_head(index,)
+        self.__gen_page_head(index)
+
+        self.__gen_content_start(index)
         self.__gen_iframe(index)
         self.__gen_script(index, c_d.FRAME_ID)
+        self.__gen_content_end(index)
+
+        self.__gen_page_foot_info(index)
         self.__gen_page_foot(index)
 
         index.close()
@@ -33,13 +38,16 @@ class WebGenerator:
         main = HtmlGen(g_v.OUT_PATH, c_d.MAIN_F_NAME)
 
         self.__gen_page_head(main)
+
+        self.__gen_content_start(main)
         self.__gen_table_head(main)
         self.__gen_main_table_head(main)
 
         self.__gen_main_content(model, main)
 
         self.__gen_table_foot(main)
-        self.__gen_page_foot_info(main)
+        self.__gen_content_end(main)
+        # self.__gen_page_foot_info(main)
         self.__gen_page_foot(main)
 
         main.close()
@@ -62,14 +70,22 @@ class WebGenerator:
         gen.w_c_tag(h_d.T_BODY)
         gen.w_c_tag(h_d.T_HTML)
 
+    def __gen_content_start(self, gen):
+        gen.w_o_tag(h_d.T_DIV,
+                    h_d.A_CLASS.format(c_d.CL_CONTENT))
+
+    def __gen_content_end(self, gen):
+        gen.w_c_tag(h_d.T_DIV)
+
     def __gen_iframe(self, gen):
         gen.w_tag(h_d.T_IFRAME,
                   c_d.FRAME_NOT,
                   h_d.A_ID.format(c_d.FRAME_ID)
-                  + h_d.A_STYLE.format(h_d.A_ST_POS.format(c_d.FRAME_POS)
-                                     + h_d.A_ST_H.format(c_d.FRAME_H)
-                                     + h_d.A_ST_W.format(c_d.FRAME_W)
-                                     + h_d.A_ST_BORDER.format(c_d.FRAME_BORDER))
+                  + h_d.A_CLASS.format(c_d.CL_IFRAME)
+                  # + h_d.A_STYLE.format(h_d.A_ST_POS.format(c_d.FRAME_POS)
+                  #                    + h_d.A_ST_H.format(c_d.FRAME_H)
+                  #                    + h_d.A_ST_W.format(c_d.FRAME_W)
+                  #                    + h_d.A_ST_BORDER.format(c_d.FRAME_BORDER))
                   + h_d.A_SRC.format(c_d.MAIN_F_NAME))
 
     def __gen_script(self, gen, frame_name):
@@ -79,15 +95,12 @@ class WebGenerator:
                   + h_d.A_SRC.format(c_d.SCRIPTS_F_NAME))
 
     def __gen_table_head(self, gen):
-        gen.w_o_tag(h_d.T_DIV,
-                     h_d.A_CLASS.format(c_d.CL_CONTENT))
         gen.w_o_tag(h_d.T_TABLE,
                     h_d.A_CLASS.format(c_d.CL_MAIN_TABLE),
                     True)
 
     def __gen_table_foot(self, gen):
         gen.w_c_tag(h_d.T_TABLE)
-        gen.w_c_tag(h_d.T_DIV)
 
     def __gen_page_foot_info(self, gen):
         gen.w_o_tag(h_d.T_DIV,
@@ -118,12 +131,12 @@ class WebGenerator:
                     h_d.A_CLASS.format(c_d.CL_MT_H),
                     True)
         gen.w_o_tag(h_d.T_TH,
-                    h_d.A_COLSPAN.format(c_d.M_TABLE_COLSPAN),
+                    h_d.A_COLSPAN.format(c_d.M_TABLE_COLSPAN) + h_d.A_CLASS.format(c_d.CL_BORDER),
                     True)
 
-        gen.w_tag(h_d.T_H.format(c_d.M_TABLE_H_NUM),
+        gen.w_tag(h_d.T_H.format(""),
                   c_d.M_HEAD_TXT,
-                  "")
+                  h_d.A_CLASS.format(c_d.CL_MAIN_HEAD))
 
         gen.w_c_tag(h_d.T_TH)
         gen.w_c_tag(h_d.T_TR)
@@ -135,22 +148,25 @@ class WebGenerator:
 
     def __gen_mid_main_table_body(self, gen):
         gen.w_tag(h_d.T_TH,
-                  c_d.DEP_TXT)
+                  c_d.DEP_TXT,
+                  h_d.A_CLASS.format(c_d.CL_BORDER + " " + c_d.CL_MID_HEAD)
+                  )
         gen.w_tag(h_d.T_TH,
-                  c_d.DEV_TXT)
+                  c_d.DEV_TXT,
+                  h_d.A_CLASS.format(c_d.CL_BORDER))
 
     def __gen_mid_common_table_body(self, gen):
         gen.w_tag(h_d.T_TH,
                   c_d.ITEM_TXT,
-                  h_d.A_ROWSPAN.format(c_d.MID_ROWS))
+                  h_d.A_ROWSPAN.format(c_d.MID_ROWS) + h_d.A_CLASS.format(c_d.CL_BORDER))
         gen.w_tag(h_d.T_TH,
                   c_d.SOFT_TYPE_TXT,
-                  h_d.A_ROWSPAN.format(c_d.MID_ROWS))
+                  h_d.A_ROWSPAN.format(c_d.MID_ROWS) + h_d.A_CLASS.format(c_d.CL_BORDER))
 
     def __gen_mid_table_foot(self, gen):
         gen.w_tag(h_d.T_TH,
                   c_d.LAST_SET_TXT,
-                  h_d.A_COLSPAN.format(c_d.MID_ROWS))
+                  h_d.A_COLSPAN.format(c_d.MID_ROWS) + h_d.A_CLASS.format(c_d.CL_BORDER))
         gen.w_c_tag(h_d.T_TR)
 
     def __gen_bottom_table_head(self, gen):
@@ -159,10 +175,10 @@ class WebGenerator:
                     True)
         gen.w_tag(h_d.T_TH,
                   c_d.DATE_TXT,
-                  h_d.A_ROWSPAN.format(c_d.BTM_ROWS))
+                  h_d.A_ROWSPAN.format(c_d.BTM_ROWS) + h_d.A_CLASS.format(c_d.CL_BORDER))
         gen.w_tag(h_d.T_TH,
                   c_d.HASH_TXT,
-                  h_d.A_ROWSPAN.format(c_d.BTM_ROWS))
+                  h_d.A_ROWSPAN.format(c_d.BTM_ROWS) + h_d.A_CLASS.format(c_d.CL_BORDER))
         gen.w_c_tag(h_d.T_TR)
 
     def __gen_main_content(self, model, file):
@@ -183,7 +199,7 @@ class WebGenerator:
                                   c_d.DEVICE_PATH + self.__get_device_file_name(dev_name),
                                   h_d.A_TITLE.format(c_d.TO_DEV_TXT))
                 self.__gen_device_name(file,
-                                       h_d.A_ROWSPAN.format(c_d.BTM_ROWS),
+                                       h_d.A_ROWSPAN.format(c_d.BTM_ROWS) + h_d.A_CLASS.format(c_d.CL_BORDER),
                                        [dev_link_attrs])
 
                 file.w_c_tag(h_d.T_TR)
@@ -191,115 +207,12 @@ class WebGenerator:
                 # gen device page
                 self.__gen_device_page(model, dep_name, dev_name)
 
-            # for dev_name in dep_obj.devices:
-            #     all_uniq_dev_rows = 0
-            #     dev_items = [item for item in dep_obj.items if item.dev_name == dev_name]
-            #
-            #     # print("DEV: ", dev_name)
-            #
-            #     for type in c_d.TYPES_L:
-            #         typed_items = [item for item in dev_items if item.item_type == type]
-            #
-            #         print("TYPE: ", type)
-            #
-            #         all_nums = [item.item_num for item in typed_items]
-            #         unic_nums = [key for key in dict.fromkeys(all_nums).keys()]
-            #
-            #         # all_uniq_dep_rows += len(unic_nums)
-            #         all_uniq_dev_rows += len(unic_nums)
-            #
-            #         for num in unic_nums:
-            #             nummed_items = [item for item in typed_items if item.item_num == num]
-            #
-            #             print("num: ", num)
-            #             for n in nummed_items:
-            #                 print(n.cm_date)
-            #
-            #             item_by_last_date = max(nummed_items, key=lambda item: item.cm_date)
-            #
-            #             print("last: ", item_by_last_date.cm_date)
-            #
-            #     print("dev rows: ", all_uniq_dev_rows)
-
-        if g_v.DEBUG: out_log("finish gen main content")
-
-    def __gen_main_content_ex(self, model, file):
-        if g_v.DEBUG: out_log("start gen main content")
-
-        deps = model.departments
-
-        for dep, repos in deps.items():
-            first_dep = True
-            all_notes = 0
-
-            for repo in repos:
-                for name, dev in repo.devices.items():
-                    all_notes += len(dev.lastOrders)
-                    if g_v.DEBUG: out_log("Notes for dev: " + name + " - " + str(all_notes))
-
-            for repo in repos:
-                for name, dev in repo.devices.items():
-                    # generate device's own page
-                    self.__gen_items_page(dep, dev, repo.link, repo.name)
-
-                    # generate content for main page
-                    first_dev = True
-                    type_class_id = 0
-
-                    if not dev.lastOrders:
-                        continue
-
-                    cur_type = dev.lastOrders[0].type
-
-                    for note in dev.lastOrders:
-                        if cur_type != note.type:
-                            cur_type = note.type
-                            type_class_id += 1
-
-                        file.w_o_tag(h_d.T_TR,
-                                     h_d.A_CLASS.format(c_d.CL_TR_1))
-
-                        # department
-                        if first_dep:
-                            first_dep = False
-                            self.__gen_department(file, dep, str(all_notes))
-
-                        # device name
-                        if first_dev:
-                            first_dev = False
-                            self.__gen_device_name(file, dev.trName, str(len(dev.lastOrders)))
-
-                        # order num
-                        order_link_attrs = (self.__get_num_by_type(note.type, note.num),
-                                      c_d.ORDERS_PATH + self.__get_order_file_name(name, note.num),
-                                      h_d.A_TITLE.format(c_d.CNT_TXT + str(dev.get_cnt_by_num(note.num))))
-
-                        self.__gen_order_num(file,
-                                             h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
-                                                                + " " + c_d.CL_TD_NUM),
-                                             [order_link_attrs])
-
-                        # tag date and commit hash
-                        tag_date_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id)) +
-                                                                      " " + c_d.CL_TD_VER)
-                        self.__gen_common_columns(file,
-                                                  note,
-                                                  repo.link,
-                                                  repo.name,
-                                                  tag_date_class)
-                        file.w_c_tag(h_d.T_TR)
-
         if g_v.DEBUG: out_log("finish gen main content")
 
     def __gen_department(self, file, text, span):
         file.w_tag(h_d.T_TD,
                    text,
-                   h_d.A_ROWSPAN.format(span))
-
-    # def __gen_device_name(self, file, text, span):
-    #     file.w_tag(h_d.T_TD,
-    #                text,
-    #                h_d.A_ROWSPAN.format(span))
+                   h_d.A_ROWSPAN.format(span) + h_d.A_CLASS.format(c_d.CL_BORDER))
 
     def __gen_device_name(self, file, td_attr, link_attrs):
         self.__gen_linked_td(file, td_attr, link_attrs)
@@ -358,11 +271,11 @@ class WebGenerator:
         page = HtmlGen(c_d.DEVICE_PATH, self.__get_device_file_name(dev_name))
 
         self.__gen_page_head(page, c_d.LEVEL_UP)
+        self.__gen_content_start(page)
         self.__gen_table_head(page)
 
         self.__gen_device_table_head(page,
-                                     [c_d.HISTORY_TXT,
-                                      model.get_tr_dev(dev_name),
+                                     [c_d.HISTORY_TXT + " \"" + model.get_tr_dev(dev_name) + "\"",
                                       c_d.DEPART_TXT + str(dep_name)])
 
         self.__gen_device_content(page, model, dep_name, dev_name)
@@ -370,8 +283,11 @@ class WebGenerator:
         self.__gen_table_foot(page)
         self.__gen_back_link(page,
                              os.path.join(c_d.LEVEL_UP,
-                                                c_d.MAIN_F_NAME))
-        self.__gen_page_foot_info(page)
+                                          c_d.MAIN_F_NAME))
+        self.__gen_content_end(page)
+
+
+        # self.__gen_page_foot_info(page)
         self.__gen_page_foot(page)
 
         page.close()
@@ -384,12 +300,12 @@ class WebGenerator:
         page = HtmlGen(c_d.ORDERS_PATH, self.__get_order_file_name(dev_name, item_num))
 
         self.__gen_page_head(page, c_d.LEVEL_UP * 2)
+        self.__gen_content_start(page)
         self.__gen_table_head(page)
 
         self.__gen_order_table_head(page,
-                                    [c_d.HISTORY_TXT, model.get_tr_dev(dev_name) + " - " +
-                                     self.__get_num_by_type(type,
-                                                            item_num),
+                                    [c_d.HISTORY_TXT + " \"" + model.get_tr_dev(dev_name) + " - "
+                                     + " \"" + self.__get_num_by_type(type, item_num) + "\"",
                                      c_d.DEPART_TXT + str(dep_name)])
 
         self.__gen_items_content(page, repo, items)
@@ -398,7 +314,8 @@ class WebGenerator:
         self.__gen_back_link(page,
                              os.path.join(c_d.LEVEL_UP,
                                           self.__get_device_file_name(dev_name)))
-        self.__gen_page_foot_info(page)
+        self.__gen_content_end(page)
+        # self.__gen_page_foot_info(page)
         self.__gen_page_foot(page)
 
         page.close()
@@ -426,12 +343,10 @@ class WebGenerator:
                          h_d.A_CLASS.format(type_class_id))
 
             # tag date and commit hash
-            tag_date_class = h_d.A_CLASS.format(type_class_id + " " + c_d.CL_TD_VER)
-
             self.__gen_common_columns(page,
                                       repo,
                                       item,
-                                      tag_date_class)
+                                      type_class_id)
 
     def __gen_device_content(self, file, model, dep_name, dev_name):
         dep = model.departments[dep_name]
@@ -479,19 +394,19 @@ class WebGenerator:
                                              + h_d.A_ROWSPAN.format(str(len(soft_type_by_num))),
                                              [order_link_attrs])
 
-                    tag_date_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id)) +
-                                                        " " + c_d.CL_TD_VER)
+                    soft_type_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
+                                                         + " " + c_d.CL_TEXT_CENTER)
                     # order soft type
                     self.__gen_item_soft_type(file,
                                               soft_t,
-                                              tag_date_class)
+                                              soft_type_class)
 
                     # tag date and commit hash
                     repo = model.departments[dep_name].repos[ld_item.repo_i]
                     self.__gen_common_columns(file,
                                               repo,
                                               ld_item,
-                                              tag_date_class)
+                                              type_class_id)
                     file.w_c_tag(h_d.T_TR)
 
                 # generate page for item
@@ -499,7 +414,9 @@ class WebGenerator:
 
             type_class_id += 1
 
-    def __gen_common_columns(self, file, repo, item, tag_date_class):
+    def __gen_common_columns(self, file, repo, item, type_class_id):
+        tag_date_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id)) +
+                                            " " + c_d.CL_TEXT_CENTER)
         # tag date
         self.__gen_tag_date(file,
                             item.tag_date,
@@ -521,6 +438,9 @@ class WebGenerator:
 
         links_list.append(repo_link_c)
 
+        ver_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
+                                       + " " + c_d.CL_TD_VER)
+
         if item.item_type is c_d.TYPE_ALL:
             ftp_link_c = (c_d.REDIST_TXT,
                           c_d.LINK_TO_FTP.format(item.dev_name, item.cm_hash),
@@ -529,7 +449,7 @@ class WebGenerator:
             links_list.append(ftp_link_c)
 
         self.__gen_tag_commit_version(file,
-                                      tag_date_class,
+                                      ver_class,
                                       links_list)
 
     def __change_class_type(self, c_type):
@@ -567,17 +487,17 @@ class WebGenerator:
                     h_d.A_CLASS.format(c_d.CL_MT_H),
                     True)
         gen.w_o_tag(h_d.T_TH,
-                    h_d.A_COLSPAN.format(span),
+                    h_d.A_COLSPAN.format(span) + h_d.A_CLASS.format(c_d.CL_BORDER),
                     True)
 
-        gen.w_o_tag(h_d.T_H.format(c_d.M_TABLE_H_NUM),
+        gen.w_o_tag(h_d.T_H.format(""),
                     "",
                     True)
         for str in text_list:
             gen.w_tag(h_d.T_P,
                       str,
                       "")
-        gen.w_c_tag(h_d.T_H.format(c_d.M_TABLE_H_NUM))
+        gen.w_c_tag(h_d.T_H.format(""))
 
         gen.w_c_tag(h_d.T_TH)
         gen.w_c_tag(h_d.T_TR)
