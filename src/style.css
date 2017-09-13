@@ -6,7 +6,7 @@ html, body {
 
 .back_circle {
     background: #eeeeee;
-    background: repeating-radial-gradient(circle, #fefefd, #fefefd 15px, #ffffff 15px, #ffffff 30px);
+    background: repeating-radial-gradient(circle, #fefeff, #fefeff 15px, #ffffff 15px, #ffffff 30px);
 }
 
 .wrapper {
