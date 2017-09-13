@@ -4,6 +4,7 @@ V_BUILD         = "170"
 V_STAT          = "beta"
 
 LAST            = "166"
+CURRENT         = "current_commits"
 
 # 1.xx.xx
 # - rewrite TagModel
