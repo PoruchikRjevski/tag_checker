@@ -20,7 +20,7 @@ class WebGenerator:
         if g_v.DEBUG: out_log("start gen index")
         index = HtmlGen(g_v.OUT_PATH, c_d.INDEX_F_NAME)
 
-        self.__gen_page_head(index)
+        self.__gen_page_head(index, "", h_d.A_CLASS.format(c_d.CL_BACK_CIRLE))
 
         self.__gen_content_start(index)
         self.__gen_iframe(index)
@@ -37,7 +37,7 @@ class WebGenerator:
         if g_v.DEBUG: out_log("start gen main")
         main = HtmlGen(g_v.OUT_PATH, c_d.MAIN_F_NAME)
 
-        self.__gen_page_head(main)
+        self.__gen_page_head(main, "")
 
         self.__gen_content_start(main)
         self.__gen_table_head(main)
@@ -52,7 +52,7 @@ class WebGenerator:
         main.close()
         if g_v.DEBUG: out_log("finish gen main")
 
-    def __gen_page_head(self, gen, level=""):
+    def __gen_page_head(self, gen, level, body_attr=""):
         gen.w_o_tag(h_d.T_HTML, "", True)
         gen.w_o_tag(h_d.T_HEAD, "", True)
         gen.w_o_tag(h_d.T_META, h_d.A_CHARSET.format(c_d.DOC_CODE), True)
@@ -60,7 +60,7 @@ class WebGenerator:
                     h_d.A_REL.format(h_d.A_REL_SS)
                     + h_d.A_HREF.format(level + c_d.STYLE_F_NAME), True)
         gen.w_c_tag(h_d.T_HEAD)
-        gen.w_o_tag(h_d.T_BODY, "", True)
+        gen.w_o_tag(h_d.T_BODY, body_attr, True)
         gen.w_o_tag(h_d.T_DIV,
                     h_d.A_CLASS.format(c_d.CL_WRAPPER))
 
@@ -294,7 +294,7 @@ class WebGenerator:
         self.__gen_table_head(page)
 
         self.__gen_order_table_head(page,
-                                    [c_d.HISTORY_TXT + " \"" + model.get_tr_dev(dev_name) + " - "
+                                    [c_d.HISTORY_TXT + " \"" + model.get_tr_dev(dev_name) + "\"" + " - "
                                      + " \"" + self.__get_num_by_type(type, item_num) + "\"",
                                      c_d.DEPART_TXT + str(dep_name)])
 
@@ -379,12 +379,14 @@ class WebGenerator:
 
                         self.__gen_order_num(file,
                                              h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
-                                                                + " " + c_d.CL_TD_NUM)
+                                                                + " " + c_d.CL_TD_NUM
+                                                                + " " + c_d.CL_BORDER)
                                              + h_d.A_ROWSPAN.format(str(len(soft_type_by_num))),
                                              [order_link_attrs])
 
                     soft_type_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
-                                                         + " " + c_d.CL_TEXT_CENTER)
+                                                         + " " + c_d.CL_TEXT_CENTER
+                                                         + " " + c_d.CL_BORDER)
                     # order soft type
                     self.__gen_item_soft_type(file,
                                               soft_t,
@@ -404,8 +406,9 @@ class WebGenerator:
             type_class_id += 1
 
     def __gen_common_columns(self, file, repo, item, type_class_id):
-        tag_date_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id)) +
-                                            " " + c_d.CL_TEXT_CENTER)
+        tag_date_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
+                                            + " " + c_d.CL_TEXT_CENTER
+                                            + " " + c_d.CL_BORDER)
         # tag date
         self.__gen_tag_date(file,
                             item.tag_date,
@@ -428,7 +431,8 @@ class WebGenerator:
         links_list.append(repo_link_c)
 
         ver_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
-                                       + " " + c_d.CL_TD_VER)
+                                       + " " + c_d.CL_TD_VER
+                                       + " " + c_d.CL_BORDER)
 
         if item.item_type is c_d.TYPE_ALL:
             ftp_link_c = (c_d.REDIST_TXT,

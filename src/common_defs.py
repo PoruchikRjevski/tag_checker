@@ -31,6 +31,7 @@ CL_BORDER           = "border"
 CL_MAIN_HEAD        = "main_head"
 CL_MID_HEAD         = "mid_head"
 CL_IFRAME           = "main_frame"
+CL_BACK_CIRLE       = "back_circle"
 
 
 D_TABLE_COLSPAN     = "4"
