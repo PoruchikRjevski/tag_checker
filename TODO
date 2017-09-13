@@ -83,7 +83,7 @@
     - show "for all" version for each found domains and for root domain
     - check versions metrics with base in same domain or in upper domain (if same domain base is not exists)
     
-- for each repo add sw name prefix in config:
++ for each repo add sw name prefix in config:
 
     HL:asv-1_v2_hl.git
     DRV:asv-1_ll_drv.git

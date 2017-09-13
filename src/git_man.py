@@ -61,6 +61,7 @@ class GitMan:
                 state[0] = W_BREAK
 
         # main
+        # W_START
         if state[0] == W_START:
             if self.__is_tag_valid(item_out.tag):
                 if g_v.DEBUG: out_log("tag is valid")
@@ -68,10 +69,12 @@ class GitMan:
             else:
                 if g_v.DEBUG: out_log("tag is not valid")
                 state[0] = W_BREAK
+        # W_DEV
         elif state[0] == W_DEV:
             item_out.dev_name = tag_part
             state[0] = W_OFFSET
             if g_v.DEBUG: out_log("name: " + item_out.dev_name)
+        # W_ITEM
         elif state[0] == W_ITEM:
             parts = tag_part.split("-")
             item_out.item_type = parts[0]
@@ -90,11 +93,13 @@ class GitMan:
                         out_log("type: " + item_out.item_type)
                         out_log("num: " + str(item_out.item_num))
                 state[0] = W_DATE
+        # W_DATE
         elif state[0] == W_DATE:
             item_out.tag_date = self.__repair_tag_date(tag_part)
             if g_v.DEBUG: out_log("date: " + item_out.tag_date)
 
             state[0] = W_DOMEN
+        # W_DOMEN
         elif state[0] == W_DOMEN:
             item_out.platform = tag_part
             if g_v.DEBUG: out_log("platform: " + item_out.platform)
@@ -300,6 +305,9 @@ class GitMan:
 
         res = ""
 
+        # if len(temp) < 4:
+
+
         try:
             res = "{:s}-{:s}-{:s} {:s}:{:s}".format(temp[0],
                                                     temp[1],
@@ -387,86 +395,6 @@ class GitMan:
                                 dep_obj.devices.append(item.dev_name)
 
         if g_v.DEBUG: out_log("stop scanning")
-
-
-    def scanning_ex(self, model):
-        if g_v.DEBUG: out_log("start scanning")
-
-        # create time checker
-        time_ch = TimeChecker()
-        int_time_ch = TimeChecker()
-        time_ch.start
-
-        # do work
-        deps = model.departments
-
-        for name, repos in deps.items():
-            if g_v.DEBUG: out_log("department: " + name)
-
-            for repo in repos:
-                link = repo.link
-
-                if g_v.DEBUG: out_log("repo: " + link)
-
-                # try go to dir link
-                self.__go_to_dir(link)
-
-                if self.__is_dir_exist(link):
-                    # do dirty work
-                    int_time_ch.start
-                    tags = self.__get_tags()
-                    int_time_ch.stop
-
-                    if g_v.DEBUG: out_log("get all tags " + int_time_ch.passed_time_str)
-
-                    if tags:
-                        tags_list = tags.split("\n")
-
-                        if g_v.DEBUG:
-                            if g_v.DEBUG:
-                                out_log("Tags number: " + str(len(tags_list)))
-                                out_log("Tags: " + str(tags_list))
-
-                        notes_list = []
-
-                        if g_v.MULTITH:
-                            cpu_ths = multiprocessing.cpu_count()
-                            if g_v.DEBUG: out_log("cpu count: " + str(cpu_ths))
-
-                            pool = ThreadPool(cpu_ths)
-
-                            notes_list = pool.map(self.__gen_note_by_tag, tags_list)
-
-                            pool.close()
-                            pool.join()
-                        else:
-                            notes_list = self.__gen_notes_by_tag_list(tags_list)
-
-                        # add notes
-                        for note_t in notes_list:
-                            (flag, note) = note_t
-                            if flag and note.valid:
-                                self.__add_note_ex(model, repo, note)
-
-                        # sort notes for devices and separate last updates
-                        int_time_ch.start
-                        for dev_name, dev in repo.devices.items():
-                            if g_v.DEBUG: out_log("Sort history for: " + dev_name)
-
-                            dev.sort_orders()
-
-                            if g_v.DEBUG: out_log("Separate last notes for: " + dev_name)
-
-                            dev.fill_last()
-                        int_time_ch.stop
-
-                        if g_v.DEBUG: out_log("sort " + int_time_ch.passed_time_str)
-                    else:
-                        out_err("no tags")
-
-        time_ch.stop
-
-        out_log("finish scanning - " + time_ch.passed_time_str)
 
     def try_get_build_ver(self):
         cmd = g_d.GIT_CMD.format(g_d.A_REV_LIST

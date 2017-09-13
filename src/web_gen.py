@@ -113,7 +113,7 @@ class WebGenerator:
                   c_d.CR_TXT,
                   h_d.A_CLASS.format(c_d.CL_FOOT_INFO))
         gen.w_tag(h_d.T_P,
-                  c_d.VER_TXT.format(v.V_MAJ, v.V_MIN, v.V_BUILD, v.V_STAT),
+                  c_d.VER_TXT.format(v.V_MAJ, v.V_MIN, str(int(v.V_BUILD) - int(v.LAST)), v.V_BUILD, v.V_STAT),
                   h_d.A_CLASS.format(c_d.CL_FOOT_INFO))
 
         gen.w_c_tag(h_d.T_DIV)
