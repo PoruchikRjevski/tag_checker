@@ -421,7 +421,7 @@ class GitMan:
         try:
             out_int = int(out)
         except ValueError:
-            pass
+            s_v.V_BUILD = s_v.CURRENT
         else:
             s_v.V_BUILD = out
             out_log("change build version: {:s}".format(out))
