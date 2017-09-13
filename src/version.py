@@ -1,8 +1,10 @@
 V_MAJ           = "1"
-V_MIN           = "2"
-V_R             = "170"
+V_MIN           = "3"
+V_BUILD         = "170"
 V_STAT          = "beta"
 
 
+# 1.xx.xx
 # - rewrite TagModel
 # - rewrite WebGen + include intro-page
+# - update build version if can

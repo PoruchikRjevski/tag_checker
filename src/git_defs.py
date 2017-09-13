@@ -16,6 +16,7 @@ A_SHORT             = " --short"
 A_PRETTY            = " --pretty={:s}"
 A_CONTAINS          = " --contains {:s}"
 A_DATE              = " --date={:s}"
+A_COUNT             = " --count"
 A_FORMAT            = " --format=\"{:s}\""
 A_TAIL              = " | tail -{:s}"
 

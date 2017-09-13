@@ -8,6 +8,8 @@ from queue import Queue
 import common_defs as c_d
 import global_vars as g_v
 import git_defs as g_d
+import version as s_v
+
 from cmd_wrap import *
 from tag_model import *
 from logger import *
@@ -465,3 +467,20 @@ class GitMan:
         time_ch.stop
 
         out_log("finish scanning - " + time_ch.passed_time_str)
+
+    def try_get_build_ver(self):
+        cmd = g_d.GIT_CMD.format(g_d.A_REV_LIST
+                                 + g_d.A_ALL
+                                 + g_d.A_COUNT)
+
+        out = run_cmd(cmd)
+
+        try:
+            out_int = int(out)
+        except ValueError:
+            pass
+        else:
+            s_v.V_BUILD = out
+            out_log("change build version: {:s}".format(out))
+
+        return

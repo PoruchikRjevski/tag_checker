@@ -96,6 +96,9 @@ def main():
         out_err(c_d.E_GNT_STR)
         sys.exit(c_d.EXIT_GNT)
 
+    # check script ver
+    git_man.try_get_build_ver()
+
     # create model
     tag_model = TagModel()
 

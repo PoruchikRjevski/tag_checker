@@ -9,12 +9,6 @@ from time_checker import *
 __all__ = ['run_cmd']
 
 
-# t_chckr = TimeChecker()
-
-# def init_cmd_wrapper():
-#     t_chckr = TimeChecker()
-
-
 def run_cmd(cmd):
     command = ""
 
@@ -23,24 +17,24 @@ def run_cmd(cmd):
 
     command += cmd
 
-    # out_log(c_d.CMD_WRAP, "cmd: " + command)
+    if g_v.DEBUG: out_log(c_d.CMD_WRAP, "cmd: " + command)
 
-    # t_chckr.start
+    cmd_run_t = start()
     proc = subprocess.Popen([command + '\n'],
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE,
                             shell=True)
     (out, err) = proc.communicate()
-    # t_chckr.stop
+    stop(cmd_run_t)
 
-    # if g_v.DEBUG: out_log("cmd: {:s} | pid: {:s} | exec time: {:s}".format(command,
-    #                                                                        str(threading.get_ident()),
-    #                                                                        t_chckr.passed_time_str,))
+    if g_v.DEBUG: out_log("cmd: {:s} | pid: {:s} | exec time: {:s}".format(command,
+                                                                           str(threading.get_ident()),
+                                                                           get_pass_time(cmd_run_t)))
 
     u_out = out.decode(c_d.DOC_CODE).strip()
     u_err = err.decode(c_d.DOC_CODE).strip()
 
-    # out_log("out: {:s}".format(u_out))
+    if g_v.DEBUG: out_log("out: {:s}".format(u_out))
 
     if u_err:
         out_err("err: {:s}".format(u_err))
