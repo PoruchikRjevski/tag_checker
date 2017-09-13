@@ -9,3 +9,4 @@ LAST            = "166"
 # - rewrite TagModel
 # - rewrite WebGen + include intro-page
 # - update build version if can
+# - show soft type like: DRV, HL

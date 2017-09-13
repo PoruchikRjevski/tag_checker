@@ -54,7 +54,7 @@ class GitMan:
             parts = tag_part.split("-")
             if len(parts) == 2 and pos == P_ITEM:
                 state[0] = W_ITEM
-            elif len(parts) == 4 and pos >= P_ITEM:
+            elif len(parts) >= 3 and pos >= P_ITEM:
                 state[0] = W_DATE
             else:
                 out_err("Parce error. Bad item num or date.")
@@ -305,17 +305,32 @@ class GitMan:
 
         res = ""
 
-        # if len(temp) < 4:
+        date = {0 : "1992", 1 : "06", 2 : "10", 3 : "00", 4 : "00"}
 
+        time_exist = False
 
-        try:
-            res = "{:s}-{:s}-{:s} {:s}:{:s}".format(temp[0],
-                                                    temp[1],
-                                                    temp[2],
-                                                    temp[3][0:2],
-                                                    temp[3][2:4])
-        except Exception:
-            out_err("Bad date: " + date)
+        if len(temp) >= 3:
+            for p in temp:
+                if temp.index(p) == 3:
+                    break
+                date[temp.index(p)] = p
+            if len(temp) == 4:
+                if len(temp[3]) == 4:
+                    date[3] = temp[3][0:2]
+                    date[4] = temp[3][2:4]
+                    time_exist = True
+
+            try:
+                res = "{:s}-{:s}-{:s}".format(date[0],
+                                               date[1],
+                                               date[2])
+                if time_exist:
+                    res += " {:s}:{:s}".format(date[3],
+                                               date[4])
+
+            except Exception:
+                out_err("Bad date: " + date)
+                res = ""
 
         return res
 

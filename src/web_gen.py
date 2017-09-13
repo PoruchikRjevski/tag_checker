@@ -24,7 +24,7 @@ class WebGenerator:
 
         self.__gen_content_start(index)
         self.__gen_iframe(index)
-        self.__gen_script(index, c_d.FRAME_ID)
+        self.__gen_script(index)
         self.__gen_content_end(index)
 
         self.__gen_page_foot_info(index)
@@ -47,7 +47,6 @@ class WebGenerator:
 
         self.__gen_table_foot(main)
         self.__gen_content_end(main)
-        # self.__gen_page_foot_info(main)
         self.__gen_page_foot(main)
 
         main.close()
@@ -82,13 +81,9 @@ class WebGenerator:
                   c_d.FRAME_NOT,
                   h_d.A_ID.format(c_d.FRAME_ID)
                   + h_d.A_CLASS.format(c_d.CL_IFRAME)
-                  # + h_d.A_STYLE.format(h_d.A_ST_POS.format(c_d.FRAME_POS)
-                  #                    + h_d.A_ST_H.format(c_d.FRAME_H)
-                  #                    + h_d.A_ST_W.format(c_d.FRAME_W)
-                  #                    + h_d.A_ST_BORDER.format(c_d.FRAME_BORDER))
                   + h_d.A_SRC.format(c_d.MAIN_F_NAME))
 
-    def __gen_script(self, gen, frame_name):
+    def __gen_script(self, gen):
         gen.w_tag(h_d.T_SCRIPT,
                   "",
                   h_d.A_TYPE.format(h_d.A_T_JS)
@@ -122,9 +117,6 @@ class WebGenerator:
         self.__gen_top_main_table_head(gen)
         self.__gen_mid_table_head(gen)
         self.__gen_mid_main_table_body(gen)
-        # self.__gen_mid_common_table_body(gen)
-        # self.__gen_mid_table_foot(gen)
-        # self.__gen_bottom_table_head(gen)
 
     def __gen_top_main_table_head(self, gen):
         gen.w_o_tag(h_d.T_TR,
@@ -286,8 +278,6 @@ class WebGenerator:
                                           c_d.MAIN_F_NAME))
         self.__gen_content_end(page)
 
-
-        # self.__gen_page_foot_info(page)
         self.__gen_page_foot(page)
 
         page.close()
@@ -315,7 +305,6 @@ class WebGenerator:
                              os.path.join(c_d.LEVEL_UP,
                                           self.__get_device_file_name(dev_name)))
         self.__gen_content_end(page)
-        # self.__gen_page_foot_info(page)
         self.__gen_page_foot(page)
 
         page.close()
