@@ -135,8 +135,9 @@ main() {
     
     # COPY
     # prepare
+    check_and_rem_d "$SETUP_DIR"
     check_and_make_d "$SETUP_DIR"
-    check_and_make_d "$OUT_DIR"
+    check_and_rem_d "$OUT_DIR"
     check_and_make_d "$OUT_ORD_DIR"
     
     echo "Dirs was checked."
