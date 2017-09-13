@@ -56,9 +56,7 @@ def check_options(opts):
 
 
 def main():
-    # create time checker
-    time_ch = TimeChecker()
-    time_ch.start
+    main_t = start()
 
     # init_cmd_wrapper()
 
@@ -90,7 +88,7 @@ def main():
     if g_v.DEBUG: out_log("config path: " + path)
 
     # main func
-    if g_v.DEBUG: out_log("start work", True)
+    if g_v.DEBUG: out_log("start work")
 
     git_man = GitMan()
     # check environment
@@ -98,25 +96,37 @@ def main():
         out_err(c_d.E_GNT_STR)
         sys.exit(c_d.EXIT_GNT)
 
+    # check script ver
+    git_man.try_get_build_ver()
+
     # create model
     tag_model = TagModel()
 
     # load config
     cfg_loader = CfgLoader()
+    load_t = start()
     res = cfg_loader.load_config(path, tag_model)
+    stop(load_t)
+    out_log("load config time: {:s}".format(get_pass_time(load_t)))
 
     if res is not None:
         sys.exit(res)
 
     # get tags and fill model
+    scan_t = start()
     git_man.scanning(tag_model)
+    stop(scan_t)
+    out_log("scan time: {:s}".format(get_pass_time(scan_t)))
 
     # generate web
+    web_gen_t = start()
     web_gen = WebGenerator()
     web_gen.generate_web(tag_model)
+    stop(web_gen_t)
+    out_log("web gen time: {:s}".format(get_pass_time(web_gen_t)))
 
-    time_ch.stop
-    out_log("finish work - " + time_ch.passed_time_str)
+    stop(main_t)
+    out_log("finish work: {:s}".format(get_pass_time(main_t)))
 
     if g_v.MULTITH:
         out_deffered_logs()

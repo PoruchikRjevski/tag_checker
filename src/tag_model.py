@@ -5,42 +5,98 @@ import common_defs as c_d
 import global_vars as g_v
 from logger import *
 
-__all__ = ['TagModel', 'Repo', 'Device', 'Note']
+__all__ = ['TagModel', 'Department', 'Repo', 'Device', 'Item']
 
-# __departments contain [repos] by name of department
+
 class TagModel:
+    """
+    __departments           is ordered {dep_name, Department object}
+    __tr_dev_names          is {orig_name, tr_name}
+    """
     def __init__(self):
-        if g_v.DEBUG: out_log("init")
         self.__departments = OrderedDict()
+        self.__tr_dev_names = {}
 
-        self.__trDevNames = {}
+        if g_v.DEBUG: out_log("inited")
 
-    def get_trDevName(self, key=None):
+    def get_tr_dev_name(self, key=None):
         if key:
-            if key in self.__trDevNames:
-                return self.__trDevNames[key]
+            if key in self.__tr_dev_names:
+                return self.__tr_dev_names[key]
             else:
                 return key
-        return self.__trDevNames
+        return self.__tr_dev_names
 
     @property
-    def trDevNames(self):
-        return self.get_trDevName()
+    def tr_dev_names(self):
+        return self.get_tr_dev_name()
+
+    def get_tr_dev(self, dev_name):
+        if dev_name in self.__tr_dev_names:
+            return self.__tr_dev_names[dev_name]
+        else:
+            return dev_name
 
     @property
     def departments(self):
         return self.__departments
 
 
-class Repo:
-    def __init__(self):
-        self.__devices = OrderedDict()
-        self.__link = None
-        self.__name = None
+class Department:
+    """
+    __name                  is name of department from config
+    __repos                 is [Repo...]
+    __items                 is [Item...]
+    __devices               is [den_1...dev_n]
+    __soft_types            is [type...]
+    """
+    def __init__(self, name=""):
+        self.__name = name
+        self.__repos = []
+        self.__items = []
+        self.__devices = []
+        self.__soft_types = [""]
+
+    @property
+    def repos(self):
+        return self.__repos
+
+    @property
+    def items(self):
+        return self.__items
+
+    @property
+    def devices(self):
+        return self.__devices
+
+    @property
+    def soft_types(self):
+        return self.__soft_types
 
     @property
     def name(self):
         return self.__name
+
+    @name.setter
+    def name(self, name):
+        self.__name = name
+
+
+class Repo:
+    """
+    __name                  is repo name
+    __link                  is link to location
+    __soft_type             is belong to type of soft
+    """
+    def __init__(self):
+        self.__name = ""
+        self.__link = ""
+        self.__soft_type = ""
+
+    @property
+    def name(self):
+        return self.__name
+
     @name.setter
     def name(self, name):
         self.__name = name
@@ -50,27 +106,28 @@ class Repo:
     @property
     def link(self):
         return self.__link
+
     @link.setter
     def link(self, link):
         self.__link = link
 
     @property
-    def devices(self):
-        return self.__devices
+    def soft_type(self):
+        return self.__soft_type
 
-    def add_device(self, name, dev):
-        self.devices[name] = dev
-
-    def add_to_device(self, name, note):
-        self.devices[name].add_order(note)
+    @soft_type.setter
+    def soft_type(self, soft_type):
+        self.__soft_type = soft_type
 
 
 class Device:
+    """
+    __name                      is device name
+    __items                     is [Items objects]
+    """
     def __init__(self):
-        self.__lastOrders = []                      # list if Notes
-        self.__orders = OrderedDict()               # list of Notes by items
-        self.__name = ""                            # name from repo
-        self.__trName = ""                          # translated name
+        self.__name = ""
+        self.__items = []
 
     @property
     def name(self):
@@ -81,61 +138,25 @@ class Device:
         self.__name = name
 
     @property
-    def trName(self):
-        return self.__trName
+    def items(self):
+        return self.__items
 
-    @trName.setter
-    def trName(self, tr_name):
-        self.__trName = tr_name
 
-    @property
-    def orders(self):
-        return self.__orders
-
-    def add_order(self, note):
-        if note.num in self.orders:
-            self.orders[note.num].append(note)
-        else:
-            self.orders[note.num] = [note]
-
-    @property
-    def lastOrders(self):
-        return self.__lastOrders
-
-    @lastOrders.setter
-    def lastOrders(self, adding):
-        self.__lastOrders += adding
-
-    def get_cnt_by_num(self, number):
-        return len(self.orders[number])
-
-    def sort_orders(self):
-        for key, val in self.orders.items():
-            self.orders[key].sort(key=lambda note: note.date, reverse=True)
-
-    def fill_last(self):
-        for m_type in c_d.TYPES_L:
-            to_sort = []
-            for num, notes in self.orders.items():
-                if notes[0].type == m_type:
-                    to_sort.append(notes[0])
-            to_sort.sort(key=lambda note: note.num, reverse=False)
-            self.lastOrders = to_sort
-
-# struct with info for one tag
-class Note:
+class Item:
+    """
+    describes one item
+    """
     def __init__(self):
-        self.type = c_d.TYPE_ALL
-        self.tag = None
-        self.name = None
-        self.num = -1
-        self.date = ""
-        self.sHash = -1
-        self.pHash = -1
-        self.commDate = -1
-        self.commMsg = None
-        self.author = None
-        self.valid = False
-        self.platform = ""
-
-
+        self.dev_name = ""
+        self.item_num = -1
+        self.item_type = c_d.TYPE_ALL
+        self.tag = ""
+        self.tag_date = ""
+        self.cm_hash = ""
+        self.cm_date = ""
+        self.cm_msg = ""
+        self.cm_auth = ""
+        self.p_hash = ""
+        self.platform = c_d.D_LINUX
+        self.validity = False
+        self.repo_i = -1

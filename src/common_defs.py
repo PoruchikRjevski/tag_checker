@@ -15,6 +15,9 @@ SCRIPTS_F_NAME      = "scripts.js"
 CL_MAIN_TABLE       = "main_table"
 CL_FOOT_INFO        = "foot_info"
 CL_FOOT_BACK        = "foot_back"
+CL_WRAPPER          = "wrapper"
+CL_CONTENT          = "content"
+CL_FOOTER           = "footer"
 CL_MT_H             = "mt_head"
 CL_MT_F             = "mt_foot"
 CL_TR_1             = "tr_1"
@@ -23,8 +26,17 @@ CL_TD_2             = "td_2"
 CL_TD_INC           = "td_inc_{:s}"
 CL_TD_VER           = "version"
 CL_TD_NUM           = "num"
+CL_TEXT_CENTER      = "t_center"
+CL_BORDER           = "border"
+CL_MAIN_HEAD        = "main_head"
+CL_MID_HEAD         = "mid_head"
+CL_IFRAME           = "main_frame"
+CL_BACK_CIRLE       = "back_circle"
 
-M_TABLE_COLSPAN     = "5"
+
+D_TABLE_COLSPAN     = "4"
+M_TABLE_COLSPAN     = "2"
+M_TABLE_CS_ITEM     = "3"
 MID_ROWS            = "2"
 BTM_ROWS            = "1"
 M_TABLE_H_NUM       = "2"
@@ -35,8 +47,8 @@ INDEX_F_NAME        = "index.html"
 FRAME_ID            = "includer"
 FRAME_POS           = "absolute"
 FRAME_BORDER        = "none"
-FRAME_H             = "99%"
-FRAME_W             = "99%"
+FRAME_H             = "100%"
+FRAME_W             = "100%"
 FRAME_NOT           = "Bad browser"
 
 ALIGN_C             = "center"
@@ -64,18 +76,21 @@ M_HEAD_TXT          = "Актуальные прошивки"
 DEP_TXT             = "Отдел"
 DEV_TXT             = "Прибор"
 ITEM_TXT            = "№"
+SOFT_TYPE_TXT       = "Тип"
 LAST_SET_TXT        = "Последняя установка"
 DATE_TXT            = "Дата установки"
 HASH_TXT            = "Версия"
 TAG_TXT             = "Тэг: "
 CNT_TXT             = "В истории: "
-BACK_TXT            = "На главную"
+BACK_TXT            = "Назад"
 LINK_FTP_TXT        = "Ссылка на дистрибутив"
 REDIST_TXT          = " [R]"
 HISTORY_TXT         = "История прошивок для устройства "
 DEPART_TXT          = "Отдел: "
 
-VER_TXT             = "ПО версии: {:s}.{:s}.{:s}"
+TO_DEV_TXT          = "Перейти к списку приборов"
+
+VER_TXT             = "ПО версии: {:s}.{:s}.{:s}({:s}) {:s}"
 
 REPO_TXT            = "Репозиторий: "
 AUTHOR_TXT          = "Автор коммита: "
@@ -119,6 +134,8 @@ COMMIT_MSG_SIZE     = 30        # edge for commit msg size
 
 GIT_VER             = "version"
 
+BAD_DATE            = "BAD DATE"
+
 # TAG MODEL ---------------------------------------------------------
 PROD                = ("PROD", "ROD")
 WRONG_NUM           = ("xxxx", "XXXX")
@@ -130,11 +147,11 @@ TYPE_ALL            = "ALL"
 TYPES_L             = [TYPE_ITEM, TYPE_ORDER, TYPE_ALL]
 
 D_UNK               = "UNKNOWN"
-D_LIN               = "LINUX"
+D_LINUX               = "LINUX"
 D_WIN               = "WIN"
 D_DOS               = "DOS"
 
-DOMENS_L            = [D_LIN, D_WIN, D_DOS]
+DOMENS_L            = [D_LINUX, D_WIN, D_DOS]
 
 # PLATFORMS ---------------------------------------------------------
 WINDOWS_P           = "windows"

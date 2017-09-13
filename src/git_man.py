@@ -8,6 +8,8 @@ from queue import Queue
 import common_defs as c_d
 import global_vars as g_v
 import git_defs as g_d
+import version as s_v
+
 from cmd_wrap import *
 from tag_model import *
 from logger import *
@@ -46,56 +48,61 @@ class GitMan:
 
         return False
 
-    def __parce_tag_sm(self, tag_part, pos, note_out, state):
+    def __parce_tag_sm(self, tag_part, pos, item_out, state):
         # offset
         if state[0] == W_OFFSET:
             parts = tag_part.split("-")
             if len(parts) == 2 and pos == P_ITEM:
                 state[0] = W_ITEM
-            elif len(parts) == 4 and pos >= P_ITEM:
+            elif len(parts) >= 3 and pos >= P_ITEM:
                 state[0] = W_DATE
             else:
+                out_err("Parce error. Bad item num or date.")
                 state[0] = W_BREAK
 
         # main
+        # W_START
         if state[0] == W_START:
-            if self.__is_tag_valid(note_out.tag):
+            if self.__is_tag_valid(item_out.tag):
                 if g_v.DEBUG: out_log("tag is valid")
                 state[0] = W_DEV
             else:
                 if g_v.DEBUG: out_log("tag is not valid")
                 state[0] = W_BREAK
+        # W_DEV
         elif state[0] == W_DEV:
-            note_out.name = tag_part
+            item_out.dev_name = tag_part
             state[0] = W_OFFSET
-            if g_v.DEBUG: out_log("name: " + note_out.name)
+            if g_v.DEBUG: out_log("name: " + item_out.dev_name)
+        # W_ITEM
         elif state[0] == W_ITEM:
             parts = tag_part.split("-")
-            note_out.type = parts[0]
+            item_out.item_type = parts[0]
 
             try:
-                note_out.num = int(parts[1])
+                item_out.item_num = int(parts[1])
             except ValueError:
                 out_err("EXCEPT Bad item num: " + parts[1])
                 state[0] = W_BREAK
             else:
-                if note_out.type not in c_d.TYPES_L:
-                    out_err("Bad item type: " + note_out.type)
+                if item_out.item_type not in c_d.TYPES_L:
+                    out_err("Bad item type: " + item_out.item_type)
                     state[0] = W_BREAK
                 else:
                     if g_v.DEBUG:
-                        out_log("type: " + note_out.type)
-                        out_log("num: " + str(note_out.num))
-
-            state[0] = W_DATE
+                        out_log("type: " + item_out.item_type)
+                        out_log("num: " + str(item_out.item_num))
+                state[0] = W_DATE
+        # W_DATE
         elif state[0] == W_DATE:
-            note_out.date = self.__repair_tag_date(tag_part)
-            if g_v.DEBUG: out_log("date: " + note_out.date)
+            item_out.tag_date = self.__repair_tag_date(tag_part)
+            if g_v.DEBUG: out_log("date: " + item_out.tag_date)
 
             state[0] = W_DOMEN
+        # W_DOMEN
         elif state[0] == W_DOMEN:
-            note_out.platform = tag_part
-            if g_v.DEBUG: out_log("platform: " + note_out.platform)
+            item_out.platform = tag_part
+            if g_v.DEBUG: out_log("platform: " + item_out.platform)
 
         # end
         if state[0] == W_BREAK:
@@ -103,24 +110,26 @@ class GitMan:
         else:
             return True
 
-    def __parce_tag(self, note_out):
-        timer = TimeChecker()
-        timer.start
+    def __parce_tag(self, items_out):
+        parce_t = -1
+        if g_v.DEBUG:
+            parce_t = start()
+            out_log("start parce tag")
 
-        if g_v.DEBUG: out_log("start parce tag")
-
-        tag_parts = note_out.tag.split("/")
+        tag_parts = items_out.tag.split("/")
 
         if len(tag_parts) < 3:
+            out_err("bad tag size: {:s}".format(str(len(tag_parts))))
             return False
 
         state = [W_START]
         for part in tag_parts:
-            if not self.__parce_tag_sm(part, tag_parts.index(part), note_out, state):
+            if not self.__parce_tag_sm(part, tag_parts.index(part), items_out, state):
                 return False
 
-        timer.stop
-        if g_v.DEBUG: out_log("finish parce tag - " + timer.passed_time_str)
+        if g_v.DEBUG:
+            stop(parce_t)
+            out_log("parce tag time: {:s}".format(get_pass_time(parce_t)))
 
         return True
 
@@ -239,70 +248,100 @@ class GitMan:
                 return -1
 
     def __gen_notes_by_tag_list(self, tag_list):
-        notes = []
+        items = []
 
         for tag in tag_list:
-            notes.append(self.__gen_note_by_tag(tag))
+            items.append(self.__gen_note_by_tag(tag))
 
-        return notes
+        return items
 
     def __gen_note_by_tag(self, tag):
-        timer = TimeChecker()
-        timer.start
-
         res_flag = True
+        gen_t = -1
 
-        if g_v.DEBUG: out_log("Gen note for tag: " + tag)
+        if g_v.DEBUG:
+            gen_t = start()
+            out_log("Gen item for tag: " + tag)
 
-        note = Note()
-        note.tag = tag
+        item = Item()
+        item.tag = tag
 
-        if self.__parce_tag(note):
-            note.sHash = self.__get_short_hash(tag)
-            if g_v.DEBUG: out_log("Note short hash: " + note.sHash)
+        if self.__parce_tag(item):
+            item.cm_hash = self.__get_short_hash(tag)
+            if g_v.DEBUG: out_log("item short hash: " + item.cm_hash)
 
-            note.commDate = self.__repair_commit_date(self.__get_commit_date_by_short_hash(note.sHash))
-            if g_v.DEBUG: out_log("Note commit date: " + note.commDate)
+            item.cm_date = self.__repair_commit_date(self.__get_commit_date_by_short_hash(item.cm_hash))
+            if g_v.DEBUG: out_log("item commit date: " + item.cm_date)
 
-            note.author = self.__get_commit_author_by_short_hash(note.sHash)
-            if g_v.DEBUG: out_log("Note author: " + note.author)
+            item.cm_auth = self.__get_commit_author_by_short_hash(item.cm_hash)
+            if g_v.DEBUG: out_log("item author: " + item.cm_auth)
 
-            msg = self.__get_commit_msg_by_short_hash(note.sHash)
-            note.commMsg = self.__repair_commit_msg(msg)
-            if g_v.DEBUG: out_log("Note commMsg: " + note.commMsg)
+            msg = self.__get_commit_msg_by_short_hash(item.cm_hash)
+            item.cm_msg = self.__repair_commit_msg(msg)
+            if g_v.DEBUG: out_log("item commMsg: " + item.cm_msg)
 
             # get pHash
-            note.pHash = self.__get_parents_short_hash(note.sHash)
-            if note.pHash == -1:
-                note.pHash = note.sHash
-            if g_v.DEBUG: out_log("Note pHash: " + str(note.pHash))
+            item.p_hash = self.__get_parents_short_hash(item.cm_hash)
+            if item.p_hash == -1:
+                item.p_hash = item.cm_hash
+            if g_v.DEBUG: out_log("item pHash: " + str(item.p_hash))
 
-            note.valid = True
+            item.valid = True
         else:
             out_err("Bad tag: " + tag)
             res_flag = False
 
-        timer.stop
-        if g_v.DEBUG: out_log("Tag time: {:s}".format(timer.passed_time_str))
+        if g_v.DEBUG:
+            stop(gen_t)
+            out_log("gen item time: {:s}".format(get_pass_time(gen_t)))
 
         if res_flag:
-            return (res_flag, note)
+            return (res_flag, item)
         else:
             return (res_flag, None)
+
+    def __is_numeric(self, part):
+        try:
+            int(part)
+            return True
+        except ValueError:
+            return False
 
     def __repair_tag_date(self, date):
         temp = date.split("-")
 
         res = ""
 
-        try:
-            res = "{:s}-{:s}-{:s} {:s}:{:s}".format(temp[0],
-                                                    temp[1],
-                                                    temp[2],
-                                                    temp[3][0:2],
-                                                    temp[3][2:4])
-        except Exception:
-            out_err("Bad date: " + date)
+        date = {0 : "1992", 1 : "06", 2 : "10", 3 : "00", 4 : "00"}
+
+        time_exist = False
+
+        if len(temp) >= 3:
+            for p in temp:
+                if temp.index(p) == 3:
+                    break
+
+                if self.__is_numeric(p):
+                    date[temp.index(p)] = p
+                else:
+                    return c_d.BAD_DATE
+            if len(temp) == 4:
+                if len(temp[3]) == 4:
+                    date[3] = temp[3][0:2]
+                    date[4] = temp[3][2:4]
+                    time_exist = True
+
+            try:
+                res = "{:s}-{:s}-{:s}".format(date[0],
+                                               date[1],
+                                               date[2])
+                if time_exist:
+                    res += " {:s}:{:s}".format(date[3],
+                                               date[4])
+
+            except Exception:
+                out_err("Bad date: " + date)
+                return c_d.BAD_DATE
 
         return res
 
@@ -321,16 +360,22 @@ class GitMan:
 
         return res
 
-    def __add_note(self, model, repo, note):
-        if note.name not in repo.devices:
-            dev = Device()
-            dev.add_order(note)
-            dev.name = note.name
-            dev.trName = model.get_trDevName(note.name)
+    def __do_work(self, tags_list):
+        items_out = []
+        if g_v.MULTITH:
+            cpu_ths = multiprocessing.cpu_count()
+            if g_v.DEBUG: out_log("cpu count: " + str(cpu_ths))
 
-            repo.add_device(note.name, dev)
+            pool = ThreadPool(cpu_ths)
+
+            items_out = pool.map(self.__gen_note_by_tag, tags_list)
+
+            pool.close()
+            pool.join()
         else:
-            repo.add_to_device(note.name, note)
+            items_out = self.__gen_notes_by_tag_list(tags_list)
+
+        return items_out
 
     @property
     def check_git_installed(self):
@@ -344,78 +389,52 @@ class GitMan:
     def scanning(self, model):
         if g_v.DEBUG: out_log("start scanning")
 
-        # create time checker
-        time_ch = TimeChecker()
-        int_time_ch = TimeChecker()
-        time_ch.start
+        for dep_name, dep_obj in model.departments.items():
+            if g_v.DEBUG: out_log("department: \"{:s}\"".format(dep_name))
+            for repo in dep_obj.repos:
+                if g_v.DEBUG:
+                    out_log("repo: \"{:s}\"".format(repo.name))
+                    out_log("repo-link: \"{:s}\"".format(repo.link))
+                    out_log("repo-soft-type: \"{:s}\"".format(repo.soft_type))
 
-        # do work
-        deps = model.departments
+                if self.__is_dir_exist(repo.link):
+                    self.__go_to_dir(repo.link)
 
-        for name, repos in deps.items():
-            if g_v.DEBUG: out_log("department: " + name)
+                tags = self.__get_tags()
 
-            for repo in repos:
-                link = repo.link
+                if tags:
+                    tags_list = tags.split("\n")
 
-                if g_v.DEBUG: out_log("repo: " + link)
+                    if g_v.DEBUG:
+                        out_log("Tags number: " + str(len(tags_list)))
+                        out_log("Tags: " + str(tags_list))
 
-                # try go to dir link
-                self.__go_to_dir(link)
+                    items_list = self.__do_work(tags_list)
 
-                if self.__is_dir_exist(link):
-                    # do dirty work
-                    int_time_ch.start
-                    tags = self.__get_tags()
-                    int_time_ch.stop
+                    # add items
+                    for item_t in items_list:
+                        (flag, item) = item_t
+                        if flag and item.valid:
+                            item.repo_i = dep_obj.repos.index(repo)
+                            dep_obj.items.append(item)
+                            if item.dev_name not in dep_obj.devices:
+                                dep_obj.devices.append(item.dev_name)
 
-                    if g_v.DEBUG: out_log("get all tags " + int_time_ch.passed_time_str)
+        if g_v.DEBUG: out_log("stop scanning")
 
-                    if tags:
-                        tags_list = tags.split("\n")
+    def try_get_build_ver(self):
+        cmd = g_d.GIT_CMD.format(g_d.A_REV_LIST
+                                 + g_d.A_ALL
+                                 + g_d.A_COUNT)
 
-                        if g_v.DEBUG:
-                            if g_v.DEBUG:
-                                out_log("Tags number: " + str(len(tags_list)))
-                                out_log("Tags: " + str(tags_list))
+        out = run_cmd(cmd)
 
-                        notes_list = []
+        try:
+            out_int = int(out)
+        except ValueError:
+            s_v.V_BUILD = s_v.CURRENT
+        else:
+            s_v.V_BUILD = out
+            out_log("change build version: {:s}".format(out))
 
-                        if g_v.MULTITH:
-                            cpu_ths = multiprocessing.cpu_count()
-                            if g_v.DEBUG: out_log("cpu count: " + str(cpu_ths))
-
-                            pool = ThreadPool(cpu_ths)
-
-                            notes_list = pool.map(self.__gen_note_by_tag, tags_list)
-
-                            pool.close()
-                            pool.join()
-                        else:
-                            notes_list = self.__gen_notes_by_tag_list(tags_list)
-
-                        # add notes
-                        for note_t in notes_list:
-                            (flag, note) = note_t
-                            if flag and note.valid:
-                                self.__add_note(model, repo, note)
-
-                        # sort notes for devices and separate last updates
-                        int_time_ch.start
-                        for dev_name, dev in repo.devices.items():
-                            if g_v.DEBUG: out_log("Sort history for: " + dev_name)
-
-                            dev.sort_orders()
-
-                            if g_v.DEBUG: out_log("Separate last notes for: " + dev_name)
-
-                            dev.fill_last()
-                        int_time_ch.stop
-
-                        if g_v.DEBUG: out_log("sort " + int_time_ch.passed_time_str)
-                    else:
-                        out_err("no tags")
-
-        time_ch.stop
-
-        out_log("finish scanning - " + time_ch.passed_time_str)
+        return

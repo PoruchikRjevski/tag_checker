@@ -13,11 +13,13 @@ TRANSLATE_FILE="tag_checker_translate"
 NAME="tag_checker.py"
 SCRIPTS_FILE="scripts.js"
 STYLE_FILE="style.css"
+VERSION_FILE="version.py"
 
 EXEC_F="run.sh"
 PREFIX_F="#!/bin/bash"
 
 PYTHON="python3"
+GIT="git"
 
 
 # check and remove file
@@ -74,6 +76,12 @@ run_now() {
     $SETUP_DIR$NAME $log $sud $mt $deb
 }
 
+# repair build ver
+build_ver() {
+    commits=$($GIT rev-list --all --count)
+    sed -Ei "s/current_commits/$commits/g" $SETUP_DIR$VERSION_FILE
+}
+
 # ---------------------------------
 # main
 # ---------------------------------
@@ -82,6 +90,12 @@ main() {
     # check pyton
     if ! which $PYTHON > /dev/null; then
         echo "Please, install python3 before using $0"
+        exit 0
+    fi
+
+    # check git
+    if ! which $GIT > /dev/null; then
+        echo "Please, install git before using $0"
         exit 0
     fi
 
@@ -147,6 +161,9 @@ main() {
     cp $CUR_DIR$SRC_DIR$STYLE_FILE $OUT_DIR
     
     create_exec_file
+
+    # fix build ver
+    build_ver
     
     # CRON
     read -p "Add to crontab (y/n)? " answ

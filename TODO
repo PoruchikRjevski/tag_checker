@@ -8,7 +8,7 @@
     must be something like:
         http://172.16.20.64/swver_hist/gitweb/?p=bourevest/ase-2.git;a=shortlog;cm=fix%20board%20determination;h=996d84f
     No more place?
-- intro page -> departments and devices only lists
++ intro page -> departments and devices only lists
 + rename version column "Хэш сумма" => "Версия"
 + rename column "Устройство" => "Прибор"
 + add to column "Версия" date and time of commit: <hash> <YYYY-MM-DD> <HH:MM>
@@ -83,7 +83,7 @@
     - show "for all" version for each found domains and for root domain
     - check versions metrics with base in same domain or in upper domain (if same domain base is not exists)
     
-- for each repo add sw name prefix in config:
++ for each repo add sw name prefix in config:
 
     HL:asv-1_v2_hl.git
     DRV:asv-1_ll_drv.git
