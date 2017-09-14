@@ -289,12 +289,10 @@ class GitMan:
             out_err("Bad tag: " + tag)
             res_flag = False
 
-
         stop(gen_t)
 
-        if g_v.TIM_OUT: out_log("gen item time: {:s}".format(get_pass_time(gen_t)))
-
         if res_flag:
+            if g_v.TIM_OUT: out_log("gen item time: {:s}".format(get_pass_time(gen_t)))
             return (res_flag, item)
         else:
             return (res_flag, None)
