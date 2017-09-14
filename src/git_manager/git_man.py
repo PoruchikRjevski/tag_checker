@@ -212,10 +212,20 @@ class GitMan:
         return run_cmd(cmd)
 
     def __get_parent_commit_hash(self, note_hash, last_commit_hash):
-        cmd = g_d.GIT_CMD.format(g_d.A_REV_LIST
-                                 + g_d.A_ABBREV.format(g_d.A_AB_COMMIT)
-                                 + " " + note_hash + "..." + last_commit_hash
-                                 + g_d.A_TAIL.format(str(c_d.GIT_PAR_SH_NEST)))
+        cmd = g_d.GIT_CMD.format("".join([g_d.A_REV_LIST,
+                                          g_d.A_ABBREV.format(g_d.A_AB_COMMIT),
+                                          " ",
+                                          note_hash,
+                                          "...",
+                                          last_commit_hash,
+                                          g_d.A_TAIL.format(str(c_d.GIT_PAR_SH_NEST))]))
+
+        # cmd = g_d.GIT_CMD.format(g_d.A_REV_LIST
+        #                          + g_d.A_ABBREV.format(g_d.A_AB_COMMIT)
+        #                          + " " + note_hash + "..." + last_commit_hash
+        #                          + g_d.A_TAIL.format(str(c_d.GIT_PAR_SH_NEST)))
+
+        print("TRALALA")
 
         out = run_cmd(cmd)
 
@@ -228,17 +238,17 @@ class GitMan:
 
     def __get_parents_short_hash(self, note_hash):
         branch = self.__get_develop_branch_by_hash(note_hash)
-        if g_v.DEBUG: out_log("finded branch: " + str(branch))
+        if g_v.DEBUG: out_log("finded branch: {:s}".format(str(branch)))
         if branch is None:
             return -1
 
         last_commit_s_hash = self.__get_last_commit_on_branch(branch)
-        if g_v.DEBUG: out_log("last commit short hash: " + str(last_commit_s_hash))
+        if g_v.DEBUG: out_log("last commit short hash: {:s}".format(str(last_commit_s_hash)))
         if last_commit_s_hash is None:
             return -1
 
         parents_hash = self.__get_parent_commit_hash(note_hash, last_commit_s_hash)
-        if g_v.DEBUG: out_log("parent's hash: " + str(parents_hash))
+        if g_v.DEBUG: out_log("parent's hash: {:s}".format(str(parents_hash)))
         if parents_hash is None:
             return -1
         else:
@@ -262,30 +272,30 @@ class GitMan:
         res_flag = True
 
         if g_v.DEBUG:
-            out_log("Gen item for tag: " + tag)
+            out_log("Gen item for tag: {:s}".format(tag))
 
         item = Item()
         item.tag = tag
 
         if self.__parce_tag(item):
             item.cm_hash = self.__get_short_hash(tag)
-            if g_v.DEBUG: out_log("item short hash: " + item.cm_hash)
+            if g_v.DEBUG: out_log("item short hash: {:s}".format(item.cm_hash))
 
             item.cm_date = self.__repair_commit_date(self.__get_commit_date_by_short_hash(item.cm_hash))
-            if g_v.DEBUG: out_log("item commit date: " + item.cm_date)
+            if g_v.DEBUG: out_log("item commit date: {:s}".format(item.cm_date))
 
             item.cm_auth = self.__get_commit_author_by_short_hash(item.cm_hash)
-            if g_v.DEBUG: out_log("item author: " + item.cm_auth)
+            if g_v.DEBUG: out_log("item author: {:s}".format(item.cm_auth))
 
             msg = self.__get_commit_msg_by_short_hash(item.cm_hash)
             item.cm_msg = self.__repair_commit_msg(msg)
-            if g_v.DEBUG: out_log("item commMsg: " + item.cm_msg)
+            if g_v.DEBUG: out_log("item commMsg: {:s}".format(item.cm_msg))
 
             # get pHash
             item.p_hash = self.__get_parents_short_hash(item.cm_hash)
             if item.p_hash == -1:
                 item.p_hash = item.cm_hash
-            if g_v.DEBUG: out_log("item pHash: " + str(item.p_hash))
+            if g_v.DEBUG: out_log("item pHash: {:s}".format(str(item.p_hash)))
 
             item.valid = True
         else:
@@ -340,7 +350,7 @@ class GitMan:
                                                date[4])
 
             except Exception:
-                out_err("Bad date: " + date)
+                out_err("Bad date: {:s}".format(date))
                 return c_d.BAD_DATE
 
         return res
@@ -356,7 +366,7 @@ class GitMan:
                                           time_temp[0],
                                           time_temp[1])
         except Exception:
-            out_err("Bad date: " + date)
+            out_err("Bad date: {:s}".format(date))
 
         return res
 
@@ -364,7 +374,7 @@ class GitMan:
         items_out = []
         if g_v.MULTITH:
             cpu_ths = multiprocessing.cpu_count()
-            if g_v.DEBUG: out_log("cpu count: " + str(cpu_ths))
+            if g_v.DEBUG: out_log("cpu count: {:s}".format(str(cpu_ths)))
 
             pool = ThreadPool(cpu_ths)
 
@@ -406,8 +416,8 @@ class GitMan:
                     tags_list = tags.split("\n")
 
                     if g_v.DEBUG:
-                        out_log("Tags number: " + str(len(tags_list)))
-                        out_log("Tags: " + str(tags_list))
+                        out_log("Tags number: {:s}".format(str(len(tags_list))))
+                        out_log("Tags: {:s}".format(str(tags)))
 
                     items_list = self.__do_work(tags_list)
 
