@@ -27,7 +27,7 @@ class GitMan:
 
     def __is_dir_exist(self, link):
         if not os.path.isdir(link):
-            out_err("can't find dir of repo: " + link)
+            out_err("can't find dir of repo: {:s}".format(link))
             return False
         return True
 
@@ -71,7 +71,7 @@ class GitMan:
         elif state[0] == W_DEV:
             item_out.dev_name = tag_part
             state[0] = W_OFFSET
-            if g_v.DEBUG: out_log("name: " + item_out.dev_name)
+            if g_v.DEBUG: out_log("name: {:s}".format(item_out.dev_name))
         # W_ITEM
         elif state[0] == W_ITEM:
             parts = tag_part.split("-")
@@ -80,21 +80,21 @@ class GitMan:
             try:
                 item_out.item_num = int(parts[1])
             except ValueError:
-                out_err("EXCEPT Bad item num: " + parts[1])
+                out_err("EXCEPT Bad item num: {:s}".format(parts[1]))
                 state[0] = W_BREAK
             else:
                 if item_out.item_type not in c_d.TYPES_L:
-                    out_err("Bad item type: " + item_out.item_type)
+                    out_err("Bad item type: {:s}".format(item_out.item_type))
                     state[0] = W_BREAK
                 else:
                     if g_v.DEBUG:
-                        out_log("type: " + item_out.item_type)
-                        out_log("num: " + str(item_out.item_num))
+                        out_log("type: {:s}".format(item_out.item_type))
+                        out_log("num: {:s}".format(str(item_out.item_num)))
                 state[0] = W_DATE
         # W_DATE
         elif state[0] == W_DATE:
             item_out.tag_date = self.__repair_tag_date(tag_part)
-            if g_v.DEBUG: out_log("date: " + item_out.tag_date)
+            if g_v.DEBUG: out_log("date: {:s}".format(item_out.tag_date))
 
             if item_out.tag_date == c_d.BAD_DATE:
                 state[0] = W_BREAK
@@ -103,7 +103,7 @@ class GitMan:
         # W_DOMEN
         elif state[0] == W_DOMEN:
             item_out.platform = tag_part
-            if g_v.DEBUG: out_log("platform: " + item_out.platform)
+            if g_v.DEBUG: out_log("platform: {:s}".format(item_out.platform))
 
         # end
         if state[0] == W_BREAK:
@@ -212,20 +212,10 @@ class GitMan:
         return run_cmd(cmd)
 
     def __get_parent_commit_hash(self, note_hash, last_commit_hash):
-        cmd = g_d.GIT_CMD.format("".join([g_d.A_REV_LIST,
-                                          g_d.A_ABBREV.format(g_d.A_AB_COMMIT),
-                                          " ",
-                                          note_hash,
-                                          "...",
-                                          last_commit_hash,
-                                          g_d.A_TAIL.format(str(c_d.GIT_PAR_SH_NEST))]))
-
-        # cmd = g_d.GIT_CMD.format(g_d.A_REV_LIST
-        #                          + g_d.A_ABBREV.format(g_d.A_AB_COMMIT)
-        #                          + " " + note_hash + "..." + last_commit_hash
-        #                          + g_d.A_TAIL.format(str(c_d.GIT_PAR_SH_NEST)))
-
-        print("TRALALA")
+        cmd = g_d.GIT_CMD.format(g_d.A_REV_LIST
+                                 + g_d.A_ABBREV.format(g_d.A_AB_COMMIT)
+                                 + " " + note_hash + "..." + last_commit_hash
+                                 + g_d.A_TAIL.format(str(c_d.GIT_PAR_SH_NEST)))
 
         out = run_cmd(cmd)
 
@@ -417,7 +407,6 @@ class GitMan:
 
                     if g_v.DEBUG:
                         out_log("Tags number: {:s}".format(str(len(tags_list))))
-                        out_log("Tags: {:s}".format(str(tags)))
 
                     items_list = self.__do_work(tags_list)
 
