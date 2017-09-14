@@ -254,11 +254,11 @@ class GitMan:
         return items
 
     def __gen_note_by_tag(self, tag):
+        gen_t = start()
+
         res_flag = True
-        gen_t = -1
 
         if g_v.DEBUG:
-            gen_t = start()
             out_log("Gen item for tag: " + tag)
 
         item = Item()
@@ -289,9 +289,10 @@ class GitMan:
             out_err("Bad tag: " + tag)
             res_flag = False
 
-        if g_v.DEBUG:
-            stop(gen_t)
-            out_log("gen item time: {:s}".format(get_pass_time(gen_t)))
+
+        stop(gen_t)
+
+        if g_v.TIM_OUT: out_log("gen item time: {:s}".format(get_pass_time(gen_t)))
 
         if res_flag:
             return (res_flag, item)

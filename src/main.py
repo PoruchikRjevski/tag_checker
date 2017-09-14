@@ -5,8 +5,7 @@ from optparse import OptionParser
 import common_defs as c_d
 import global_vars as g_v
 from cfg_loader import CfgLoader
-# from git_manager import GitMan
-from git_manager import *
+from git_manager import GitMan
 from logger import *
 from tag_model import TagModel
 from time_profiler.time_checker import *

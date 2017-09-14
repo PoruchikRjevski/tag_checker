@@ -10,7 +10,7 @@ PY_FILES="*.py"
 CONFIG_DIR="/etc/"
 CONFIG_FILE="tag_checker.ini"
 TRANSLATE_FILE="tag_checker_translate"
-NAME="tag_checker.py"
+NAME="main.py"
 SCRIPTS_FILE="scripts.js"
 STYLE_FILE="style.css"
 VERSION_FILE="version.py"
@@ -152,7 +152,7 @@ main() {
     echo "Dirs was checked."
     
     # copy files
-    yes | cp -rf $SRC_DIR$PY_FILES $SETUP_DIR
+    yes | cp -rf $SRC_DIR* $SETUP_DIR
     chmod +x $SETUP_DIR*
     
     echo "Executable files was copied."
