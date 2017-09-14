@@ -96,7 +96,10 @@ class GitMan:
             item_out.tag_date = self.__repair_tag_date(tag_part)
             if g_v.DEBUG: out_log("date: " + item_out.tag_date)
 
-            state[0] = W_DOMEN
+            if item_out.tag_date == c_d.BAD_DATE:
+                state[0] = W_BREAK
+            else:
+                state[0] = W_DOMEN
         # W_DOMEN
         elif state[0] == W_DOMEN:
             item_out.platform = tag_part
