@@ -2,7 +2,7 @@ import os
 
 import global_vars as g_v
 from logger import *
-import html_defs as h_d
+from web_generator import html_defs as h_d
 
 __all__ = ['HtmlGen']
 

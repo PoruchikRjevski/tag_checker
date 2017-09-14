@@ -1,24 +1,22 @@
-import os
-
 import multiprocessing
+import os
 from multiprocessing.dummy import Pool as ThreadPool
-from threading import Thread
-from queue import Queue
 
 import common_defs as c_d
 import global_vars as g_v
-import git_defs as g_d
 import version as s_v
-
 from cmd_wrap import *
-from tag_model import *
+from git_manager import git_defs as g_d
 from logger import *
-from time_checker import *
+from tag_model import *
+from time_profiler.time_checker import *
 
 # parce state machine environment
 W_START, W_DEV, W_OFFSET, W_ITEM, W_DATE, W_DOMEN, W_BREAK = range(7)
 P_PROD, P_DEV, P_ITEM, P_DATE, P_PLATFORM = range(5)
 # true tag seq: P_PROD/P_DEV/P_ITEM(?)/P_DATE/P_PLATFORM(?)
+
+__all__ = ['GitMan']
 
 
 class GitMan:

@@ -1,5 +1,7 @@
 import time
 
+import global_vars as g_v
+
 __all__ = ['start', 'stop', 'get_pass_time']
 
 
@@ -13,6 +15,9 @@ free_ids = []
 
 
 def start():
+    if not g_v.TIM_OUT:
+        return -1
+
     start_t = time.time()
 
     id = -1
@@ -28,6 +33,9 @@ def start():
 
 
 def stop(id):
+    if not g_v.TIM_OUT:
+        return -1
+
     stop_t = time.time()
     if id in times_dict:
         res = stop_t - times_dict[id]

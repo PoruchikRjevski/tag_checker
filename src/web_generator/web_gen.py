@@ -1,15 +1,13 @@
 import datetime
 import os
 
+from web_generator.html_gen import HtmlGen
+
 import common_defs as c_d
 import global_vars as g_v
-import html_defs as h_d
 import version as v
-
-from html_gen import HtmlGen
-from tag_model import *
-from logger import out_log, out_err
-from time_checker import *
+from logger import out_log
+from web_generator import html_defs as h_d
 
 
 class WebGenerator:

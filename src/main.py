@@ -1,18 +1,16 @@
 #!/usr/bin/sudo python3
-import os
 import sys
 from optparse import OptionParser
 
 import common_defs as c_d
 import global_vars as g_v
 from cfg_loader import CfgLoader
-from tag_model import TagModel
-from git_man import GitMan
-from web_gen import WebGenerator
-
+# from git_manager import GitMan
+from git_manager import *
 from logger import *
-from time_checker import *
-from cmd_wrap import *
+from tag_model import TagModel
+from time_profiler.time_checker import *
+from web_generator.web_gen import WebGenerator
 
 
 def set_options(parser):
@@ -40,9 +38,13 @@ def set_options(parser):
                       action="store_true", dest="debug_out",
                       default=False,
                       help="run debug out")
+    parser.add_option("-t", "--timings",
+                      action="store_true", dest="timings_out",
+                      default=False,
+                      help="run timings out if -d - True by default")
 
 
-def check_options(opts):
+def setup_options(opts):
     if opts.quiet:
         g_v.QUIET = True
     if opts.log:
@@ -53,11 +55,12 @@ def check_options(opts):
         g_v.MULTITH = True
     if opts.debug_out:
         g_v.DEBUG = True
+        g_v.TIM_OUT = True
+    if opts.timings_out:
+        g_v.TIM_OUT = True
 
 
 def main():
-    main_t = start()
-
     # init_cmd_wrapper()
 
     # check options
@@ -66,7 +69,9 @@ def main():
 
     (opts, args) = optParser.parse_args()
 
-    check_options(opts)
+    setup_options(opts)
+
+    main_t = start()
 
     # check platform
     g_v.CUR_PLATFORM = sys.platform
@@ -79,6 +84,8 @@ def main():
         out_log("-l: " + str(g_v.LOGGING))
         out_log("-s: " + str(g_v.SUDOER))
         out_log("-m: " + str(g_v.MULTITH))
+        out_log("-d: " + str(g_v.DEBUG))
+        out_log("-t: " + str(g_v.TIM_OUT))
 
     if len(args) != 1:
         path = ""
@@ -107,7 +114,7 @@ def main():
     load_t = start()
     res = cfg_loader.load_config(path, tag_model)
     stop(load_t)
-    out_log("load config time: {:s}".format(get_pass_time(load_t)))
+    if g_v.TIM_OUT: out_log("load config time: {:s}".format(get_pass_time(load_t)))
 
     if res is not None:
         sys.exit(res)
@@ -116,17 +123,17 @@ def main():
     scan_t = start()
     git_man.scanning(tag_model)
     stop(scan_t)
-    out_log("scan time: {:s}".format(get_pass_time(scan_t)))
+    if g_v.TIM_OUT: out_log("scan time: {:s}".format(get_pass_time(scan_t)))
 
     # generate web
     web_gen_t = start()
     web_gen = WebGenerator()
     web_gen.generate_web(tag_model)
     stop(web_gen_t)
-    out_log("web gen time: {:s}".format(get_pass_time(web_gen_t)))
+    if g_v.TIM_OUT: out_log("web gen time: {:s}".format(get_pass_time(web_gen_t)))
 
     stop(main_t)
-    out_log("finish work: {:s}".format(get_pass_time(main_t)))
+    if g_v.TIM_OUT: out_log("finish work: {:s}".format(get_pass_time(main_t)))
 
     if g_v.MULTITH:
         out_deffered_logs()

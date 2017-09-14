@@ -4,7 +4,7 @@ import threading
 import common_defs as c_d
 import global_vars as g_v
 from logger import *
-from time_checker import *
+from time_profiler.time_checker import *
 
 __all__ = ['run_cmd']
 
@@ -27,9 +27,9 @@ def run_cmd(cmd):
     (out, err) = proc.communicate()
     stop(cmd_run_t)
 
-    if g_v.DEBUG: out_log("cmd: {:s} | pid: {:s} | exec time: {:s}".format(command,
-                                                                           str(threading.get_ident()),
-                                                                           get_pass_time(cmd_run_t)))
+    if g_v.TIM_OUT: out_log("exec time: {:s} | pid: {:s} | cmd: \"{:s}\"".format(get_pass_time(cmd_run_t),
+                                                                             str(threading.get_ident()),
+                                                                             command))
 
     u_out = out.decode(c_d.DOC_CODE).strip()
     u_err = err.decode(c_d.DOC_CODE).strip()

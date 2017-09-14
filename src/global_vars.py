@@ -3,6 +3,7 @@ LOGGING             = False         # global flag for out or not log and err to 
 SUDOER              = False         # global flag for exec shell cmd by sudo
 MULTITH             = False         # global flag for exec by multithreading
 DEBUG               = False
+TIM_OUT             = False
 
 OUT_PATH            = ""
 

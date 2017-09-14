@@ -14,6 +14,7 @@ NAME="tag_checker.py"
 SCRIPTS_FILE="scripts.js"
 STYLE_FILE="style.css"
 VERSION_FILE="version.py"
+MISC_DIR="misc/"
 
 EXEC_F="run.sh"
 PREFIX_F="#!/bin/bash"
@@ -68,15 +69,15 @@ create_exec_file() {
     chmod 777 $SETUP_DIR$EXEC_F
     
     echo $PREFIX_F > $SETUP_DIR$EXEC_F
-    echo $SETUP_DIR$NAME $quiet $log $sud $mt $deb >> $SETUP_DIR$EXEC_F
+    echo $SETUP_DIR$NAME $quiet $log $sud $mt $deb $tim >> $SETUP_DIR$EXEC_F
 }
 
 # run script
 run_now() {
-    $SETUP_DIR$NAME $log $sud $mt $deb
+    $SETUP_DIR$NAME $log $sud $mt $deb $tim
 }
-
-# repair build ver
+repair
+#  build ver
 build_ver() {
     commits=$($GIT rev-list --all --count)
     sed -Ei "s/current_commits/$commits/g" $SETUP_DIR$VERSION_FILE
@@ -127,9 +128,17 @@ main() {
 
     read -p "Run debug out (y/n)? " answ
     case "$answ" in 
-      y|Y ) deb="-m"
+      y|Y ) deb="-d"
       ;;
-      n|N ) ;;
+      n|N ) 
+        read -p "Run timings out (y/n)? " answ
+        case "$answ" in 
+          y|Y ) tim="-t"
+          ;;
+          n|N ) ;;
+          * ) tim="";;
+        esac
+      ;;
       * ) deb="";;
     esac
     
@@ -157,9 +166,9 @@ main() {
     chmod 777 $CONFIG_DIR$TRANSLATE_FILE
 
     check_and_rem_f "$OUT_DIR$SCRIPTS_FILE"
-    cp $CUR_DIR$SRC_DIR$SCRIPTS_FILE $OUT_DIR
+    cp $CUR_DIR$SRC_DIR$MISC_DIR$SCRIPTS_FILE $OUT_DIR
     check_and_rem_f "$OUT_DIR$STYLE_FILE"
-    cp $CUR_DIR$SRC_DIR$STYLE_FILE $OUT_DIR
+    cp $CUR_DIR$SRC_DIR$MISC_DIR$STYLE_FILE $OUT_DIR
     
     create_exec_file
 
