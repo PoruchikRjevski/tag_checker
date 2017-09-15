@@ -23,6 +23,16 @@ PYTHON="python3"
 GIT="git"
 
 
+
+
+# ----------
+ONE="1"
+TWO="2"
+THREE="3"
+FOUR="4"
+FIVE="5"
+
+
 # check and remove file
 check_and_rem_f() {    
     if [ -f "$1" ] 
@@ -47,6 +57,63 @@ check_and_make_d() {
     fi
 }
 
+# create executable file
+create_exec_file() {
+    touch $SETUP_DIR$EXEC_F
+    
+    chmod 777 $SETUP_DIR$EXEC_F
+    
+    echo $PREFIX_F > $SETUP_DIR$EXEC_F
+    echo $SETUP_DIR$NAME $quiet $log $sud $mt $deb $tim >> $SETUP_DIR$EXEC_F
+}
+
+# run script
+run_now() {
+    $SETUP_DIR$NAME $log $sud $mt $deb $tim
+}
+
+#  build ver
+build_ver() {
+    commits=$($GIT rev-list --all --count)
+    sed -Ei "s/current_commits/$commits/g" $SETUP_DIR$VERSION_FILE
+}
+
+
+# check soft installed
+check_soft() {
+    # check pyton
+    if ! which $PYTHON > /dev/null; then
+        echo "Please, install python3 before using $0"
+        exit 0
+    fi
+
+    # check git
+    if ! which $GIT > /dev/null; then
+        echo "Please, install git before using $0"
+        exit 0
+    fi
+}
+
+# main menu
+main_menu() {
+    echo "Select action"
+    echo "------"
+    echo ""
+    echo "[$ONE] Full install"
+    echo "[$TWO] Update files"
+    echo "[3] Edit crontab"
+    echo "[4] Reset attributes"
+    echo "[5] Run from source"
+    echo ""
+
+    read action
+
+    case "$action" in
+      $TWO ) edit_crontab;;
+      * ) echo "Bad select";;
+    esac
+}
+
 # remove note from crontab
 remove_from_crontab() {
     crontab -l | grep -q !"$NAME" > temp
@@ -62,43 +129,42 @@ add_to_crontab() {
     rm temp
 }
 
-# create executable file
-create_exec_file() {
-    touch $SETUP_DIR$EXEC_F
-    
-    chmod 777 $SETUP_DIR$EXEC_F
-    
-    echo $PREFIX_F > $SETUP_DIR$EXEC_F
-    echo $SETUP_DIR$NAME $quiet $log $sud $mt $deb $tim >> $SETUP_DIR$EXEC_F
+# edit crontab
+edit_crontab() {
+    echo "Edit crontab"
+    echo ""
+    echo "[$ONE] Add to crontab"
+    echo "[$TWO] Remove from crontab"
+    echo "[$THREE] Back to main"
+    echo ""
+
+    read action
+
+    case "$action" in
+      $ONE ) 
+        remove_from_crontab
+        add_to_crontab 
+      ;;
+      $TWO ) 
+        remove_from_crontab
+      ;;
+      $THREE )
+        main_menu
+      ;;
+      * ) echo "Bad select";;
+    esac
 }
 
-# run script
-run_now() {
-    $SETUP_DIR$NAME $log $sud $mt $deb $tim
-}
-repair
-#  build ver
-build_ver() {
-    commits=$($GIT rev-list --all --count)
-    sed -Ei "s/current_commits/$commits/g" $SETUP_DIR$VERSION_FILE
-}
 
 # ---------------------------------
 # main
 # ---------------------------------
 main() {
-    # CHECKS
-    # check pyton
-    if ! which $PYTHON > /dev/null; then
-        echo "Please, install python3 before using $0"
-        exit 0
-    fi
+    check_soft
 
-    # check git
-    if ! which $GIT > /dev/null; then
-        echo "Please, install git before using $0"
-        exit 0
-    fi
+    main_menu
+
+    exit 0
 
     # ASKS
     # ask about log and update
@@ -174,20 +240,7 @@ main() {
 
     # fix build ver
     build_ver
-    
-    # CRON
-    read -p "Add to crontab (y/n)? " answ
-    case "$answ" in 
-      y|Y ) 
-      remove_from_crontab
-      add_to_crontab      
-      ;;
-      n|N )
-      remove_from_crontab
-      ;;
-      * ) ;;
-    esac
-    
+
     # CRON
     read -p "Run now (y/n)? " answ
     case "$answ" in 
@@ -198,8 +251,7 @@ main() {
       ;;
       * ) ;;
     esac
-    
-    exit 0
+
 }
 
 main
