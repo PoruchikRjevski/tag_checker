@@ -27,9 +27,9 @@ def run_cmd(cmd):
     (out, err) = proc.communicate()
     stop(cmd_run_t)
 
-    if g_v.TIM_OUT: out_log("exec time: {:s} | pid: {:s} | cmd: \"{:s}\"".format(get_pass_time(cmd_run_t),
-                                                                             str(threading.get_ident()),
-                                                                             command))
+    if g_v.TIMEOUTS: out_log("exec time: {:s} | pid: {:s} | cmd: \"{:s}\"".format(get_pass_time(cmd_run_t),
+                                                                                  str(threading.get_ident()),
+                                                                                  command))
 
     u_out = out.decode(c_d.DOC_CODE).strip()
     u_err = err.decode(c_d.DOC_CODE).strip()

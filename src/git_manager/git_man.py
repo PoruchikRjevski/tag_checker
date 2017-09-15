@@ -295,7 +295,7 @@ class GitMan:
         stop(gen_t)
 
         if res_flag:
-            if g_v.TIM_OUT: out_log("gen item time: {:s}".format(get_pass_time(gen_t)))
+            if g_v.TIMEOUTS: out_log("gen item time: {:s}".format(get_pass_time(gen_t)))
             return (res_flag, item)
         else:
             return (res_flag, None)
@@ -376,15 +376,6 @@ class GitMan:
             items_out = self.__gen_notes_by_tag_list(tags_list)
 
         return items_out
-
-    @property
-    def check_git_installed(self):
-        out = run_cmd(g_d.GIT_CMD.format(g_d.A_VERSION))
-
-        if c_d.GIT_VER in str(out):
-            return True
-
-        return False
 
     def scanning(self, model):
         if g_v.DEBUG: out_log("start scanning")

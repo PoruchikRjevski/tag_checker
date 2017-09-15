@@ -15,7 +15,7 @@ free_ids = []
 
 
 def start():
-    if not g_v.TIM_OUT:
+    if not g_v.TIMEOUTS:
         return -1
 
     start_t = time.time()
@@ -33,7 +33,7 @@ def start():
 
 
 def stop(id):
-    if not g_v.TIM_OUT:
+    if not g_v.TIMEOUTS:
         return -1
 
     stop_t = time.time()
