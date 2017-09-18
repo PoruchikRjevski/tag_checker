@@ -178,7 +178,7 @@ remove_from_crontab() {
 # add note to crontab
 add_to_crontab() {
     crontab -l > temp
-    echo "0 * * * * $TAG_CHECKER $UPDATE_A" >> temp
+    echo "0/1 * * * * $TAG_CHECKER $UPDATE_A" >> temp
     crontab temp
     rm temp
 }
@@ -313,93 +313,6 @@ main() {
     main_menu
 
     exit 0
-
-    # ASKS
-    # ask about log and update
-    quiet="-q"
-    
-    read -p "Log (y/n)? " answ
-    case "$answ" in 
-      y|Y ) log="-l";;
-      n|N ) ;;
-      * ) log="";;
-    esac
-    
-    read -p "Exec cmd's by sudo (y/n)? " answ
-    case "$answ" in 
-      y|Y ) sud="-s";;
-      n|N ) ;;
-      * ) sud="";;
-    esac
-    
-    read -p "Run multithreading (y/n)? " answ
-    case "$answ" in 
-      y|Y ) mt="-m"
-      ;;
-      n|N ) ;;
-      * ) mt="";;
-    esac
-
-    read -p "Run debug out (y/n)? " answ
-    case "$answ" in 
-      y|Y ) deb="-d"
-      ;;
-      n|N ) 
-        read -p "Run timings out (y/n)? " answ
-        case "$answ" in 
-          y|Y ) tim="-t"
-          ;;
-          n|N ) ;;
-          * ) tim="";;
-        esac
-      ;;
-      * ) deb="";;
-    esac
-    
-    # COPY
-    # prepare
-    check_and_rem_d "$SETUP_DIR"
-    check_and_make_d "$SETUP_DIR"
-    check_and_rem_d "$OUT_DIR"
-    check_and_make_d "$OUT_ORD_DIR"
-    
-    echo "Dirs was checked."
-    
-    # copy files
-    yes | cp -rf $SRC_DIR* $SETUP_DIR
-    chmod +x $SETUP_DIR*
-    
-    echo "Executable files was copied."
-
-    #check_and_rem_f "$CONFIG_DIR$CONFIG_FILE"
-    cp -rfn $CUR_DIR$CONFIG_FILE $CONFIG_DIR
-    chmod 777 $CONFIG_DIR$CONFIG_FILE
-    
-    #check_and_rem_f "$CONFIG_DIR$TRANSLATE_FILE"
-    cp -rfn $CUR_DIR$TRANSLATE_FILE $CONFIG_DIR
-    chmod 777 $CONFIG_DIR$TRANSLATE_FILE
-
-    check_and_rem_f "$OUT_DIR$SCRIPTS_FILE"
-    cp $CUR_DIR$SRC_DIR$MISC_DIR$SCRIPTS_FILE $OUT_DIR
-    check_and_rem_f "$OUT_DIR$STYLE_FILE"
-    cp $CUR_DIR$SRC_DIR$MISC_DIR$STYLE_FILE $OUT_DIR
-    
-    create_exec_file
-
-    # fix build ver
-    build_ver
-
-    # CRON
-    read -p "Run now (y/n)? " answ
-    case "$answ" in 
-      y|Y ) 
-      run_now   
-      ;;
-      n|N )
-      ;;
-      * ) ;;
-    esac
-
 }
 
 main
