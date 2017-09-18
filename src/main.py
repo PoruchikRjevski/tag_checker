@@ -13,7 +13,7 @@ from web_generator.web_gen import WebGenerator
 
 
 def set_options(parser):
-    usage = "usage: %prog [options] [path_to_config]"
+    usage = "usage: %prog [options]"
 
     parser.set_usage(usage)
 

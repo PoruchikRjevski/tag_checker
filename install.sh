@@ -1,7 +1,8 @@
 #!/bin/bash
 
 CUR_DIR="./"
-SETUP_DIR="/usr/local/bin/tag_checker/"
+LINK_PATH="/usr/local/bin/"
+SETUP_DIR="/opt/tag_checker/"
 OUT_DIR="/var/www/swver_hist/"
 OUT_DEV_DIR=$OUT_DIR"devices/"
 OUT_ORD_DIR=$OUT_DEV_DIR"orders/"
@@ -9,12 +10,13 @@ SRC_DIR="src/"
 PY_FILES="*.py"
 CONFIG_DIR="/etc/"
 CONFIG_FILE="tag_checker.ini"
-TRANSLATE_FILE="tag_checker_translate"
 NAME="main.py"
 SCRIPTS_FILE="scripts.js"
 STYLE_FILE="style.css"
 VERSION_FILE="version.py"
 MISC_DIR="misc/"
+UPDATE_A="--update"
+TAG_CHECKER="tag_checker"
 
 EXEC_F="run.sh"
 PREFIX_F="#!/bin/bash"
@@ -26,12 +28,21 @@ GIT="git"
 
 
 # ----------
+# cases
 ONE="1"
 TWO="2"
 THREE="3"
 FOUR="4"
 FIVE="5"
+EXIT="q"
 
+# attributes
+sud=""
+mt=""
+deb=""
+tim=""
+quiet=""
+log=""
 
 # check and remove file
 check_and_rem_f() {    
@@ -61,10 +72,21 @@ check_and_make_d() {
 create_exec_file() {
     touch $SETUP_DIR$EXEC_F
     
-    chmod 777 $SETUP_DIR$EXEC_F
+    chmod +x $SETUP_DIR$EXEC_F
     
     echo $PREFIX_F > $SETUP_DIR$EXEC_F
-    echo $SETUP_DIR$NAME $quiet $log $sud $mt $deb $tim >> $SETUP_DIR$EXEC_F
+    echo $SETUP_DIR$NAME $quiet $log $sud $mt $deb $tim '$@' >> $SETUP_DIR$EXEC_F
+
+    echo "Exec file was created."
+}
+
+# create link
+create_link() {
+    check_and_rem_f "$LINK_PATH$TAG_CHECKER"
+
+    ln -s $SETUP_DIR$EXEC_F $LINK_PATH$TAG_CHECKER
+
+    echo "Link was created."
 }
 
 # run script
@@ -96,22 +118,59 @@ check_soft() {
 
 # main menu
 main_menu() {
+    echo ""
+    echo "----------------------------"
+    echo "----------------------------"
+    echo "Parameters"
+    echo "----------------------------"
+    echo "----------------------------"
+    echo ""
+    echo "Out path: $OUT_DIR"
+    echo "Setup path: $SETUP_DIR"
+    echo "attributes: "
+    if ! [ -z "$sud" ]; then
+      echo "        $sud" 
+    fi
+    if ! [ -z "$mt" ]; then
+      echo "        $mt" 
+    fi
+    if ! [ -z "$deb" ]; then
+      echo "        $deb" 
+    fi
+    if ! [ -z "$tim" ]; then
+      echo "        $tim" 
+    fi
+    if ! [ -z "$quiet" ]; then
+      echo "        $quiet" 
+    fi
+    if ! [ -z "$log" ]; then
+      echo "        $log" 
+    fi
+    echo ""
+    echo "----------------------------"
     echo "Select action"
-    echo "------"
+    echo "----------------------------"
     echo ""
     echo "[$ONE] Full install"
     echo "[$TWO] Update files"
-    echo "[3] Edit crontab"
-    echo "[4] Reset attributes"
-    echo "[5] Run from source"
+    echo "[$THREE] Edit crontab"
+    echo "[$FOUR] Reset attributes"
+    echo "[$FIVE] Run from source"
+    echo "[$EXIT] Exit from installer" 
     echo ""
 
     read action
 
     case "$action" in
-      $TWO ) edit_crontab;;
+      $TWO ) update_files;;
+      $THREE ) edit_crontab;;
+      $FOUR ) reset_attributes;;
+      $FIVE ) run_from_source;;
+      $EXIT ) exit 0;;
       * ) echo "Bad select";;
     esac
+
+    main_menu
 }
 
 # remove note from crontab
@@ -124,7 +183,7 @@ remove_from_crontab() {
 # add note to crontab
 add_to_crontab() {
     crontab -l > temp
-    echo "0 * * * * $SETUP_DIR$EXEC_F" >> temp
+    echo "0 * * * * $TAG_CHECKER $UPDATE_A" >> temp
     crontab temp
     rm temp
 }
@@ -145,16 +204,102 @@ edit_crontab() {
         remove_from_crontab
         add_to_crontab 
       ;;
-      $TWO ) 
-        remove_from_crontab
-      ;;
-      $THREE )
-        main_menu
-      ;;
+      $TWO ) remove_from_crontab;;
+      $THREE ) main_menu;;
       * ) echo "Bad select";;
     esac
 }
 
+# update files
+update_files() {
+    # prepare
+    check_and_rem_d "$SETUP_DIR"
+    check_and_make_d "$SETUP_DIR"
+    check_and_rem_d "$OUT_DIR"
+    check_and_make_d "$OUT_ORD_DIR"
+    
+    echo "Dirs was checked."
+    
+    # copy files
+    yes | cp -rf $SRC_DIR* $SETUP_DIR
+    chmod +x $SETUP_DIR*
+    
+    echo "Script files was copied."
+
+    #check_and_rem_f "$CONFIG_DIR$CONFIG_FILE"
+    cp -rfn $CUR_DIR$CONFIG_FILE $CONFIG_DIR
+    chmod 777 $CONFIG_DIR$CONFIG_FILE
+
+    echo "Config file was checked."
+
+    check_and_rem_f "$OUT_DIR$SCRIPTS_FILE"
+    cp $CUR_DIR$SRC_DIR$MISC_DIR$SCRIPTS_FILE $OUT_DIR
+    check_and_rem_f "$OUT_DIR$STYLE_FILE"
+    cp $CUR_DIR$SRC_DIR$MISC_DIR$STYLE_FILE $OUT_DIR
+
+    build_ver
+
+    echo "Files was fully updated."
+    echo ""
+}
+
+# reset attributes
+reset_attributes() {
+    read -p "Exec all shell commands by sudo (y/n)? " answ
+    case "$answ" in 
+      y|Y ) sud="-s";;
+      n|N ) ;;
+      * ) sud="-s";;
+    esac
+    
+    read -p "Run with multithreading (y/n)? " answ
+    case "$answ" in 
+      y|Y ) mt="-m";;
+      n|N ) ;;
+      * ) mt="-m";;
+    esac
+
+    read -p "Switch on debug out (y/n)? " answ
+    case "$answ" in 
+      y|Y ) deb="-d";;
+      n|N ) ;;
+      * ) deb="-d";;
+    esac
+
+    if [ -z "$deb" ]; then
+      read -p "Run timings out (y/n)? " answ
+      case "$answ" in 
+        y|Y ) tim="-t";;
+        n|N ) ;;
+        * ) tim="-t";;
+      esac
+    fi
+
+    if ! [ -z "$tim" ] || ! [ -z "$deb" ]; then
+      read -p "Move logs to stdout (y/n)? " answ
+      case "$answ" in 
+        y|Y );;
+        n|N ) quiet="-q";;
+      * ) quiet="";;
+      esac
+        
+      read -p "Move logs to file (y/n)? " answ
+      case "$answ" in 
+        y|Y ) log="-l";;
+        n|N ) ;;
+      * ) log="-l";;
+      esac
+    fi
+
+    create_exec_file
+    create_link
+}
+
+# run_from_source
+run_from_source() {
+
+    $TAG_CHECKER $log $sud $mt $deb $tim $UPDATE_A
+}
 
 # ---------------------------------
 # main
