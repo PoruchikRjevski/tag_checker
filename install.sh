@@ -121,10 +121,10 @@ main_menu() {
     echo ""
     echo "----------------------------"
     echo "----------------------------"
+    echo "Tag Checker installer"
+    echo "----------------------------"
     echo "Parameters"
     echo "----------------------------"
-    echo "----------------------------"
-    echo ""
     echo "Out path: $OUT_DIR"
     echo "Setup path: $SETUP_DIR"
     echo "attributes: "
@@ -146,7 +146,6 @@ main_menu() {
     if ! [ -z "$log" ]; then
       echo "        $log" 
     fi
-    echo ""
     echo "----------------------------"
     echo "Select action"
     echo "----------------------------"
@@ -162,15 +161,20 @@ main_menu() {
     read action
 
     case "$action" in
+      $ONE ) full_install;;
       $TWO ) update_files;;
       $THREE ) edit_crontab;;
-      $FOUR ) reset_attributes;;
+      $FOUR ) change_attributes;;
       $FIVE ) run_from_source;;
       $EXIT ) exit 0;;
       * ) echo "Bad select";;
     esac
 
     main_menu
+
+    echo ""
+    echo "----------------------------"
+    echo ""
 }
 
 # remove note from crontab
@@ -194,7 +198,7 @@ edit_crontab() {
     echo ""
     echo "[$ONE] Add to crontab"
     echo "[$TWO] Remove from crontab"
-    echo "[$THREE] Back to main"
+    echo "[$THREE] Cancel"
     echo ""
 
     read action
@@ -205,7 +209,7 @@ edit_crontab() {
         add_to_crontab 
       ;;
       $TWO ) remove_from_crontab;;
-      $THREE ) main_menu;;
+      $THREE );;
       * ) echo "Bad select";;
     esac
 }
@@ -244,7 +248,7 @@ update_files() {
 }
 
 # reset attributes
-reset_attributes() {
+change_attributes() {
     read -p "Exec all shell commands by sudo (y/n)? " answ
     case "$answ" in 
       y|Y ) sud="-s";;
@@ -297,8 +301,14 @@ reset_attributes() {
 
 # run_from_source
 run_from_source() {
+    $TAG_CHECKER $UPDATE_A
+}
 
-    $TAG_CHECKER $log $sud $mt $deb $tim $UPDATE_A
+# full install
+full_install() {
+    update_files
+    change_attributes
+    edit_crontab
 }
 
 # ---------------------------------
