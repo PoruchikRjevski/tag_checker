@@ -1,6 +1,7 @@
 #!/bin/bash
 
 CUR_DIR="./"
+LOG_DIR="/tmp/tag_checker_log/"
 LINK_PATH="/usr/local/bin/"
 SETUP_DIR="/opt/tag_checker/"
 OUT_DIR="/var/www/swver_hist/"
@@ -19,6 +20,7 @@ UPDATE_A="--update"
 TAG_CHECKER="tag_checker"
 
 EXEC_F="run.sh"
+EXEC_CT_F="run_ct.sh"
 PREFIX_F="#!/bin/bash"
 
 PYTHON="python3"
@@ -30,6 +32,7 @@ TWO="2"
 THREE="3"
 FOUR="4"
 FIVE="5"
+SIX="6"
 EXIT="q"
 
 # attributes
@@ -87,7 +90,8 @@ create_link() {
 
 #  build ver
 build_ver() {
-    commits=$($GIT rev-list --all --count)
+    branch=$($GIT rev-parse --abbrev-ref HEAD) 
+    commits=$($GIT rev-list $branch --count)
     sed -Ei "s/current_commits/$commits/g" $SETUP_DIR$VERSION_FILE
 }
 
@@ -142,30 +146,40 @@ main_menu() {
     echo "----------------------------"
     echo ""
     echo "[$ONE] Full install"
-    echo "[$TWO] Update files"
-    echo "[$THREE] Edit crontab"
-    echo "[$FOUR] Reset attributes"
-    echo "[$FIVE] Run from source"
+    echo "[$TWO] Full unninstall" 
+    echo "[$THREE] Update files"
+    echo "[$FOUR] Change parameters"
+    echo "[$FIVE] Edit crontab"
+    echo "[$SIX] Run from source"
     echo "[$EXIT] Exit from installer" 
     echo ""
 
+    ask_menu_point
+
+    echo ""
+    echo "Succesfully out from matrix"
+    echo ""
+    echo "----------------------------"
+    echo ""
+}
+
+ask_menu_point() {
+    echo ""
+    echo "Red or blue, Neo:"
     read action
 
     case "$action" in
       $ONE ) full_install;;
-      $TWO ) update_files;;
-      $THREE ) edit_crontab;;
-      $FOUR ) change_attributes;;
-      $FIVE ) run_from_source;;
+      $TWO ) full_uninstall;;
+      $THREE ) update_files;;
+      $FOUR ) change_parameters;;
+      $FIVE ) edit_crontab;;
+      $SIX ) run_from_source;;
       $EXIT ) exit 0;;
       * ) echo "Bad select";;
     esac
 
-    main_menu
-
-    echo ""
-    echo "----------------------------"
-    echo ""
+    ask_menu_point
 }
 
 # remove note from crontab
@@ -173,18 +187,24 @@ remove_from_crontab() {
     crontab -l | grep -q !"$NAME" > temp
     crontab temp
     rm temp
+
+    echo "Crontab was cleared."
 }
 
 # add note to crontab
 add_to_crontab() {
     crontab -l > temp
-    echo "0/1 * * * * $TAG_CHECKER $UPDATE_A" >> temp
+    echo "0 * * * * $SETUP_DIR$EXEC_F --update" >> temp
     crontab temp
     rm temp
+
+    echo "Note was added to crontab."
 }
 
 # edit crontab
 edit_crontab() {
+    echo ""
+    echo "----------------------------"
     echo "Edit crontab"
     echo ""
     echo "[$ONE] Add to crontab"
@@ -207,10 +227,13 @@ edit_crontab() {
 
 # update files
 update_files() {
+    echo ""
+    echo "Updating files."
+
+    delete_dirs
+
     # prepare
-    check_and_rem_d "$SETUP_DIR"
     check_and_make_d "$SETUP_DIR"
-    check_and_rem_d "$OUT_DIR"
     check_and_make_d "$OUT_ORD_DIR"
     
     echo "Dirs was checked."
@@ -227,9 +250,9 @@ update_files() {
 
     echo "Config file was checked."
 
-    check_and_rem_f "$OUT_DIR$SCRIPTS_FILE"
+    #check_and_rem_f "$OUT_DIR$SCRIPTS_FILE"
     cp $CUR_DIR$SRC_DIR$MISC_DIR$SCRIPTS_FILE $OUT_DIR
-    check_and_rem_f "$OUT_DIR$STYLE_FILE"
+    #check_and_rem_f "$OUT_DIR$STYLE_FILE"
     cp $CUR_DIR$SRC_DIR$MISC_DIR$STYLE_FILE $OUT_DIR
 
     build_ver
@@ -238,8 +261,20 @@ update_files() {
     echo ""
 }
 
+# delete files
+delete_dirs() {
+    check_and_rem_d "$SETUP_DIR"
+    check_and_rem_d "$OUT_DIR"
+    check_and_rem_d "$LOG_DIR"
+
+    echo "Setup, out and log setup dirs was deleted."
+}
+
 # reset attributes
-change_attributes() {
+change_parameters() {
+    echo ""
+    echo "Changing parameters."
+
     read -p "Exec all shell commands by sudo (y/n)? " answ
     case "$answ" in 
       y|Y ) sud="-s";;
@@ -286,22 +321,64 @@ change_attributes() {
       esac
     fi
 
+    echo "New parameters was accepted."
+
     create_exec_file
     create_link
 }
 
 # run_from_source
 run_from_source() {
-    change_attributes
+    echo ""
+    echo "Running from source."
+    change_parameters
 
     $CUR_DIR$SRC_DIR$NAME $quiet $log $sud $mt $deb $tim $UPDATE_A
+
+    echo "Script from source was run."
 }
 
 # full install
 full_install() {
+    echo ""
+    echo "Full installing."
+
     update_files
-    change_attributes
+    change_parameters
     edit_crontab
+
+    echo ""
+    read -p "Run installed script now (y/n)? " answ
+    case "$answ" in 
+      y|Y ) run_now;;
+      n|N );;
+      * ) ;;
+    esac
+}
+
+# full uninstall
+full_uninstall() {
+    echo ""
+    echo "Full uninstalling."
+
+    delete_dirs
+
+    check_and_rem_f "$CONFIG_DIR$CONFIG_FILE"
+    check_and_rem_f "$LINK_PATH$TAG_CHECKER"
+
+    echo "Config file and link was deleted."
+
+    remove_from_crontab
+}
+
+# run installed now
+run_now() {
+    echo ""
+    echo "Running installed script."
+
+    $TAG_CHECKER $UPDATE_A
+
+    echo "Installed script was run."
 }
 
 # ---------------------------------
