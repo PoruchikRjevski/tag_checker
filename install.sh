@@ -24,10 +24,6 @@ PREFIX_F="#!/bin/bash"
 PYTHON="python3"
 GIT="git"
 
-
-
-
-# ----------
 # cases
 ONE="1"
 TWO="2"
@@ -87,11 +83,6 @@ create_link() {
     ln -s $SETUP_DIR$EXEC_F $LINK_PATH$TAG_CHECKER
 
     echo "Link was created."
-}
-
-# run script
-run_now() {
-    $SETUP_DIR$NAME $log $sud $mt $deb $tim
 }
 
 #  build ver
@@ -301,7 +292,9 @@ change_attributes() {
 
 # run_from_source
 run_from_source() {
-    $TAG_CHECKER $UPDATE_A
+    change_attributes
+
+    $CUR_DIR$SRC_DIR$NAME $quiet $log $sud $mt $deb $tim $UPDATE_A
 }
 
 # full install

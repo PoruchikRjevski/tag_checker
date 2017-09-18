@@ -25,26 +25,26 @@ def set_options(parser):
     parser.add_option("--show",
                       action="store_true", dest="show",
                       default=False,
-                      help="show command, uses with arg: [dep] or without")
+                      help="show command, uses with '--dep [dep_name]' or alone")
 
     parser.add_option("--pref",
                       action="store_true", dest="prefix",
                       default=False,
-                      help="change or set prefix command, uses with arg: [dep]")
+                      help="set or change department repo's prefix command, uses with arg: [dep_name] [prefix]")
 
     parser.add_option("--add",
                       action="store_true", dest="add",
                       default=False,
-                      help="add command, uses with --repo or --tr")
+                      help="add smth command, uses with --repo, --tran or --dep")
     parser.add_option("--rem",
                       action="store_true", dest="remove",
                       default=False,
-                      help="remove command, uses with --repo or --tr")
+                      help="remove smth command, uses with --repo, --tran or --dep")
 
     parser.add_option("--repo",
                       action="store_true", dest="repo",
                       default=False,
-                      help="repo command, uses with --add or --rem and args: [dep] pref:repo_path")
+                      help="repo command, uses with --add or --rem and args: [dep] [repo_name]")
     parser.add_option("--dep",
                       action="store_true", dest="dep",
                       default=False,
