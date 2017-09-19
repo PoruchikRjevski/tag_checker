@@ -11,8 +11,10 @@ Installing:
 - cd device_tag_visualiser/
 - git checkout develop
 - sudo ./install.sh
-- edit /etc/tag_checker.ini for set repo's and /etc/tag_checker_translate for set device's names translate
-- if need - change in install.sh cron timeout update(every hour at 0 minute - default)
+- two ways to edit config:
+    - edit tag_checker.ini manually(example in config.example/)
+    - edit by script controls(for help exec tag_checker -h)
+- all actions you can find in menu install.sh
 
 #### DEVELOPER INFO ####
 Main parts:
@@ -25,7 +27,6 @@ Main parts:
     - agregate all info about tags, repos, commits etc
 - checker(GitMan)
     - got throw repos, update, get tags, parce it's put info to model
- # TODO : rewrite html_gen(api for more flexibility)
 - web configurator(WebGen)
     - create web page's:
         - main - last changes for all departments, devices and types(ITEM, ORDER, ALL)
