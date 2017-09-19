@@ -33,15 +33,8 @@ THREE="3"
 FOUR="4"
 FIVE="5"
 SIX="6"
+MENU="m"
 EXIT="q"
-
-# attributes
-sud=""
-mt=""
-deb=""
-tim=""
-quiet=""
-log=""
 
 # check and remove file
 check_and_rem_f() {    
@@ -111,8 +104,8 @@ check_soft() {
     fi
 }
 
-# main menu
-main_menu() {
+# show main menu
+show_main_menu() {
     echo ""
     echo "----------------------------"
     echo "----------------------------"
@@ -151,9 +144,14 @@ main_menu() {
     echo "[$FOUR] Change parameters"
     echo "[$FIVE] Edit crontab"
     echo "[$SIX] Run from source"
+    echo "[$MENU] Show menu"
     echo "[$EXIT] Exit from installer" 
     echo ""
+}
 
+# main menu
+main_menu() {
+    show_main_menu
     ask_menu_point
 
     echo ""
@@ -165,8 +163,7 @@ main_menu() {
 
 ask_menu_point() {
     echo ""
-    echo "Red or blue, Neo:"
-    read action
+    read -p "Red or blue, Neo:" action
 
     case "$action" in
       $ONE ) full_install;;
@@ -175,6 +172,7 @@ ask_menu_point() {
       $FOUR ) change_parameters;;
       $FIVE ) edit_crontab;;
       $SIX ) run_from_source;;
+      $MENU ) show_main_menu;;
       $EXIT ) exit 0;;
       * ) echo "Bad select";;
     esac
@@ -204,8 +202,9 @@ add_to_crontab() {
 # edit crontab
 edit_crontab() {
     echo ""
-    echo "----------------------------"
+    echo "--------------"
     echo "Edit crontab"
+    echo "--------------"
     echo ""
     echo "[$ONE] Add to crontab"
     echo "[$TWO] Remove from crontab"
@@ -228,7 +227,9 @@ edit_crontab() {
 # update files
 update_files() {
     echo ""
+    echo "--------------"
     echo "Updating files."
+    echo "--------------"
 
     delete_dirs
 
@@ -267,13 +268,15 @@ delete_dirs() {
     check_and_rem_d "$OUT_DIR"
     check_and_rem_d "$LOG_DIR"
 
-    echo "Setup, out and log setup dirs was deleted."
+    echo "Setup, out and log dirs was deleted."
 }
 
 # reset attributes
 change_parameters() {
     echo ""
+    echo "--------------"
     echo "Changing parameters."
+    echo "--------------"
 
     read -p "Exec all shell commands by sudo (y/n)? " answ
     case "$answ" in 
@@ -330,7 +333,10 @@ change_parameters() {
 # run_from_source
 run_from_source() {
     echo ""
+    echo "--------------"
     echo "Running from source."
+    echo "--------------"
+
     change_parameters
 
     $CUR_DIR$SRC_DIR$NAME $quiet $log $sud $mt $deb $tim $UPDATE_A
@@ -341,7 +347,9 @@ run_from_source() {
 # full install
 full_install() {
     echo ""
+    echo "--------------"
     echo "Full installing."
+    echo "--------------"
 
     update_files
     change_parameters
@@ -359,7 +367,9 @@ full_install() {
 # full uninstall
 full_uninstall() {
     echo ""
+    echo "--------------"
     echo "Full uninstalling."
+    echo "--------------"
 
     delete_dirs
 
@@ -374,7 +384,9 @@ full_uninstall() {
 # run installed now
 run_now() {
     echo ""
+    echo "--------------"
     echo "Running installed script."
+    echo "--------------"
 
     $TAG_CHECKER $UPDATE_A
 

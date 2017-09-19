@@ -273,7 +273,6 @@ class GitMan:
 
             date = self.__get_commit_date_by_short_hash(item.cm_hash)
             (sh_date, full_date) = self.__repair_commit_date(date)
-            print("cm date: ", sh_date, full_date)
             item.cm_date = sh_date
             item.cm_date_full = full_date
             if g_v.DEBUG: out_log("item commit date: {:s}".format(item.cm_date))
