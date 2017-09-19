@@ -169,16 +169,15 @@ class CfgLoader:
         if self.__cfg.has_option(c_d.BLOCK_TRAN, c_d.SECT_PAIRS):
             pairs = self.__cfg[c_d.BLOCK_TRAN][c_d.SECT_PAIRS]
 
-        if name not in pairs:
-            self.__cfg[c_d.BLOCK_TRAN][c_d.SECT_PAIRS] = pairs + "{:s}:{:s}|".format(name, tr_name)
-        else:
+        tr_dict = {}
+        if pairs:
             tr_dict = dict(item.split(":") for item in pairs.split("|") if item)
 
-            tr_dict[name] = tr_name
+        tr_dict[name] = tr_name
 
-            pairs = "|".join("{:s}:{:s}".format(key, value) for key, value in tr_dict.items())
+        pairs = "|".join("{:s}:{:s}".format(key, value) for key, value in tr_dict.items())
 
-            self.__cfg[c_d.BLOCK_TRAN][c_d.SECT_PAIRS] = pairs
+        self.__cfg[c_d.BLOCK_TRAN][c_d.SECT_PAIRS] = pairs
 
         self.__write_cfg()
 
