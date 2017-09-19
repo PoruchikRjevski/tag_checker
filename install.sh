@@ -84,15 +84,10 @@ create_link() {
 
 #  build ver
 build_ver() {
-    branch=$($GIT rev-parse --abbrev-ref HEAD) 
-    echo $branch
+    branch=$($GIT rev-parse --abbrev-ref HEAD)
     commits=$($GIT rev-list $branch --count)
-    echo $commits
     sed -Ei "s/current_commits/$commits/g" $SETUP_DIR$VERSION_FILE
-    echo "1"
-    #sed -i -e "s/beta/${branch}/g" $SETUP_DIR$VERSION_FILE
     sed -i "s@beta@$branch@" $SETUP_DIR$VERSION_FILE
-    echo "2"
 }
 
 # check soft installed

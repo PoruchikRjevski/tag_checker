@@ -181,10 +181,6 @@ def main():
 
     git_man = GitMan()
 
-    # check script ver and branch
-    git_man.try_get_build_ver()
-    git_man.try_get_branch_name()
-
     # create model
     tag_model = TagModel()
 

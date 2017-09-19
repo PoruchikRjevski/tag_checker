@@ -11,6 +11,7 @@ CURRENT         = "current_commits"
 # - add control for add or remove repo and tr from config
 # - rewrite installer
 # - add commit date in link to FTP
+# - fix storing translate pairs in config file
 
 
 # 1.3.xx - 166 to 192

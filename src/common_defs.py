@@ -115,8 +115,9 @@ E_BAD_ARGS          = "Bad arguments"
 # CFG LOADER --------------------------------------------------------
 BLOCK_CONFIG        = "CONFIG"
 BLOCK_TRAN          = "TRANSLATE"
-SECT_REPOS               = "repos"
-SECT_PREFIX              = "prefix"
+SECT_REPOS          = "repos"
+SECT_PREFIX         = "prefix"
+SECT_PAIRS          = "pairs"
 OUT_P               = "out"
 
 CFG_F_NAME          = "tag_checker.ini"

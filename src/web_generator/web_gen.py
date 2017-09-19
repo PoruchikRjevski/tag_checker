@@ -54,6 +54,16 @@ class WebGenerator:
         gen.w_o_tag(h_d.T_HTML, "", True)
         gen.w_o_tag(h_d.T_HEAD, "", True)
         gen.w_o_tag(h_d.T_META, h_d.A_CHARSET.format(c_d.DOC_CODE), True)
+        gen.w_o_tag(h_d.T_META,
+                    h_d.A_HTTP_EQUIV.format(h_d.A_HE_CACHE_CONTR)
+                    + h_d.A_CONTENT.format(h_d.A_C_NO_CACHE + ", "
+                                         + h_d.A_C_NO_STORE + ", "
+                                         + h_d.A_C_MUST_REVAL),
+                    True)
+        gen.w_o_tag(h_d.T_META,
+                    h_d.A_HTTP_EQUIV.format(h_d.A_HE_PRAGMA)
+                    + h_d.A_CONTENT.format(h_d.A_C_NO_CACHE),
+                    True)
         gen.w_o_tag(h_d.T_LINK,
                     h_d.A_REL.format(h_d.A_REL_SS)
                     + h_d.A_HREF.format(level + c_d.STYLE_F_NAME), True)
@@ -106,7 +116,7 @@ class WebGenerator:
                   c_d.CR_TXT,
                   h_d.A_CLASS.format(c_d.CL_FOOT_INFO))
         gen.w_tag(h_d.T_P,
-                  c_d.VER_TXT.format(v.V_MAJ, v.V_MIN, str(int(v.V_BUILD) - int(v.LAST)), v.V_BUILD, v.V_STAT),
+                  c_d.VER_TXT.format(v.V_MAJ, v.V_MIN, str(int(v.V_BUILD) - int(v.LAST)), v.V_BUILD, "b:{:s}".format(v.V_STAT)),
                   h_d.A_CLASS.format(c_d.CL_FOOT_INFO))
 
         gen.w_c_tag(h_d.T_DIV)

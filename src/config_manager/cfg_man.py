@@ -160,23 +160,44 @@ class CfgLoader:
         if not self.__cfg.has_section(c_d.BLOCK_TRAN):
             self.__cfg[c_d.BLOCK_TRAN] = {}
 
-        self.__cfg[c_d.BLOCK_TRAN][name] = tr_name
+        pairs = ""
+        if self.__cfg.has_option(c_d.BLOCK_TRAN, c_d.SECT_PAIRS):
+            pairs = self.__cfg[c_d.BLOCK_TRAN][c_d.SECT_PAIRS]
+
+        if name not in pairs:
+            self.__cfg[c_d.BLOCK_TRAN][c_d.SECT_PAIRS] = pairs + "{:s}:{:s}|".format(name, tr_name)
+        else:
+            tr_dict = dict(item.split(":") for item in pairs.split("|") if item)
+
+            tr_dict[name] = tr_name
+
+            pairs = "|".join("{:s}:{:s}".format(key, value) for key, value in tr_dict.items())
+
+            self.__cfg[c_d.BLOCK_TRAN][c_d.SECT_PAIRS] = pairs
 
         self.__write_cfg()
 
     def rem_translate(self, translates):
         if self.__cfg.has_section(c_d.BLOCK_TRAN):
-            if isinstance(translates, list):
-                for tr in translates:
-                    if tr in self.__cfg[c_d.BLOCK_TRAN].keys():
-                        del self.__cfg[c_d.BLOCK_TRAN][tr]
-            else:
-                del self.__cfg[c_d.BLOCK_TRAN][translates]
+            if self.__cfg.has_option(c_d.BLOCK_TRAN, c_d.SECT_PAIRS):
+                pairs = self.__cfg[c_d.BLOCK_TRAN][c_d.SECT_PAIRS]
+                tr_dict = dict(item.split(":") for item in pairs.split("|") if item)
 
-            if not self.__cfg[c_d.BLOCK_TRAN]:
-                del self.__cfg[c_d.BLOCK_TRAN]
+                if isinstance(translates, list):
+                    for tr in translates:
+                        if tr in tr_dict.keys():
+                            del tr_dict[tr]
+                else:
+                    del tr_dict[translates]
 
-            self.__write_cfg()
+                if not tr_dict:
+                    del self.__cfg[c_d.BLOCK_TRAN]
+
+                pairs = "|".join("{:s}:{:s}".format(key, value) for key, value in tr_dict.items())
+
+                self.__cfg[c_d.BLOCK_TRAN][c_d.SECT_PAIRS] = pairs
+
+                self.__write_cfg()
 
     def add_department(self, departments):
         if isinstance(departments, list):
