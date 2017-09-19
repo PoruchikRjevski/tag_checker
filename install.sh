@@ -33,6 +33,7 @@ THREE="3"
 FOUR="4"
 FIVE="5"
 SIX="6"
+SEV="7"
 MENU="m"
 EXIT="q"
 
@@ -84,10 +85,15 @@ create_link() {
 #  build ver
 build_ver() {
     branch=$($GIT rev-parse --abbrev-ref HEAD) 
+    echo $branch
     commits=$($GIT rev-list $branch --count)
+    echo $commits
     sed -Ei "s/current_commits/$commits/g" $SETUP_DIR$VERSION_FILE
+    echo "1"
+    #sed -i -e "s/beta/${branch}/g" $SETUP_DIR$VERSION_FILE
+    sed -i "s@beta@$branch@" $SETUP_DIR$VERSION_FILE
+    echo "2"
 }
-
 
 # check soft installed
 check_soft() {
@@ -144,6 +150,7 @@ show_main_menu() {
     echo "[$FOUR] Change parameters"
     echo "[$FIVE] Edit crontab"
     echo "[$SIX] Run from source"
+    echo "[$SEV] Run from installed"
     echo "[$MENU] Show menu"
     echo "[$EXIT] Exit from installer" 
     echo ""
@@ -172,6 +179,7 @@ ask_menu_point() {
       $FOUR ) change_parameters;;
       $FIVE ) edit_crontab;;
       $SIX ) run_from_source;;
+      $SEV ) run_now;;
       $MENU ) show_main_menu;;
       $EXIT ) exit 0;;
       * ) echo "Bad select";;
@@ -231,11 +239,10 @@ update_files() {
     echo "Updating files."
     echo "--------------"
 
-    delete_dirs
+    check_and_rem_d "$SETUP_DIR"
 
     # prepare
     check_and_make_d "$SETUP_DIR"
-    check_and_make_d "$OUT_ORD_DIR"
     
     echo "Dirs was checked."
     
@@ -257,6 +264,8 @@ update_files() {
     cp $CUR_DIR$SRC_DIR$MISC_DIR$STYLE_FILE $OUT_DIR
 
     build_ver
+    create_exec_file
+    create_link
 
     echo "Files was fully updated."
     echo ""

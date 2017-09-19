@@ -436,3 +436,15 @@ class GitMan:
             out_log("change build version: {:s}".format(out))
 
         return
+
+    def try_get_branch_name(self):
+        cmd = g_d.GIT_CMD.format(g_d.A_REV_PARSE
+                                 + g_d.A_ABBREV.format(g_d.A_RP_REF)
+                                 + g_d.REV_HEAD)
+
+        out = run_cmd(cmd)
+
+        if out:
+            s_v.V_STAT = str(out)
+
+        return
