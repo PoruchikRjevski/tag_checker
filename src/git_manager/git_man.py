@@ -271,7 +271,10 @@ class GitMan:
             item.cm_hash = self.__get_short_hash(tag)
             if g_v.DEBUG: out_log("item short hash: {:s}".format(item.cm_hash))
 
-            item.cm_date = self.__repair_commit_date(self.__get_commit_date_by_short_hash(item.cm_hash))
+            date = self.__get_commit_date_by_short_hash(item.cm_hash)
+            (sh_date, full_date) = self.__repair_commit_date(date)
+            item.cm_date = sh_date
+            item.cm_date_full = full_date
             if g_v.DEBUG: out_log("item commit date: {:s}".format(item.cm_date))
 
             item.cm_auth = self.__get_commit_author_by_short_hash(item.cm_hash)
@@ -295,7 +298,7 @@ class GitMan:
         stop(gen_t)
 
         if res_flag:
-            if g_v.TIM_OUT: out_log("gen item time: {:s}".format(get_pass_time(gen_t)))
+            if g_v.TIMEOUTS: out_log("gen item time: {:s}".format(get_pass_time(gen_t)))
             return (res_flag, item)
         else:
             return (res_flag, None)
@@ -349,16 +352,21 @@ class GitMan:
         date_temp = date.split(" ")
         time_temp = date_temp[1].split(":")
 
-        res = ""
+        sh_res = ""
 
         try:
-            res = "{:s} {:s}:{:s}".format(date_temp[0],
-                                          time_temp[0],
-                                          time_temp[1])
+            sh_res = "{:s} {:s}:{:s}".format(date_temp[0],
+                                             time_temp[0],
+                                             time_temp[1])
+
+            full_res = "{:s}-{:s}{:s}{:s}".format(date_temp[0],
+                                                    time_temp[0],
+                                                    time_temp[1],
+                                                    time_temp[2])
         except Exception:
             out_err("Bad date: {:s}".format(date))
 
-        return res
+        return (sh_res, full_res)
 
     def __do_work(self, tags_list):
         items_out = []
@@ -376,15 +384,6 @@ class GitMan:
             items_out = self.__gen_notes_by_tag_list(tags_list)
 
         return items_out
-
-    @property
-    def check_git_installed(self):
-        out = run_cmd(g_d.GIT_CMD.format(g_d.A_VERSION))
-
-        if c_d.GIT_VER in str(out):
-            return True
-
-        return False
 
     def scanning(self, model):
         if g_v.DEBUG: out_log("start scanning")
@@ -420,20 +419,3 @@ class GitMan:
                                 dep_obj.devices.append(item.dev_name)
 
         if g_v.DEBUG: out_log("stop scanning")
-
-    def try_get_build_ver(self):
-        cmd = g_d.GIT_CMD.format(g_d.A_REV_LIST
-                                 + g_d.A_ALL
-                                 + g_d.A_COUNT)
-
-        out = run_cmd(cmd)
-
-        try:
-            out_int = int(out)
-        except ValueError:
-            s_v.V_BUILD = s_v.CURRENT
-        else:
-            s_v.V_BUILD = out
-            out_log("change build version: {:s}".format(out))
-
-        return

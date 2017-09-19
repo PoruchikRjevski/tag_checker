@@ -39,7 +39,8 @@ A_COLSPAN           = " colspan=\"{:s}\""
 A_ROWSPAN           = " rowspan=\"{:s}\""
 A_TITLE             = " title=\"{:s}\""
 A_TARGET            = " target=\"{:s}\""
-
+A_HTTP_EQUIV        = " http-equiv=\"{:s}\""
+A_CONTENT           = " content=\"{:s}\""
 
 # params
 A_REL_SS            = "stylesheet"
@@ -52,7 +53,13 @@ A_ST_POS            = "position:{:s};"
 
 A_T_JS              = "text/javascript"
 
-A_TAR_BLANK         = "_blank"
+A_TARGET_BLANK      = "_blank"
+
+A_HE_CACHE_CONTR    = "Cache-control"
+A_HE_PRAGMA         = "Pragma"
+A_C_NO_CACHE        = "no-cache"
+A_C_NO_STORE        = "no-store"
+A_C_MUST_REVAL      = "must-revalidate"
 
 
 A_BGCOLOR           = "bgcolor=\"{0!s}\""

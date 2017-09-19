@@ -105,15 +105,19 @@ T_ORDER_TXT         = "Заказ&nbsp;№&nbsp;"
 EXIT_NORMAL         = 0                                         # all ok
 EXIT_GNT            = 1                                         # git not installed
 EXIT_WA             = 2                                         # wron arguments
+EXIT_WO             = 3                                         # wrong options
 EXIT_CFNE           = 4                                         # config file does not exist
 
 E_GNT_STR           = "Git not installed"
 E_CFNE_STR          = "Config file does not exist"
+E_BAD_ARGS          = "Bad arguments"
 
 # CFG LOADER --------------------------------------------------------
-CONFIG              = "CONFIG"
-REPOS               = "repos"
-PREFIX              = "prefix"
+BLOCK_CONFIG        = "CONFIG"
+BLOCK_TRAN          = "TRANSLATE"
+SECT_REPOS          = "repos"
+SECT_PREFIX         = "prefix"
+SECT_PAIRS          = "pairs"
 OUT_P               = "out"
 
 CFG_F_NAME          = "tag_checker.ini"
