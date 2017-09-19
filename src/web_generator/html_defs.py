@@ -52,7 +52,7 @@ A_ST_POS            = "position:{:s};"
 
 A_T_JS              = "text/javascript"
 
-A_TAR_BLANK         = "_blank"
+A_TARGET_BLANK         = "_blank"
 
 
 A_BGCOLOR           = "bgcolor=\"{0!s}\""

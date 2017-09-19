@@ -154,6 +154,7 @@ class Item:
         self.tag_date = ""
         self.cm_hash = ""
         self.cm_date = ""
+        self.cm_date_full = ""
         self.cm_msg = ""
         self.cm_auth = ""
         self.p_hash = ""

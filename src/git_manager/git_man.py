@@ -271,7 +271,11 @@ class GitMan:
             item.cm_hash = self.__get_short_hash(tag)
             if g_v.DEBUG: out_log("item short hash: {:s}".format(item.cm_hash))
 
-            item.cm_date = self.__repair_commit_date(self.__get_commit_date_by_short_hash(item.cm_hash))
+            date = self.__get_commit_date_by_short_hash(item.cm_hash)
+            (sh_date, full_date) = self.__repair_commit_date(date)
+            print("cm date: ", sh_date, full_date)
+            item.cm_date = sh_date
+            item.cm_date_full = full_date
             if g_v.DEBUG: out_log("item commit date: {:s}".format(item.cm_date))
 
             item.cm_auth = self.__get_commit_author_by_short_hash(item.cm_hash)
@@ -349,16 +353,21 @@ class GitMan:
         date_temp = date.split(" ")
         time_temp = date_temp[1].split(":")
 
-        res = ""
+        sh_res = ""
 
         try:
-            res = "{:s} {:s}:{:s}".format(date_temp[0],
-                                          time_temp[0],
-                                          time_temp[1])
+            sh_res = "{:s} {:s}:{:s}".format(date_temp[0],
+                                             time_temp[0],
+                                             time_temp[1])
+
+            full_res = "{:s}-{:s}{:s}{:s}".format(date_temp[0],
+                                                    time_temp[0],
+                                                    time_temp[1],
+                                                    time_temp[2])
         except Exception:
             out_err("Bad date: {:s}".format(date))
 
-        return res
+        return (sh_res, full_res)
 
     def __do_work(self, tags_list):
         items_out = []

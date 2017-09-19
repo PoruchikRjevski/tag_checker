@@ -444,9 +444,11 @@ class WebGenerator:
 
         if item.item_type is c_d.TYPE_ALL:
             ftp_link_c = (c_d.REDIST_TXT,
-                          c_d.LINK_TO_FTP.format(item.dev_name, item.cm_hash),
+                          c_d.LINK_TO_FTP.format(item.dev_name,
+                                                 "{:s}.{:s}".format(item.cm_date_full,
+                                                                    item.cm_hash)),
                           h_d.A_TITLE.format(c_d.LINK_FTP_TXT)
-                          + h_d.A_TARGET.format(h_d.A_TAR_BLANK))
+                          + h_d.A_TARGET.format(h_d.A_TARGET_BLANK))
             links_list.append(ftp_link_c)
 
         self.__gen_tag_commit_version(file,
