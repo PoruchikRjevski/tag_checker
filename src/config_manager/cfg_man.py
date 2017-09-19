@@ -35,8 +35,13 @@ class CfgLoader:
             g_v.OUT_PATH = self.__cfg.get(block, c_d.OUT_P)
 
     def __load_translate_block(self, block, model):
-        for name in self.__cfg[block]:
-            model.tr_dev_names[name] = self.__cfg.get(block, name)
+        if self.__cfg.has_option(block, c_d.SECT_PAIRS):
+            pairs = self.__cfg.get(block, c_d.SECT_PAIRS)
+            tr_dict = dict(item.split(":") for item in pairs.split("|") if item)
+
+            model.tr_dev_names.update(tr_dict)
+        # for name in self.__cfg[block]:
+        #     model.tr_dev_names[name] = self.__cfg.get(block, name)
 
     def __add_department(self, block, model):
         prefix = ""

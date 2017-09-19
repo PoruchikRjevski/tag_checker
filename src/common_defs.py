@@ -121,7 +121,6 @@ SECT_PAIRS          = "pairs"
 OUT_P               = "out"
 
 CFG_F_NAME          = "tag_checker.ini"
-TR_F_NAME           = "tag_checker_translate"
 
 # LOGGER
 LOG_T               = "LOG"

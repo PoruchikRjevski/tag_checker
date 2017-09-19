@@ -181,6 +181,9 @@ def main():
 
     git_man = GitMan()
 
+    # get build version
+    git_man.try_get_build_ver()
+
     # create model
     tag_model = TagModel()
 

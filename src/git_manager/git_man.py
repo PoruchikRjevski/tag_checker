@@ -419,3 +419,20 @@ class GitMan:
                                 dep_obj.devices.append(item.dev_name)
 
         if g_v.DEBUG: out_log("stop scanning")
+
+    def try_get_build_ver(self):
+        cmd = g_d.GIT_CMD.format(g_d.A_REV_LIST
+                                 + g_d.A_ALL
+                                 + g_d.A_COUNT)
+
+        out = run_cmd(cmd)
+
+        try:
+            out_int = int(out)
+        except ValueError:
+            s_v.V_BUILD = s_v.CURRENT
+        else:
+            s_v.V_BUILD = out
+            out_log("change build version: {:s}".format(out))
+
+        return

@@ -140,7 +140,7 @@ show_main_menu() {
     echo "----------------------------"
     echo ""
     echo "[$ONE] Full install"
-    echo "[$TWO] Full unninstall" 
+    echo "[$TWO] Full uninstall" 
     echo "[$THREE] Update files"
     echo "[$FOUR] Change parameters"
     echo "[$FIVE] Edit crontab"
@@ -170,7 +170,11 @@ ask_menu_point() {
     case "$action" in
       $ONE ) full_install;;
       $TWO ) full_uninstall;;
-      $THREE ) update_files;;
+      $THREE ) 
+        check_and_rem_d "$SETUP_DIR"
+        check_and_make_d "$SETUP_DIR"
+        update_files
+        ;;
       $FOUR ) change_parameters;;
       $FIVE ) edit_crontab;;
       $SIX ) run_from_source;;
@@ -233,17 +237,11 @@ update_files() {
     echo "--------------"
     echo "Updating files."
     echo "--------------"
-
-    check_and_rem_d "$SETUP_DIR"
-
-    # prepare
-    check_and_make_d "$SETUP_DIR"
     
     echo "Dirs was checked."
     
     # copy files
     yes | cp -rf $SRC_DIR* $SETUP_DIR
-    chmod +x $SETUP_DIR*
     
     echo "Script files was copied."
 
@@ -266,13 +264,27 @@ update_files() {
     echo ""
 }
 
-# delete files
+# delete dirs
 delete_dirs() {
     check_and_rem_d "$SETUP_DIR"
     check_and_rem_d "$OUT_DIR"
     check_and_rem_d "$LOG_DIR"
 
-    echo "Setup, out and log dirs was deleted."
+    echo "SETUP, OUT and LOG dirs was deleted."
+}
+
+# create dirs
+create_dirs() {
+    check_and_make_d "$SETUP_DIR"
+    chmod +x $SETUP_DIR*
+
+    check_and_make_d "$OUT_ORD_DIR"
+    chmod +x $OUT_ORD_DIR*
+
+    check_and_make_d "$LOG_DIR"
+    chmod +x $LOG_DIR*
+
+    echo "SETUP, OUT and LOG dirs was created."
 }
 
 # reset attributes
@@ -354,6 +366,8 @@ full_install() {
     echo "--------------"
     echo "Full installing."
     echo "--------------"
+
+    create_dirs
 
     update_files
     change_parameters
