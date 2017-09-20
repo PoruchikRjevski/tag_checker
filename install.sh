@@ -27,21 +27,67 @@ PYTHON="python3"
 GIT="git"
 
 # cases
-ONE="1"
-TWO="2"
-THREE="3"
-FOUR="4"
-FIVE="5"
-SIX="6"
-SEV="7"
-MENU="m"
-EXIT="q"
+ONE=1
+TWO=2
+THREE=3
+FOUR=4
+FIVE=5
+SIX=6
+SEV=7
+EIGHT=8
+NINE=9
+
+# parameters
+def_ar=("" "" "" "" "" "")
+sw_on="on"
+sw_off="off"
+
+sud="-s"
+mt="-m"
+deb="-d"
+tim="-t"
+quiet="-q"
+log="-l"
+
+setted_params=("${def_ar[@]}")
+setted_params_sw=("${def_ar[@]}")
+
+# dialogs
+dialog=(dialog)
+
+wnd_sz="20 50"
+wnd_sz_f="20 50 9"
+
+main_menu_dlg=(--clear \
+               --title "Tag Checker Installer" \
+               --menu "Main menu" $wnd_sz_f)
+
+change_params_dlg=(--clear \
+                   --title "Change parameters" \
+                   --checklist "Run parameters" $wnd_sz_f)
+
+progress_dlg=(--clear \
+              --gauge "Processing" $wnd_sz)
+full_inst_title=(--title "Full install")
+full_uninst_title=(--title "Full uninstall")
+after_change_pararms_title=(--title "Create files")
+create_dirs_title=(--title "Create dirs")
+
+m_m_opts=(1 "Full install"
+          2 "Full uninstall"
+          3 "Update files"
+          4 "Change parameters"
+          5 "Edit crontab"
+          6 "Run from source"
+          7 "Run from installed"
+          8 "Show menu"
+          9 "Exit from installer")    
 
 # check and remove file
 check_and_rem_f() {    
     if [ -f "$1" ] 
     then
-        rm -f $1
+        rm -f $1 > /dev/null 2>&1 &
     fi
 }
 
@@ -49,7 +95,7 @@ check_and_rem_f() {
 check_and_rem_d() {    
     if [ -d "$1" ] 
     then
-        rm -rf $1
+        rm -rf $1 > /dev/null 2>&1 &
     fi
 }
 
@@ -57,37 +103,33 @@ check_and_rem_d() {
 check_and_make_d() {
     if [ ! -d "$1" ] 
     then
-        mkdir -p $1
+        mkdir -p $ > /dev/null 2>&1 &
     fi
 }
 
 # create executable file
 create_exec_file() {
-    touch $SETUP_DIR$EXEC_F
+    touch $SETUP_DIR$EXEC_F > /dev/null 2>&1 &
     
-    chmod +x $SETUP_DIR$EXEC_F
+    chmod +x $SETUP_DIR$EXEC_F > /dev/null 2>&1 &
     
     echo $PREFIX_F > $SETUP_DIR$EXEC_F
     echo $SETUP_DIR$NAME $quiet $log $sud $mt $deb $tim '$@' >> $SETUP_DIR$EXEC_F
-
-    echo "Exec file was created."
 }
 
 # create link
 create_link() {
     check_and_rem_f "$LINK_PATH$TAG_CHECKER"
 
-    ln -s $SETUP_DIR$EXEC_F $LINK_PATH$TAG_CHECKER
-
-    echo "Link was created."
+    ln -s $SETUP_DIR$EXEC_F $LINK_PATH$TAG_CHECKER > /dev/null 2>&1 &
 }
 
 #  build ver
 build_ver() {
-    branch=$($GIT rev-parse --abbrev-ref HEAD)
-    commits=$($GIT rev-list $branch --count)
-    last_author=$($GIT log -1 --pretty=format:"%an")
-    last_hash=$($GIT log -1 --pretty=format:"%h")
+    branch=$($GIT rev-parse --abbrev-ref HEAD) > /dev/null 2>&1 &
+    commits=$($GIT rev-list $branch --count) > /dev/null 2>&1 &
+    last_author=$($GIT log -1 --pretty=format:"%an") > /dev/null 2>&1 &
+    last_hash=$($GIT log -1 --pretty=format:"%h") > /dev/null 2>&1 &
 
     sed -Ei "s/current_commits/$commits/g" $SETUP_DIR$VERSION_FILE
     sed -i "s@beta@$branch@" $SETUP_DIR$VERSION_FILE
@@ -110,86 +152,50 @@ check_soft() {
     fi
 }
 
-# show main menu
-show_main_menu() {
-    echo ""
-    echo "----------------------------"
-    echo "----------------------------"
-    echo "Tag Checker installer"
-    echo "----------------------------"
-    echo "Parameters"
-    echo "----------------------------"
-    echo "Out path: $OUT_DIR"
-    echo "Setup path: $SETUP_DIR"
-    echo "attributes: "
-    if ! [ -z "$sud" ]; then
-      echo "        $sud" 
-    fi
-    if ! [ -z "$mt" ]; then
-      echo "        $mt" 
-    fi
-    if ! [ -z "$deb" ]; then
-      echo "        $deb" 
-    fi
-    if ! [ -z "$tim" ]; then
-      echo "        $tim" 
-    fi
-    if ! [ -z "$quiet" ]; then
-      echo "        $quiet" 
-    fi
-    if ! [ -z "$log" ]; then
-      echo "        $log" 
-    fi
-    echo "----------------------------"
-    echo "Select action"
-    echo "----------------------------"
-    echo ""
-    echo "[$ONE] Full install"
-    echo "[$TWO] Full uninstall" 
-    echo "[$THREE] Update files"
-    echo "[$FOUR] Change parameters"
-    echo "[$FIVE] Edit crontab"
-    echo "[$SIX] Run from source"
-    echo "[$SEV] Run from installed"
-    echo "[$MENU] Show menu"
-    echo "[$EXIT] Exit from installer" 
-    echo ""
-}
-
 # main menu
 main_menu() {
-    show_main_menu
-    ask_menu_point
+    clear
+    choise=$("${dialog[@]}" "${main_menu_dlg[@]}" "${m_m_opts[@]}" 2>&1 >/dev/tty)
+    clear
+    case $choise in
+        1 ) full_install;;
+        2 ) full_uninstall;;
+        3 ) 
+            clear
+            (
+                progress_step "Init updating files" 0
 
-    echo ""
-    echo "Succesfully out from matrix"
-    echo ""
-    echo "----------------------------"
-    echo ""
-}
+                progress_step "Remove $SETUP_DIR" 5
+                check_and_rem_d "$SETUP_DIR" > /dev/null 2>&1 &
 
-ask_menu_point() {
-    echo ""
-    read -p "Red or blue, Neo:" action
+                progress_step "make $SETUP_DIR." 15
+                check_and_make_d "$SETUP_DIR" > /dev/null 2>&1 &
 
-    case "$action" in
-      $ONE ) full_install;;
-      $TWO ) full_uninstall;;
-      $THREE ) 
-        check_and_rem_d "$SETUP_DIR"
-        check_and_make_d "$SETUP_DIR"
-        update_files
+                progress_step "Update files" 20
+            ) | $("${dialog[@]}" "${create_dirs_title[@]}" "${progress_dlg[@]}" 2>&1 >/dev/tty)
+
+            update_files
+
+            (
+                progress_step "Finish updating files" 100
+            ) | $("${dialog[@]}" "${create_dirs_title[@]}" "${progress_dlg[@]}" 2>&1 >/dev/tty)
+
+            show_msg "Files was updated."
+            clear
         ;;
-      $FOUR ) change_parameters;;
-      $FIVE ) edit_crontab;;
-      $SIX ) run_from_source;;
-      $SEV ) run_now;;
-      $MENU ) show_main_menu;;
-      $EXIT ) exit 0;;
-      * ) echo "Bad select";;
+        4 ) 
+            change_parameters
+            show_msg "Parameters accepted. Use link: $TAG_CHECKER."
+            clear
+            ;;
+        5 ) edit_crontab;;
+        6 ) run_from_source;;
+        7 ) run_now;;
+        8 ) show_main_menu;;
+        9 ) exit 0;;
     esac
 
-    ask_menu_point
+    main_menu
 }
 
 # remove note from crontab
@@ -238,33 +244,36 @@ edit_crontab() {
 
 # update files
 update_files() {
-    echo ""
-    echo "--------------"
-    echo "Updating files."
-    echo "--------------"
-    
-    # copy files
-    yes | cp -rf $SRC_DIR* $SETUP_DIR
-    
-    echo "Script files was copied."
+    clear
+    (
+        progress_step "Init updating files" 0
 
-    #check_and_rem_f "$CONFIG_DIR$CONFIG_FILE"
-    cp -rfn $CUR_DIR$CONFIG_FILE $CONFIG_DIR
-    chmod 777 $CONFIG_DIR$CONFIG_FILE
+        progress_step "Script files was copied" 10
+        yes | cp -rf $SRC_DIR* $SETUP_DIR > /dev/null 2>&1 &
 
-    echo "Config file was checked."
+        progress_step "Config file was checked." 15
+        cp -rfn $CUR_DIR$CONFIG_FILE $CONFIG_DIR > /dev/null 2>&1 &
+        chmod 777 $CONFIG_DIR$CONFIG_FILE > /dev/null 2>&1 &
 
-    #check_and_rem_f "$OUT_DIR$SCRIPTS_FILE"
-    cp $CUR_DIR$SRC_DIR$MISC_DIR$SCRIPTS_FILE $OUT_DIR
-    #check_and_rem_f "$OUT_DIR$STYLE_FILE"
-    cp $CUR_DIR$SRC_DIR$MISC_DIR$STYLE_FILE $OUT_DIR
+        progress_step "Copy scripts" 20
+        cp $CUR_DIR$SRC_DIR$MISC_DIR$SCRIPTS_FILE $OUT_DIR > /dev/null 2>&1 &
 
-    build_ver
-    create_exec_file
-    create_link
+        progress_step "Copy styles" 25
+        cp $CUR_DIR$SRC_DIR$MISC_DIR$STYLE_FILE $OUT_DIR > /dev/null 2>&1 &
 
-    echo "Files was fully updated."
-    echo ""
+        progress_step "Create build version" 50
+        build_ver
+
+        progress_step "Create exec file" 75
+        create_exec_file
+
+        progress_step "Create link" 90
+        create_link
+
+        progress_step "Finish updating files" 100
+    ) | $("${dialog[@]}" "${create_dirs_title[@]}" "${progress_dlg[@]}" 2>&1 >/dev/tty)
+
+    clear
 }
 
 # delete dirs
@@ -278,75 +287,71 @@ delete_dirs() {
 
 # create dirs
 create_dirs() {
-    check_and_make_d "$SETUP_DIR"
-    chmod +x $SETUP_DIR*
+    clear
+    (
+        progress_step "make $SETUP_DIR" 35
+        check_and_make_d "$SETUP_DIR"
+        chmod +x $SETUP_DIR* > /dev/null 2>&1 &
 
-    check_and_make_d "$OUT_ORD_DIR"
-    chmod +x $OUT_ORD_DIR*
+        progress_step "make $OUT_ORD_DIR" 75
+        check_and_make_d "$OUT_ORD_DIR"
+        chmod +x $OUT_ORD_DIR* > /dev/null 2>&1 &
 
-    check_and_make_d "$LOG_DIR"
-    chmod +x $LOG_DIR*
+        progress_step "make $LOG_DIR" 100
+        check_and_make_d "$LOG_DIR"
+        chmod +x $LOG_DIR* > /dev/null 2>&1 &
+    ) | $("${dialog[@]}" "${create_dirs_title[@]}" "${progress_dlg[@]}" 2>&1 >/dev/tty)
 
-    echo "SETUP, OUT and LOG dirs was created."
+    clear
 }
 
 # reset attributes
 change_parameters() {
-    echo ""
-    echo "--------------"
-    echo "Changing parameters."
-    echo "--------------"
+    changed=("${def_ar[@]}")
+    changed_sw=("${def_ar[@]}")
 
-    read -p "Exec all shell commands by sudo (y/n)? " answ
-    case "$answ" in 
-      y|Y ) sud="-s";;
-      n|N ) ;;
-      * ) sud="-s";;
-    esac
-    
-    read -p "Run with multithreading (y/n)? " answ
-    case "$answ" in 
-      y|Y ) mt="-m";;
-      n|N ) ;;
-      * ) mt="-m";;
-    esac
+    c_p_opts=(1 "Run cmd's as sudo." "${setted_params_sw[1]}"
+              2 "Multithreading on." "${setted_params_sw[2]}"
+              3 "Debug out on." "${setted_params_sw[3]}"
+              4 "Timings out." "${setted_params_sw[4]}"
+              5 "Out logs to stdout." "${setted_params_sw[5]}"
+              6 "Logging on." "${setted_params_sw[6]}")
 
-    read -p "Switch on debug out (y/n)? " answ
-    case "$answ" in 
-      y|Y ) deb="-d";;
-      n|N ) ;;
-      * ) deb="-d";;
-    esac
 
-    if [ -z "$deb" ]; then
-      read -p "Run timings out (y/n)? " answ
-      case "$answ" in 
-        y|Y ) tim="-t";;
-        n|N ) ;;
-        * ) tim="-t";;
-      esac
-    fi
+    choises=$("${dialog[@]}" "${change_params_dlg[@]}" "${c_p_opts[@]}" 2>&1 >/dev/tty)
 
-    if ! [ -z "$tim" ] || ! [ -z "$deb" ]; then
-      read -p "Move logs to stdout (y/n)? " answ
-      case "$answ" in 
-        y|Y );;
-        n|N ) quiet="-q";;
-      * ) quiet="";;
-      esac
-        
-      read -p "Move logs to file (y/n)? " answ
-      case "$answ" in 
-        y|Y ) log="-l";;
-        n|N ) ;;
-      * ) log="-l";;
-      esac
-    fi
+    for choise in $choises
+    do
+        case $choise in
+            1) changed[1]="$sud" changed_sw[1]="on";;
+            2) changed[2]="$mt" changed_sw[2]="on";;
+            3) changed[3]="$deb" changed_sw[3]="on";;
+            4) changed[4]="$tim" changed_sw[4]="on";;
+            5) changed[5]="$quiet" changed_sw[5]="on";;
+            6) changed[6]="$log" changed_sw[6]="on";;
+        esac
+    done
 
-    echo "New parameters was accepted."
+    setted_params=("${changed[@]}")
+    setted_params_sw=("${changed_sw[@]}")
 
-    create_exec_file
-    create_link
+    (
+        progress_step "Init create addition files" 0
+        progress_step "Create exec file" 50
+        create_exec_file
+
+        progress_step "Create link" 100
+        create_link
+    ) | $("${dialog[@]}" "${after_change_pararms_title[@]}" "${progress_dlg[@]}" 2>&1 >/dev/tty)
+
+    clear
+
+    main_menu
+}
+
+show_msg() {
+    msgbox_dlg=(--title "Message" --msgbox "$1" $wnd_sz)
+    $("${dialog[@]}" "${msgbox_dlg[@]}" 2>&1 >/dev/tty)
 }
 
 # run_from_source
@@ -363,26 +368,54 @@ run_from_source() {
     echo "Script from source was run."
 }
 
+progress_step() {
+        echo $2
+        echo "XXX"
+        echo $1
+        echo "XXX"
+        sleep 0.5
+        pct=$2 
+}
+
 # full install
 full_install() {
-    echo ""
-    echo "--------------"
-    echo "Full installing."
-    echo "--------------"
+    (
+        progress_step "Init installing" 5
+        
+        progress_step "Create dirs\n" 35
+    ) | $("${dialog[@]}" "${full_inst_title[@]}" "${progress_dlg[@]}" 2>&1 >/dev/tty)
 
     create_dirs
+    
+    (
+        progress_step "Update files" 65
+    ) | $("${dialog[@]}" "${full_inst_title[@]}" "${progress_dlg[@]}" 2>&1 >/dev/tty)
 
     update_files
+
+    (
+        progress_step "Change parameters" 80
+    ) | $("${dialog[@]}" "${full_inst_title[@]}" "${progress_dlg[@]}" 2>&1 >/dev/tty)
+
     change_parameters
+
+    (
+        progress_step "Edit crontab" 90
+    ) | $("${dialog[@]}" "${full_inst_title[@]}" "${progress_dlg[@]}" 2>&1 >/dev/tty)
+
     edit_crontab
 
-    echo ""
-    read -p "Run installed script now (y/n)? " answ
-    case "$answ" in 
-      y|Y ) run_now;;
-      n|N );;
-      * ) ;;
-    esac
+    (
+        progress_step "Finish installing" 100
+    ) | $("${dialog[@]}" "${full_inst_title[@]}" "${progress_dlg[@]}" 2>&1 >/dev/tty)
+    
+    clear
+
+    show_msg "Parameters accepted. Use link: $TAG_CHECKER."
+
+    clear
+
+    main_menu
 }
 
 # full uninstall
@@ -421,6 +454,42 @@ main() {
     check_soft
 
     main_menu
+
+    
+    # choise=$(dialog --clear \
+    #                  --backtitle "Backtitle" \
+    #                  --menu "Menu" 40 50 10 \
+    #                  "${m_m_opts[@]}" \
+    #                  2>&1 >/dev/tty)
+
+    # clear
+    # case $CHOICE in
+    #     1)
+    #         echo "You chose Option 1"
+    #         ;;
+    #     2)
+    #         echo "You chose Option 2"
+    #         ;;
+    #     3)
+    #         echo "You chose Option 3"
+    #         ;;
+    # esac
+
+
+# COUNT=10
+# (
+# while test $COUNT != 110
+# do
+# echo $COUNT
+# echo "XXX"
+# echo "Новое сообщение ($COUNT процентов)"
+# echo "Строка 2"
+# echo "XXX"
+# COUNT=`expr $COUNT + 10`
+# sleep 1
+# done
+# ) |
+# $DIALOG --title "Индикатор" --gauge "А вот пример простейшего индикатора" 20 70 0
 
     exit 0
 }
