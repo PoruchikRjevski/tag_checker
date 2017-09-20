@@ -41,6 +41,7 @@ A_TITLE             = " title=\"{:s}\""
 A_TARGET            = " target=\"{:s}\""
 A_HTTP_EQUIV        = " http-equiv=\"{:s}\""
 A_CONTENT           = " content=\"{:s}\""
+A_NAME              = " name=\"{:s}\""
 
 # params
 A_REL_SS            = "stylesheet"

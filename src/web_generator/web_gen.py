@@ -88,6 +88,7 @@ class WebGenerator:
         gen.w_tag(h_d.T_IFRAME,
                   c_d.FRAME_NOT,
                   h_d.A_ID.format(c_d.FRAME_ID)
+                  + h_d.A_NAME.format(c_d.FRAME_ID)
                   + h_d.A_CLASS.format(c_d.CL_IFRAME)
                   + h_d.A_SRC.format(c_d.MAIN_F_NAME))
 
@@ -111,13 +112,27 @@ class WebGenerator:
 
         gen.w_tag(h_d.T_P,
                   c_d.LAST_UPD_TXT + datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
-                  h_d.A_CLASS.format(c_d.CL_FOOT_INFO))
+                  h_d.A_CLASS.format(c_d.CL_FOOT_INFO)
+                  + h_d.A_TITLE.format(c_d.SCAN_TIME_TXT.format(g_v.SCAN_TIME)))
         gen.w_tag(h_d.T_P,
                   c_d.CR_TXT,
                   h_d.A_CLASS.format(c_d.CL_FOOT_INFO))
-        gen.w_tag(h_d.T_P,
-                  c_d.VER_TXT.format(v.V_MAJ, v.V_MIN, str(int(v.V_BUILD) - int(v.LAST)), v.V_BUILD, "b:{:s}".format(v.V_STAT)),
+
+        gen.w_o_tag(h_d.T_P,
                   h_d.A_CLASS.format(c_d.CL_FOOT_INFO))
+        gen.w_txt(c_d.VER_TXT.format(v.V_MAJ,
+                                     v.V_MIN,
+                                     str(int(v.V_BUILD) - int(v.LAST)),
+                                     v.V_BUILD,
+                                     "{:s}:".format(v.V_STAT)))
+        gen.w_tag(h_d.T_A,
+                  "{:s}".format(v.HASH),
+                  h_d.A_HREF.format(c_d.LINK_TO_SRC_REPO.format(c_d.GW_SHORTLOG,
+                                                                v.HASH,
+                                                                v.HASH))
+                  + h_d.A_TITLE.format(c_d.LAST_AUTH_TXT.format(v.COMMITER))
+                  + h_d.A_TARGET.format(c_d.FRAME_ID))
+        gen.w_c_tag(h_d.T_P)
 
         gen.w_c_tag(h_d.T_DIV)
 

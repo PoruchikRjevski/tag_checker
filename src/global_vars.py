@@ -10,3 +10,5 @@ OUT_PATH            = ""
 CUR_PLATFORM        = None
 
 CUR_PATH            = ""
+
+SCAN_TIME           = ""
