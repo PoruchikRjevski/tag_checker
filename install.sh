@@ -86,8 +86,13 @@ create_link() {
 build_ver() {
     branch=$($GIT rev-parse --abbrev-ref HEAD)
     commits=$($GIT rev-list $branch --count)
+    last_author=$($GIT log -1 --pretty=format:"%an")
+    last_hash=$($GIT log -1 --pretty=format:"%h")
+
     sed -Ei "s/current_commits/$commits/g" $SETUP_DIR$VERSION_FILE
     sed -i "s@beta@$branch@" $SETUP_DIR$VERSION_FILE
+    sed -i "s@last_commiter@$last_author@" $SETUP_DIR$VERSION_FILE
+    sed -i "s@last_hash@$last_hash@" $SETUP_DIR$VERSION_FILE
 }
 
 # check soft installed
@@ -237,8 +242,6 @@ update_files() {
     echo "--------------"
     echo "Updating files."
     echo "--------------"
-    
-    echo "Dirs was checked."
     
     # copy files
     yes | cp -rf $SRC_DIR* $SETUP_DIR

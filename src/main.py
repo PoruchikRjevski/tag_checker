@@ -142,10 +142,11 @@ def update(cfg_loader, git_man, tag_model):
     cfg_loader.load_config(tag_model)
 
     # get tags and fill model
-    scan_t = start()
+    scan_t = start(True)
     git_man.scanning(tag_model)
-    stop(scan_t)
-    if g_v.TIMEOUTS: out_log("scan time: {:s}".format(get_pass_time(scan_t)))
+    stop(scan_t, True)
+    g_v.SCAN_TIME = "{:s}".format(get_pass_time(scan_t))
+    if g_v.TIMEOUTS: out_log("scan time: {:s}".format(g_v.SCAN_TIME))
 
     # generate web
     web_gen_t = start()

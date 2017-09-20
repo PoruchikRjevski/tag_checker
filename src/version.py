@@ -5,6 +5,8 @@ V_STAT          = "beta"
 
 LAST            = "192"
 CURRENT         = "current_commits"
+COMMITER        = "last_commiter"
+HASH            = "last_hash"
 
 
 # 1.4.xx - 192 to

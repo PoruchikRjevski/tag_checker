@@ -10,3 +10,8 @@ OUT_PATH            = ""
 CUR_PLATFORM        = None
 
 CUR_PATH            = ""
+
+SCAN_TIME           = ""
+REPOS_NUM           = 0
+TAGS_NUM            = 0
+PROC_TAGS_NUM       = 0

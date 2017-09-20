@@ -60,6 +60,8 @@ TABLE_CELLPAD       = "5%"
 FRAME_BAD_NAME      = "BAD_FRAME_NAME"
 
 # links
+LINK_TO_SRC_REPO    = "http://172.16.20.64/swver_hist/gitweb/?p=opensource/device_tag_visualiser.git;a={:s};ch={:s};h={:s}"
+
 LINK_TO_REPO        = "http://172.16.20.64/swver_hist/gitweb/?p=bourevest/{:s};a={:s};ch={:s};h={:s}"   # :0 - repo name
                                                                                                         # :1 - out type
                                                                                                         # :2 - commit hash for select
@@ -91,6 +93,12 @@ DEPART_TXT          = "Отдел: "
 TO_DEV_TXT          = "Перейти к списку приборов"
 
 VER_TXT             = "Версия: {:s}.{:s}.{:s}({:s}) {:s}"
+
+REPOS_NUM_TXT       = "Репозиторев: {:s}"
+TAGS_NUM_TXT        = "Всего тэгов: {:s}"
+PROC_TAGS_NUM_TXT   = "Обработанных тэгов: {:s}"
+SCAN_TIME_TXT       = "Общее время обработки: {:s}"
+LAST_AUTH_TXT       = "Последний коммитер: {:s}"
 
 REPO_TXT            = "Репозиторий: "
 AUTHOR_TXT          = "Автор коммита: "
