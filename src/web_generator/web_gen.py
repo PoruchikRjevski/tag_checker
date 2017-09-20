@@ -365,7 +365,8 @@ class WebGenerator:
         for type in c_d.TYPES_L:
             typed_items = [item for item in dev_items if item.item_type == type]
 
-            unic_nums = [key for key in dict.fromkeys([item.item_num for item in typed_items]).keys()]
+            unic_nums = sorted([key for key in dict.fromkeys([item.item_num for item in typed_items]).keys()],
+                               reverse=False)
 
             for num in unic_nums:
                 first_s_t = True
