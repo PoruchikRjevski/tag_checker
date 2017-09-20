@@ -14,8 +14,8 @@ times_dict = {}
 free_ids = []
 
 
-def start():
-    if not g_v.TIMEOUTS:
+def start(no_matter=False):
+    if not g_v.TIMEOUTS and not no_matter:
         return -1
 
     start_t = time.time()
@@ -32,8 +32,8 @@ def start():
     return id
 
 
-def stop(id):
-    if not g_v.TIMEOUTS:
+def stop(id, no_matter=False):
+    if not g_v.TIMEOUTS and not no_matter:
         return -1
 
     stop_t = time.time()

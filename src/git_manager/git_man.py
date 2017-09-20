@@ -405,6 +405,9 @@ class GitMan:
 
         for dep_name, dep_obj in model.departments.items():
             if g_v.DEBUG: out_log("department: \"{:s}\"".format(dep_name))
+
+            g_v.REPOS_NUM = g_v.REPOS_NUM + len(dep_obj.repos)
+
             for repo in dep_obj.repos:
                 if g_v.DEBUG:
                     out_log("repo: \"{:s}\"".format(repo.name))
@@ -419,6 +422,8 @@ class GitMan:
                 if tags:
                     tags_list = tags.split("\n")
 
+                    g_v.TAGS_NUM = g_v.TAGS_NUM + len(tags_list)
+
                     if g_v.DEBUG:
                         out_log("Tags number: {:s}".format(str(len(tags_list))))
 
@@ -428,6 +433,7 @@ class GitMan:
                     for item_t in items_list:
                         (flag, item) = item_t
                         if flag and item.valid:
+                            g_v.PROC_TAGS_NUM = g_v.PROC_TAGS_NUM + 1
                             item.repo_i = dep_obj.repos.index(repo)
                             dep_obj.items.append(item)
                             if item.dev_name not in dep_obj.devices:
