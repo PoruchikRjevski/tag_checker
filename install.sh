@@ -178,17 +178,17 @@ full_install() {
 create_dirs() {
     cr_dirs_dlg=(--gauge "Create dirs" $wnd_sz_g)
     (
-        progress_step "making $SETUP_DIR ..." 35
+        progress_step "making $SETUP_DIR ..." 25
         check_and_make_d "$SETUP_DIR"
-        chmod +x $SETUP_DIR*
+        chmod +x $SETUP_DIR
 
         progress_step "making $OUT_ORD_DIR ..." 75
         check_and_make_d "$OUT_ORD_DIR"
-        chmod +x $OUT_ORD_DIR*
+        chmod +x $OUT_DIR*
 
         progress_step "making $LOG_DIR ..." 100
         check_and_make_d "$LOG_DIR"
-        chmod +x $LOG_DIR*
+        chmod +x $LOG_DIR
     ) | $("${dialog[@]}" "${progress_dlg[@]}" "${cr_dirs_dlg[@]}" 2>&1 >/dev/tty)
 
     clear
