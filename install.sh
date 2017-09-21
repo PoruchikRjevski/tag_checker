@@ -41,6 +41,9 @@ setted_params=("${def_ar[@]}")
 setted_params_sw=("${def_ar[@]}")
 
 # DIALOG VARS
+DIALOG="dialog"
+WHIPT="whiptail"
+
 dialog=(dialog)
 
 sw_on="on"
@@ -69,6 +72,16 @@ main() {
 }
 
 check_soft() {
+    # check dialog or whiptail
+    if which $DIALOG > /dev/null; then
+        dialog=($DIALOG)
+    elif which $WHIPT > /dev/null; then
+        dialog=($WHIPT)
+    else
+        echo "Please install whiptail or dialog(it is better)."
+        exit 0
+    fi
+
     # check pyton
     if ! which $PYTHON > /dev/null; then
         show_msg "Please, install python3 before using $0."
@@ -97,9 +110,9 @@ main_menu() {
               10 "Exit from installer")
 
     clear
-    choise=$("${dialog[@]}" "${main_menu_dlg[@]}" "${m_m_opts[@]}" 2>&1 >/dev/tty)
+    choise_p=$("${dialog[@]}" "${main_menu_dlg[@]}" "${m_m_opts[@]}" 2>&1 >/dev/tty)
     clear
-    case $choise in
+    case $choise_p in
         3 ) 
             full_install
             main_menu
@@ -136,7 +149,7 @@ main_menu() {
         * ) close_all_dialogs ;;
     esac
 
-    clear
+    # clear
 }
 
 full_install() {
@@ -316,32 +329,65 @@ change_parameters() {
     changed=("${def_ar[@]}")
     changed_sw=("${def_ar[@]}")
 
-    c_p_opts=(1 "ON SUDO" "${setted_params_sw[1]}"
-              2 "ON MULTITHREADing" "${setted_params_sw[2]}"
-              3 "ON DEBUG out" "${setted_params_sw[3]}"
-              4 "ON TIMINGS calc" "${setted_params_sw[4]}"
-              5 "OFF use STDOUT" "${setted_params_sw[5]}"
-              6 "ON LOGging" "${setted_params_sw[6]}")
+    c_p_opts=("1" "ON SUDO" "${setted_params_sw[1]}"
+              "2" "ON MULTITHREADing" "${setted_params_sw[2]}"
+              "3" "ON DEBUG out" "${setted_params_sw[3]}"
+              "4" "ON TIMINGS calc" "${setted_params_sw[4]}"
+              "5" "OFF use STDOUT" "${setted_params_sw[5]}"
+              "6" "ON LOGging" "${setted_params_sw[6]}")
 
 
-    choises=$("${dialog[@]}" "${change_params_dlg[@]}" "${c_p_opts[@]}" 2>&1 >/dev/tty)
+    choises=$("${dialog[@]}" "${change_params_dlg[@]}" "${c_p_opts[@]}" 3>&1 1>&2 2>&3)
+    clear
 
     for choise in $choises
     do
-        case $choise in
-            1) changed[1]="$sud" changed_sw[1]=$sw_on;;
-            2) changed[2]="$mt" changed_sw[2]=$sw_on;;
-            3) changed[3]="$deb" changed_sw[3]=$sw_on;;
-            4) changed[4]="$tim" changed_sw[4]=$sw_on;;
-            5) changed[5]="$quiet" changed_sw[5]=$sw_off;;
-            6) changed[6]="$log" changed_sw[6]=$sw_on;;
+        ONE='"1"'
+        TWO='"2"'
+        echo $ONE
+        echo "${"choise"}"
+
+        case "$choise" in
+            $ONE ) 
+                echo "SUKA $ONE $choise"
+                changed[1]=$sud 
+                changed_sw[1]=$sw_on
+            ;;
+            $TWO ) 
+                echo "SUKA 2"
+                changed[2]=$mt 
+                changed_sw[2]=$sw_on
+            ;;
+            '3' ) 
+                echo "SUKA 3"
+                changed[3]=$deb 
+                changed_sw[3]=$sw_on
+            ;;
+            4 ) 
+                echo "SUKA 4"
+                changed[4]=$tim 
+                changed_sw[4]=$sw_on
+            ;;
+            5 ) 
+                echo "SUKA 5"
+                changed[5]=$quiet 
+                changed_sw[5]=$sw_off
+            ;;
+            6 ) 
+                echo "SUKA 6"
+                changed[6]=$log 
+                changed_sw[6]=$sw_on
+            ;;
+            * ) echo "cancel "$choise ;;
         esac
     done
 
     setted_params=("${changed[@]}")
     setted_params_sw=("${changed_sw[@]}")
 
-    clear
+
+    echo "${changed_sw[@]}"
+    exit 0
 }
 
 accept_params() {
@@ -364,7 +410,7 @@ create_exec_file() {
     chmod +x $SETUP_DIR$EXEC_F
     
     echo $PREFIX_F > $SETUP_DIR$EXEC_F
-    echo $SETUP_DIR$NAME "${setted_params[@]}" '$@' >> $SETUP_DIR$EXEC_F
+    echo $SETUP_DIR$NAME "${setted_params[*]}" '$@' >> $SETUP_DIR$EXEC_F
 }
 
 create_link() {
@@ -383,9 +429,9 @@ edit_crontab() {
               3 "SKIP")
 
     clear
-    choise=$("${dialog[@]}" "${crontab_menu_dlg[@]}" "${e_c_opts[@]}" 2>&1 >/dev/tty)
+    choise_cron=$("${dialog[@]}" "${crontab_menu_dlg[@]}" "${e_c_opts[@]}" 2>&1 >/dev/tty)
     clear
-    case $choise in
+    case $choise_cron in
         1 ) 
             remove_from_crontab
             add_to_crontab
@@ -417,7 +463,7 @@ add_to_crontab() {
 run_from_source() {
     change_parameters
 
-    $CUR_DIR$SRC_DIR$NAME "${setted_params[@]}" $quiet $log $sud $mt $deb $tim $UPDATE_A
+    $CUR_DIR$SRC_DIR$NAME "${setted_params[@]}" $UPDATE_A
 
     show_info "Script from source was finish work."
 }
