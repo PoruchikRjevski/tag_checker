@@ -30,12 +30,9 @@ GIT="git"
 # PARAMETERS VARS
 def_ar=("" "" "" "" "" "")
 
-sud="-s"
-mt="-m"
-deb="-d"
-tim="-t"
-quiet="-q"
-log="-l"
+nums=('"1"' '"2"' '"3"' '"4"' '"5"' '"6"')
+
+tag_params=("-s" "-m" "-d" "-t" "-q" "-l")
 
 setted_params=("${def_ar[@]}")
 setted_params_sw=("${def_ar[@]}")
@@ -325,6 +322,20 @@ build_ver() {
     sed -i "s@last_hash@$last_hash@" $SETUP_DIR$VERSION_FILE
 }
 
+get_num() {
+    i=1
+
+    for num in ${nums[*]}
+    do
+        if [ "$num" == "$1" ]; then
+            break
+        fi
+        ((i++))
+    done
+
+    return $i
+}
+
 change_parameters() {
     changed=("${def_ar[@]}")
     changed_sw=("${def_ar[@]}")
@@ -342,52 +353,23 @@ change_parameters() {
 
     for choise in $choises
     do
-        ONE='"1"'
-        TWO='"2"'
-        echo $ONE
-        echo "${"choise"}"
+        if [ $dialog == $WHIPT ]; then
+            get_num $choise
+            choose=$?
+        else
+            choose=$choise
+        fi
 
-        case "$choise" in
-            $ONE ) 
-                echo "SUKA $ONE $choise"
-                changed[1]=$sud 
-                changed_sw[1]=$sw_on
-            ;;
-            $TWO ) 
-                echo "SUKA 2"
-                changed[2]=$mt 
-                changed_sw[2]=$sw_on
-            ;;
-            '3' ) 
-                echo "SUKA 3"
-                changed[3]=$deb 
-                changed_sw[3]=$sw_on
-            ;;
-            4 ) 
-                echo "SUKA 4"
-                changed[4]=$tim 
-                changed_sw[4]=$sw_on
-            ;;
-            5 ) 
-                echo "SUKA 5"
-                changed[5]=$quiet 
-                changed_sw[5]=$sw_off
-            ;;
-            6 ) 
-                echo "SUKA 6"
-                changed[6]=$log 
-                changed_sw[6]=$sw_on
-            ;;
-            * ) echo "cancel "$choise ;;
-        esac
+        changed[$choose]="${tag_params[$(($choose-1))]}"
+        if [ $choose == 5 ]; then
+            changed_sw[$choose]=$sw_off
+        else
+            changed_sw[$choose]=$sw_on
+        fi
     done
 
     setted_params=("${changed[@]}")
     setted_params_sw=("${changed_sw[@]}")
-
-
-    echo "${changed_sw[@]}"
-    exit 0
 }
 
 accept_params() {
