@@ -570,6 +570,11 @@ class GitMan:
 
                     g_v.PROC_TAGS_NUM += len(items_list)
 
+                    for commit in dep_obj.commits:
+                        for item in items_list:
+                            if commit.repo_i == item.repo_i and commit.hash == item.cm_hash:
+                                item.cm_i = dep_obj.commits.index(commit)
+
                     for item in items_list:
                         dep_obj.items.append(item)
                         if item.dev_name not in dep_obj.devices:
