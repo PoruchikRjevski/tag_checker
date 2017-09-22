@@ -6,13 +6,25 @@ from web_generator.html_gen import HtmlGen
 import common_defs as c_d
 import global_vars as g_v
 import version as v
-from logger import out_log
+from logger import *
 from web_generator import html_defs as h_d
 
 
 class WebGenerator:
     def __init__(self):
         if g_v.DEBUG: out_log("init")
+
+    def __clear_out_dir(self, dir):
+        for item in os.listdir(dir):
+            item_path = os.path.join(dir, item)
+            if item != c_d.STYLE_F_NAME and item != c_d.SCRIPTS_F_NAME:
+                try:
+                    if os.path.isfile(item_path):
+                        os.unlink(item_path)
+                    elif os.path.isdir(item_path):
+                        self.__clear_out_dir(item_path)
+                except Exception as e:
+                    out_err(e)
 
     def __gen_index(self, model):
         if g_v.DEBUG: out_log("start gen index")
@@ -312,7 +324,7 @@ class WebGenerator:
 
         if g_v.DEBUG: out_log("finish gen pages for device: " + dev_name)
 
-    def __gen_items_page(self, model, dep_name, dev_name, repos, item_num, type, items):
+    def __gen_items_page(self, model, dep_name, dev_name, repos, commits, item_num, type, items):
         if g_v.DEBUG: out_log("start gen item page: " + str(item_num))
 
         page = HtmlGen(c_d.ORDERS_PATH, self.__get_order_file_name(dev_name, item_num))
@@ -326,7 +338,7 @@ class WebGenerator:
                                      + " \"" + self.__get_num_by_type(type, item_num) + "\"",
                                      c_d.DEPART_TXT + str(dep_name)])
 
-        self.__gen_items_content(page, repos, items)
+        self.__gen_items_content(page, repos, commits, items)
 
         self.__gen_table_foot(page)
         self.__gen_back_link(page,
@@ -339,7 +351,7 @@ class WebGenerator:
 
         if g_v.DEBUG: out_log("finish gen item page: " + str(item_num))
 
-    def __gen_items_content(self, page, repos, items):
+    def __gen_items_content(self, page, repos, commits, items):
         type_class_id = c_d.CL_TD_1
 
         first = True
@@ -370,6 +382,7 @@ class WebGenerator:
             # tag date and commit hash
             self.__gen_common_columns(page,
                                       repos[item.repo_i],
+                                      commits[item.cm_i],
                                       item,
                                       type_class_id)
 
@@ -431,18 +444,27 @@ class WebGenerator:
 
                     # tag date and commit hash
                     repo = model.departments[dep_name].repos[ld_item.repo_i]
+                    commit = model.departments[dep_name].commits[ld_item.cm_i]
                     self.__gen_common_columns(file,
                                               repo,
+                                              commit,
                                               ld_item,
                                               type_class_id)
                     file.w_c_tag(h_d.T_TR)
 
                 # generate page for item
-                self.__gen_items_page(model, dep_name, dev_name, model.departments[dep_name].repos, num, type, nummed_items)
+                self.__gen_items_page(model,
+                                      dep_name,
+                                      dev_name,
+                                      model.departments[dep_name].repos,
+                                      model.departments[dep_name].commits,
+                                      num,
+                                      type,
+                                      nummed_items)
 
             type_class_id += 1
 
-    def __gen_common_columns(self, file, repo, item, type_class_id):
+    def __gen_common_columns(self, file, repo, commit, item, type_class_id):
         tag_date_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
                                             + " " + c_d.CL_TEXT_CENTER
                                             + " " + c_d.CL_BORDER)
@@ -452,18 +474,18 @@ class WebGenerator:
                             h_d.A_TITLE.format(c_d.TAG_TXT + item.tag) + tag_date_class)
 
         # commit hash
-        link_hash = item.p_hash
+        link_hash = commit.p_hash
         if link_hash == -1:
-            link_hash = item.cm_hash
+            link_hash = commit.hash
 
         # list contains tuples (text, link, attr)
         links_list = []
 
-        repo_link_c = (item.cm_hash + " " + item.cm_date,
+        repo_link_c = (commit.hash + " " + commit.date,
                        c_d.LINK_TO_REPO.format(repo.name, c_d.GW_SHORTLOG,
-                                               item.cm_hash, str(item.p_hash)),
-                       h_d.A_TITLE.format(self.__get_title_for_commit(repo.link, item.cm_auth,
-                                                                      item.cm_date, item.cm_msg)))
+                                               commit.hash, str(commit.p_hash)),
+                       h_d.A_TITLE.format(self.__get_title_for_commit(repo.link, commit.auth,
+                                                                      commit.date, commit.msg)))
 
         links_list.append(repo_link_c)
 
@@ -474,8 +496,8 @@ class WebGenerator:
         if item.item_type is c_d.TYPE_ALL:
             ftp_link_c = (c_d.REDIST_TXT,
                           c_d.LINK_TO_FTP.format(item.dev_name,
-                                                 "{:s}.{:s}".format(item.cm_date_full,
-                                                                    item.cm_hash)),
+                                                 "{:s}.{:s}".format(commit.date_full,
+                                                                    commit.hash)),
                           h_d.A_TITLE.format(c_d.LINK_FTP_TXT)
                           + h_d.A_TARGET.format(h_d.A_TARGET_BLANK))
             links_list.append(ftp_link_c)
@@ -550,6 +572,8 @@ class WebGenerator:
 
     def generate_web(self, model):
         if g_v.DEBUG: out_log("start gen web")
+
+        self.__clear_out_dir(g_v.OUT_PATH)
 
         self.__gen_index(model)
         self.__gen_pages(model)
