@@ -24,6 +24,12 @@ class GitMan:
         if g_v.DEBUG: out_log("init")
         self.__lastBranch = None
         self.__needReturnBranch = False
+        self.__cpus = 1
+        self.__m_tasks = 1
+
+    def __get_cpus(self):
+        self.__cpus = multiprocessing.cpu_count()
+        self.__m_tasks = self.__cpus
 
     def __is_dir_exist(self, link):
         if not os.path.isdir(link):
@@ -139,7 +145,7 @@ class GitMan:
                                  + g_d.A_SHORT
                                  + " " + tag)
 
-        return run_cmd(cmd)
+        return tag, run_cmd(cmd)
 
     def __get_commit_date_by_short_hash(self, hash):
         cmd = g_d.GIT_CMD.format(g_d.A_LOG
@@ -383,20 +389,153 @@ class GitMan:
 
         return (sh_res, full_res)
 
-    def __do_work(self, tags_list):
+    def __gen_item(self, tag):
+        if g_v.DEBUG:
+            out_log("Gen item for tag: {:s}".format(tag))
+
+        item = Item()
+        item.tag = tag
+
+        if not self.__parce_tag(item):
+            out_err("Bad tag: " + tag)
+            return item
+
+        item.valid = True
+
+        return item
+
+    def __gen_items(self, tags_list, repo_i):
         items_out = []
-        if g_v.MULTITH:
-            cpu_ths = multiprocessing.cpu_count()
-            if g_v.DEBUG: out_log("cpu count: {:s}".format(str(cpu_ths)))
 
-            pool = ThreadPool(cpu_ths)
+        if g_v.MULTITH and len(tags_list) >= self.__m_tasks:
+            pool = ThreadPool(self.__cpus)
 
-            items_out = pool.map(self.__gen_note_by_tag, tags_list)
+            items_out = pool.map(self.__gen_item, tags_list)
 
             pool.close()
             pool.join()
         else:
-            items_out = self.__gen_notes_by_tag_list(tags_list)
+            for tag in tags_list:
+                items_out.append(self.__gen_item(tag))
+
+        items_out = [item for item in items_out if item.valid]
+
+        for item in items_out:
+            item.repo_i = repo_i
+
+        return items_out
+
+    def __get_short_hashes(self, tags_list, items):
+        # {tag, cm_hash}
+        hashes = {}
+
+        if g_v.MULTITH and len(tags_list) >= self.__m_tasks:
+            pool = ThreadPool(self.__cpus)
+
+            hashes_list = pool.map(self.__get_short_hash, tags_list)
+
+            pool.close()
+            pool.join()
+
+            for (tag, hash) in hashes_list:
+                hashes[tag] = hash
+        else:
+            for tag in tags_list:
+                (_, hash) = self.__get_short_hash(tag)
+                hashes[tag] = hash
+
+        for item in items:
+            if item.tag in hashes.keys():
+                item.cm_hash = hashes[item.tag]
+
+    def __get_commits(self, unic_hashes, repo_i):
+        commits_out = []
+
+        if g_v.MULTITH and len(unic_hashes) >= self.__m_tasks:
+            pool = ThreadPool(self.__cpus)
+
+            commits_out = pool.map(self.__gen_commit, unic_hashes)
+
+            pool.close()
+            pool.join()
+        else:
+            for hash in unic_hashes:
+                commits_out.append(self.__gen_commit(hash))
+
+        for commit in commits_out:
+            commit.repo_i = repo_i
+
+        return commits_out
+
+    def __gen_commit(self, hash):
+        if g_v.DEBUG:
+            out_log("Gen commit for hash: {:s}".format(str(hash)))
+
+        commit = CommitInfo()
+
+        if not hash:
+            return commit
+
+        commit.hash = hash
+
+        date = self.__get_commit_date_by_short_hash(hash)
+        (sh_date, full_date) = self.__repair_commit_date(date)
+        commit.date = sh_date
+        commit.date_full = full_date
+        if g_v.DEBUG: out_log("item commit date: {:s}".format(commit.date))
+
+        commit.auth = self.__get_commit_author_by_short_hash(hash)
+        if g_v.DEBUG: out_log("item author: {:s}".format(commit.auth))
+
+        msg = self.__get_commit_msg_by_short_hash(hash)
+        commit.msg = self.__repair_commit_msg(msg)
+        if g_v.DEBUG: out_log("item commMsg: {:s}".format(commit.msg))
+
+        # get pHash
+        commit.p_hash = self.__get_parents_short_hash(hash)
+        if commit.p_hash == -1:
+            commit.p_hash = hash
+        if g_v.DEBUG: out_log("item pHash: {:s}".format(str(commit.p_hash)))
+
+        commit.valid = True
+
+        return commit
+
+    def __do_work(self, tags_list, commits, repo_i):
+        self.__get_cpus()
+
+        items_out = []
+
+        # parce tags and gen items
+        work_t = start()
+        items_out = self.__gen_items(tags_list, repo_i)
+        stop(work_t)
+        if g_v.TIMEOUTS: out_log("Gen {:s} items by {:s} tags time: {:s}".format(str(len(items_out)),
+                                                                                 str(len(tags_list)),
+                                                                                 get_pass_time(work_t)))
+
+        # get commits hashes from git
+        work_t = start()
+        tags_list_str = [item.tag for item in items_out]
+        self.__get_short_hashes(tags_list_str, items_out)
+        stop(work_t)
+        if g_v.TIMEOUTS: out_log("Get commit's hashes from git time: {:s}".format(get_pass_time(work_t)))
+
+        # create helper lists
+        work_t = start()
+        unic_hashes = list(set([item.cm_hash for item in items_out]))
+        stop(work_t)
+        if g_v.TIMEOUTS: out_log("Create helpers lists: {:s}".format(get_pass_time(work_t)))
+
+        # get commits info
+        work_t = start()
+        commits_out = self.__get_commits(unic_hashes, repo_i)
+
+        for commit in commits_out:
+            commits.append(commit)
+
+        stop(work_t)
+        if g_v.TIMEOUTS: out_log("Get commits info: {:s}".format(get_pass_time(work_t)))
 
         return items_out
 
@@ -427,17 +566,14 @@ class GitMan:
                     if g_v.DEBUG:
                         out_log("Tags number: {:s}".format(str(len(tags_list))))
 
-                    items_list = self.__do_work(tags_list)
+                    items_list = self.__do_work(tags_list, dep_obj.commits, dep_obj.repos.index(repo))
 
-                    # add items
-                    for item_t in items_list:
-                        (flag, item) = item_t
-                        if flag and item.valid:
-                            g_v.PROC_TAGS_NUM = g_v.PROC_TAGS_NUM + 1
-                            item.repo_i = dep_obj.repos.index(repo)
-                            dep_obj.items.append(item)
-                            if item.dev_name not in dep_obj.devices:
-                                dep_obj.devices.append(item.dev_name)
+                    g_v.PROC_TAGS_NUM += len(items_list)
+
+                    for item in items_list:
+                        dep_obj.items.append(item)
+                        if item.dev_name not in dep_obj.devices:
+                            dep_obj.devices.append(item.dev_name)
 
         if g_v.DEBUG: out_log("stop scanning")
 
