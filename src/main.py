@@ -146,7 +146,7 @@ def update(cfg_loader, git_man, tag_model):
     git_man.scanning(tag_model)
     stop(scan_t, True)
     g_v.SCAN_TIME = "{:s}".format(get_pass_time(scan_t))
-    if g_v.TIMEOUTS: out_log("scan time: {:s}".format(g_v.SCAN_TIME))
+    if g_v.TIMEOUTS: out_log("Scan time: {:s}".format(g_v.SCAN_TIME))
 
     # generate web
     web_gen_t = start()
@@ -175,7 +175,8 @@ def main():
     g_v.CUR_PLATFORM = sys.platform
 
     # init logger
-    init_log()
+    if g_v.LOGGING:
+        init_log()
 
     # main func
     if g_v.DEBUG: out_log("start work")
