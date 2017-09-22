@@ -5,7 +5,7 @@ import common_defs as c_d
 import global_vars as g_v
 from logger import *
 
-__all__ = ['TagModel', 'Department', 'Repo', 'Device', 'Item']
+__all__ = ['TagModel', 'Department', 'Repo', 'Device', 'Item', 'CommitInfo']
 
 
 class TagModel:
@@ -46,13 +46,15 @@ class Department:
     """
     __name                  is name of department from config
     __repos                 is [Repo...]
+    __commits                is [CommitInfo object]
     __items                 is [Item...]
-    __devices               is [den_1...dev_n]
+    __devices               is [dev_1...dev_n]
     __soft_types            is [type...]
     """
     def __init__(self, name=""):
         self.__name = name
         self.__repos = []
+        self.__commits = []
         self.__items = []
         self.__devices = []
         self.__soft_types = [""]
@@ -60,6 +62,10 @@ class Department:
     @property
     def repos(self):
         return self.__repos
+
+    @property
+    def commits(self):
+        return self.__commits
 
     @property
     def items(self):
@@ -153,11 +159,21 @@ class Item:
         self.tag = ""
         self.tag_date = ""
         self.cm_hash = ""
-        self.cm_date = ""
-        self.cm_date_full = ""
-        self.cm_msg = ""
-        self.cm_auth = ""
-        self.p_hash = ""
         self.platform = c_d.D_LINUX
-        self.validity = False
+        self.valid = False
+        self.repo_i = -1
+        self.cm_i = -1
+
+class CommitInfo:
+    """
+    describes info about commit
+    """
+    def __init__(self):
+        self.hash = ""
+        self.p_hash = ""
+        self.date = ""
+        self.date_full = ""
+        self.msg = ""
+        self.auth = ""
+        self.valid = False
         self.repo_i = -1
