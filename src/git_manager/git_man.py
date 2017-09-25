@@ -5,7 +5,7 @@ from multiprocessing.dummy import Pool as ThreadPool
 import common_defs as c_d
 import global_vars as g_v
 import version as s_v
-from cmd_wrap import *
+from cmd_executor.cmd_executor import *
 from git_manager import git_defs as g_d
 from logger import *
 from tag_model import *

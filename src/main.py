@@ -11,7 +11,6 @@ from time_profiler.time_checker import *
 from config_manager import CfgLoader
 from web_generator.web_gen import WebGenerator
 
-
 def set_options(parser):
     usage = "usage: %prog [options]"
 
