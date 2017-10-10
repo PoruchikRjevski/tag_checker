@@ -9,8 +9,12 @@ FILE_EXT            = ".html"
 
 LEVEL_UP            = "../"
 
+JS_DIR              = "js"
+CSS_DIR             = "css"
+
 STYLE_F_NAME        = "style.css"
 SCRIPTS_F_NAME      = "scripts.js"
+JS_METRICS_F_NAME   = "metrics.js"
 
 CL_MAIN_TABLE       = "main_table"
 CL_FOOT_INFO        = "foot_info"
@@ -43,6 +47,9 @@ M_TABLE_H_NUM       = "2"
 
 MAIN_F_NAME         = "main.html"
 INDEX_F_NAME        = "index.html"
+
+CALC_METRICS_FUNC   = "calcTimeMetrics(this);"
+CALC_DEF_METR_FUNC  = "calcDefTimeMetrics();"
 
 FRAME_ID            = "includer"
 FRAME_POS           = "absolute"

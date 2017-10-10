@@ -17,7 +17,7 @@ class WebGenerator:
     def __clear_out_dir(self, dir):
         for item in os.listdir(dir):
             item_path = os.path.join(dir, item)
-            if item != c_d.STYLE_F_NAME and item != c_d.SCRIPTS_F_NAME:
+            if item != c_d.JS_DIR and item != c_d.CSS_DIR:
                 try:
                     if os.path.isfile(item_path):
                         os.unlink(item_path)
@@ -34,7 +34,7 @@ class WebGenerator:
 
         self.__gen_content_start(index)
         self.__gen_iframe(index)
-        self.__gen_script(index)
+        self.__gen_script(index, os.path.join(c_d.JS_DIR, c_d.SCRIPTS_F_NAME))
         self.__gen_content_end(index)
 
         self.__gen_page_foot_info(index)
@@ -76,9 +76,16 @@ class WebGenerator:
                     h_d.A_HTTP_EQUIV.format(h_d.A_HE_PRAGMA)
                     + h_d.A_CONTENT.format(h_d.A_C_NO_CACHE),
                     True)
+
         gen.w_o_tag(h_d.T_LINK,
                     h_d.A_REL.format(h_d.A_REL_SS)
-                    + h_d.A_HREF.format(level + c_d.STYLE_F_NAME), True)
+                    + h_d.A_HREF.format(os.path.join(level, c_d.CSS_DIR, c_d.STYLE_F_NAME)), True)
+        # gen.w_o_tag(h_d.T_LINK,
+        #             h_d.A_REL.format(h_d.A_REL_SS)
+        #             + h_d.A_HREF.format(os.path.join(level, c_d.CSS_DIR, c_d.STYLE_F_NAME)), True)
+
+        self.__gen_script(gen, os.path.join(level, c_d.JS_DIR, c_d.JS_METRICS_F_NAME))
+
         gen.w_c_tag(h_d.T_HEAD)
         gen.w_o_tag(h_d.T_BODY, body_attr, True)
         gen.w_o_tag(h_d.T_DIV,
@@ -104,11 +111,11 @@ class WebGenerator:
                   + h_d.A_CLASS.format(c_d.CL_IFRAME)
                   + h_d.A_SRC.format(c_d.MAIN_F_NAME))
 
-    def __gen_script(self, gen):
+    def __gen_script(self, gen, script):
         gen.w_tag(h_d.T_SCRIPT,
                   "",
                   h_d.A_TYPE.format(h_d.A_T_JS)
-                  + h_d.A_SRC.format(c_d.SCRIPTS_F_NAME))
+                  + h_d.A_SRC.format(script))
 
     def __gen_table_head(self, gen):
         gen.w_o_tag(h_d.T_TABLE,
@@ -418,7 +425,9 @@ class WebGenerator:
                     ld_item = max(s_typed_items, key=lambda item: item.tag_date)
 
                     file.w_o_tag(h_d.T_TR,
-                                 h_d.A_CLASS.format(str(type_class_id)))
+                                 h_d.A_CLASS.format(str(type_class_id)) +
+                                 h_d.A_ON_MOUSE_OVER.format(c_d.CALC_METRICS_FUNC) +
+                                 h_d.A_ON_MOUSE_OUT.format(c_d.CALC_DEF_METR_FUNC))
                     # order num
                     if first_s_t:
                         first_s_t = False
