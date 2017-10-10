@@ -205,7 +205,7 @@ class WebGenerator:
     def __gen_mid_table_foot(self, gen):
         gen.w_tag(h_d.T_TH,
                   c_d.LAST_SET_TXT,
-                  h_d.A_COLSPAN.format(c_d.MID_ROWS) + h_d.A_CLASS.format(c_d.CL_BORDER))
+                  h_d.A_COLSPAN.format(c_d.DEV_MID_ROWS) + h_d.A_CLASS.format(c_d.CL_BORDER))
         gen.w_c_tag(h_d.T_TR)
 
     def __gen_bottom_table_head(self, gen):
@@ -217,6 +217,9 @@ class WebGenerator:
                   h_d.A_ROWSPAN.format(c_d.BTM_ROWS) + h_d.A_CLASS.format(c_d.CL_BORDER))
         gen.w_tag(h_d.T_TH,
                   c_d.HASH_TXT,
+                  h_d.A_ROWSPAN.format(c_d.BTM_ROWS) + h_d.A_CLASS.format(c_d.CL_BORDER))
+        gen.w_tag(h_d.T_TH,
+                  c_d.METRICS_TXT,
                   h_d.A_ROWSPAN.format(c_d.BTM_ROWS) + h_d.A_CLASS.format(c_d.CL_BORDER))
         gen.w_c_tag(h_d.T_TR)
 
@@ -428,6 +431,7 @@ class WebGenerator:
                                  h_d.A_CLASS.format(str(type_class_id)) +
                                  h_d.A_ON_MOUSE_OVER.format(c_d.CALC_METRICS_FUNC) +
                                  h_d.A_ON_MOUSE_OUT.format(c_d.CALC_DEF_METR_FUNC))
+
                     # order num
                     if first_s_t:
                         first_s_t = False
@@ -443,6 +447,12 @@ class WebGenerator:
                                              + h_d.A_ROWSPAN.format(str(len(soft_type_by_num))),
                                              [order_link_attrs])
 
+
+                    ordinal_tag_date = self.__get_ordinal_days_for_tag_date(ld_item.tag_date)
+
+                    file.w_o_tag(h_d.T_DIV,
+                                 h_d.A_DATE.format(c_d.DATE_ATR_ORDINAL,
+                                                   str(ordinal_tag_date)))
                     # order soft type
                     soft_type_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
                                                          + " " + c_d.CL_TEXT_CENTER
@@ -459,6 +469,7 @@ class WebGenerator:
                                               commit,
                                               ld_item,
                                               type_class_id)
+                    file.w_c_tag(h_d.T_DIV)
                     file.w_c_tag(h_d.T_TR)
 
                 # generate page for item
@@ -472,6 +483,15 @@ class WebGenerator:
                                       nummed_items)
 
             type_class_id += 1
+
+    def __get_ordinal_days_for_tag_date(self, tag_date):
+        cur_date_str = tag_date.split(" ")[0].split("-")
+
+        cur_date = datetime.date(int(cur_date_str[0]),
+                                 int(cur_date_str[1]),
+                                 1 if int(cur_date_str[2]) == 0 else int(cur_date_str[2]))
+
+        return cur_date.toordinal()
 
     def __gen_common_columns(self, file, repo, commit, item, type_class_id):
         tag_date_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
