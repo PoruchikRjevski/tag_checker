@@ -1,5 +1,6 @@
 import multiprocessing
 import os
+import datetime
 from multiprocessing.dummy import Pool as ThreadPool
 
 import common_defs as c_d
@@ -52,6 +53,15 @@ class GitMan:
 
         return False
 
+    def __get_ordinal_days_for_tag_date(self, tag_date):
+        cur_date_str = tag_date.split(" ")[0].split("-")
+
+        cur_date = datetime.date(int(cur_date_str[0]),
+                                 int(cur_date_str[1]),
+                                 1 if int(cur_date_str[2]) == 0 else int(cur_date_str[2]))
+
+        return cur_date.toordinal()
+
     def __parce_tag_sm(self, tag_part, pos, item_out, state):
         # offset
         if state[0] == W_OFFSET:
@@ -100,12 +110,14 @@ class GitMan:
         # W_DATE
         elif state[0] == W_DATE:
             item_out.tag_date = self.__repair_tag_date(tag_part)
+
             if g_v.DEBUG: out_log("date: {:s}".format(item_out.tag_date))
 
             if item_out.tag_date == c_d.BAD_DATE:
                 state[0] = W_BREAK
             else:
                 state[0] = W_DOMEN
+                item_out.tag_date_ord = self.__get_ordinal_days_for_tag_date(item_out.tag_date)
         # W_DOMEN
         elif state[0] == W_DOMEN:
             item_out.platform = tag_part
