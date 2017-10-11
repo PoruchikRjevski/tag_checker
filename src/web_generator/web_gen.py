@@ -576,7 +576,7 @@ class WebGenerator:
         elif date_metric < 0:
             d_m_clr = c_d.CL_RED
             date_metric = -1 * date_metric
-            date_metric_text = "({:s})".format(str(date_metric))
+            date_metric_text = "({:s} д.)".format(str(date_metric))
 
         column_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
                                           + " " + c_d.CL_TEXT_LEFT
