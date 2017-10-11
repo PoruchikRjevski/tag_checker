@@ -103,14 +103,14 @@ def check_pid(pid):
 def out_err(msg):
     pid = str(threading.get_ident())
 
-    # out = gen_log_msg(msg, c_d.ERR_T, 3)
-    #
-    # if g_v.MULTITH:
-    #     check_pid(pid)
-    #
-    #     threads_errs[pid].append(out)
-    # else:
-    #     out_msg(out, c_d.ERR_T)
+    out = gen_log_msg(msg, c_d.ERR_T, 3)
+
+    if g_v.MULTITH:
+        check_pid(pid)
+
+        threads_errs[pid].append(out)
+    else:
+        out_msg(out, c_d.ERR_T)
 
 
 def gen_log_msg(msg, type, level):
