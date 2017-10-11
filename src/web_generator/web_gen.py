@@ -219,9 +219,6 @@ class WebGenerator:
         gen.w_tag(h_d.T_TH,
                   c_d.HASH_TXT,
                   h_d.A_ROWSPAN.format(c_d.BTM_ROWS) + h_d.A_CLASS.format(c_d.CL_BORDER))
-        gen.w_tag(h_d.T_TH,
-                  c_d.METRICS_TXT,
-                  h_d.A_ROWSPAN.format(c_d.BTM_ROWS) + h_d.A_CLASS.format(c_d.CL_BORDER))
         gen.w_c_tag(h_d.T_TR)
 
     def __gen_main_content(self, model, file):
@@ -281,11 +278,23 @@ class WebGenerator:
                    attr,
                    True)
 
-    def __gen_tag_date(self, file, date, attr):
-        file.w_tag(h_d.T_TD,
-                   date,
-                   attr,
-                   True)
+    def __gen_tag_date(self, file, date, date_metric, attr, date_cl, d_m_cl):
+        file.w_o_tag(h_d.T_TD, attr)
+        # file.w_o_tag(h_d.T_DIV)
+        file.w_o_tag(h_d.T_P, date_cl)
+        file.w_txt(date)
+        file.w_c_tag(h_d.T_P)
+        file.w_o_tag(h_d.T_P, d_m_cl)
+        file.w_txt(date_metric)
+        file.w_c_tag(h_d.T_P)
+        # file.w_c_tag(h_d.T_DIV)
+        file.w_c_tag(h_d.T_TD)
+
+
+        # file.w_tag(h_d.T_TD,
+        #            date,
+        #            attr,
+        #            True)
 
     def __gen_tag_commit_version(self, file, td_attr, link_attrs):
         self.__gen_linked_td(file, td_attr, link_attrs)
@@ -558,13 +567,32 @@ class WebGenerator:
                     file.w_c_tag(h_d.T_TR)
 
     def __gen_common_columns(self, file, repo, commit, item, type_class_id, date_metric=-1):
-        tag_date_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
-                                            + " " + c_d.CL_TEXT_CENTER
-                                            + " " + c_d.CL_BORDER)
+        # date metric
+        d_m_clr = ""
+        date_metric_text = "(0)"
+
+        if date_metric >= 0:
+            d_m_clr = c_d.CL_GREEN
+        elif date_metric < 0:
+            d_m_clr = c_d.CL_RED
+            date_metric = -1 * date_metric
+            date_metric_text = "({:s})".format(str(date_metric))
+
+        column_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
+                                          + " " + c_d.CL_TEXT_LEFT
+                                          + " " + c_d.CL_BORDER)
+        d_m_class = h_d.A_CLASS.format(c_d.CL_TEXT_RIGHT
+                                       + " " + d_m_clr
+                                       + " " + c_d.CL_NO_WRAP)
         # tag date
         self.__gen_tag_date(file,
                             item.tag_date,
-                            h_d.A_TITLE.format(c_d.TAG_TXT + item.tag) + tag_date_class)
+                            date_metric_text,
+                            column_class,
+                            h_d.A_TITLE.format(c_d.TAG_TXT + item.tag)
+                            + h_d.A_CLASS.format(c_d.CL_TEXT_LEFT
+                                                 + " " + c_d.CL_NO_WRAP),
+                            d_m_class)
 
         # commit hash
         link_hash = commit.p_hash
@@ -598,26 +626,6 @@ class WebGenerator:
         self.__gen_tag_commit_version(file,
                                       ver_class,
                                       links_list)
-
-        # date metric
-        d_m_class = ""
-        if date_metric >= 0:
-            d_m_class = c_d.CL_GREEN
-        elif date_metric < 0:
-            d_m_class = c_d.CL_RED
-
-        d_m_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
-                                       + " " + d_m_class
-                                       + " " + c_d.CL_BORDER
-                                       + " " + c_d.CL_TEXT_RIGHT)
-        self.__gen_date_metric(file, str(date_metric), d_m_class)
-
-
-    def __gen_date_metric(self, file, text, d_m_class):
-        file.w_tag(h_d.T_TD,
-                   text,
-                   d_m_class,
-                   True)
 
     def __change_class_type(self, c_type):
         if c_type == c_d.CL_TD_1:

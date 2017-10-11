@@ -158,6 +158,7 @@ class Item:
         self.item_type = c_d.TYPE_ALL
         self.tag = ""
         self.tag_date = ""
+        self.tag_date_obj = None
         self.tag_date_ord = 0
         self.cm_hash = ""
         self.platform = c_d.D_LINUX

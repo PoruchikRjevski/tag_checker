@@ -53,14 +53,30 @@ class GitMan:
 
         return False
 
-    def __get_ordinal_days_for_tag_date(self, tag_date):
-        cur_date_str = tag_date.split(" ")[0].split("-")
+    def __get_tag_datetime_object(self, tag_date):
+        splitted = tag_date.split(" ")
 
-        cur_date = datetime.date(int(cur_date_str[0]),
-                                 int(cur_date_str[1]),
-                                 1 if int(cur_date_str[2]) == 0 else int(cur_date_str[2]))
+        cur_date_str = splitted[0].split("-")
+        cur_time_str = None
+        if len(splitted) > 1:
+            cur_time_str = splitted[1].split(":")
 
-        return cur_date.toordinal()
+        cur_datetime = None
+
+        year = int(cur_date_str[0])
+        month = int(cur_date_str[1])
+        day = 1 if int(cur_date_str[2]) == 0 else int(cur_date_str[2])
+
+        hour = 0
+        minute = 0
+
+        if not cur_time_str is None:
+            hour = int(cur_time_str[0])
+            minute = int(cur_time_str[1])
+
+        cur_datetime = datetime.datetime(year, month, day, hour, minute)
+
+        return cur_datetime
 
     def __parce_tag_sm(self, tag_part, pos, item_out, state):
         # offset
@@ -117,7 +133,8 @@ class GitMan:
                 state[0] = W_BREAK
             else:
                 state[0] = W_DOMEN
-                item_out.tag_date_ord = self.__get_ordinal_days_for_tag_date(item_out.tag_date)
+                item_out.tag_date_obj = self.__get_tag_datetime_object(item_out.tag_date)
+                item_out.tag_date_ord = item_out.tag_date_obj.toordinal()
         # W_DOMEN
         elif state[0] == W_DOMEN:
             item_out.platform = tag_part
