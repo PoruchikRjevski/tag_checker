@@ -283,13 +283,10 @@ class WebGenerator:
                    attr,
                    True)
 
-    def __gen_tag_date(self, file, date, date_metric, attr, date_cl, d_m_cl):
+    def __gen_tag_date(self, file, date, attr, date_cl):
         file.w_o_tag(h_d.T_TD, attr)
         file.w_o_tag(h_d.T_P, date_cl)
         file.w_txt(date)
-        file.w_c_tag(h_d.T_P)
-        file.w_o_tag(h_d.T_P, d_m_cl)
-        file.w_txt(date_metric)
         file.w_c_tag(h_d.T_P)
         file.w_c_tag(h_d.T_TD)
 
@@ -374,36 +371,6 @@ class WebGenerator:
         first = True
         date = ""
 
-        # get max ordinals for date metric
-        s_t_max_ordinal = OrderedDict()
-        s_t_items_nums = OrderedDict()
-
-        soft_type_by_num = []
-        for n_item in items:
-            s_type = dep.repos[n_item.repo_i].soft_type
-
-            if s_type not in s_t_items_nums.keys():
-                s_t_items_nums[s_type] = []
-
-            s_t_items_nums[s_type].append(items.index(n_item))
-
-            if s_type not in soft_type_by_num:
-                soft_type_by_num.append(s_type)
-
-        for soft_t in dep.soft_types:
-            s_typed_items = [item for item in items if dep.repos[item.repo_i].soft_type == soft_t]
-
-            if not s_typed_items:
-                continue
-
-            max_ord = max(s_typed_items, key=lambda item: item.tag_date_ord).tag_date_ord
-
-            if soft_t not in s_t_max_ordinal.keys():
-                s_t_max_ordinal[soft_t] = []
-
-            s_t_max_ordinal[soft_t] = max_ord
-
-        # get items info
         items.sort(key=lambda item: item.tag_date, reverse=True)
 
         for item in items:
@@ -426,24 +393,12 @@ class WebGenerator:
                                       dep.repos[item.repo_i].soft_type,
                                       soft_type_class)
 
-            date_metric = 0
-            s_type = ""
-            for s_t in s_t_items_nums.keys():
-                if items.index(item) in s_t_items_nums[s_t]:
-                    s_type = s_t
-                    break
-
-            s_t_max = s_t_max_ordinal[s_type] if s_type in s_t_max_ordinal.keys() else 0
-            if item.tag_date_ord != s_t_max:
-                date_metric = item.tag_date_ord - s_t_max
-
             # tag date and commit hash
             self.__gen_common_columns(page,
                                       dep.repos[item.repo_i],
                                       dep.commits[item.cm_i],
                                       item,
-                                      type_class_id,
-                                      date_metric)
+                                      type_class_id)
 
             page.w_c_tag(h_d.T_TR)
 
@@ -451,21 +406,16 @@ class WebGenerator:
         dep = model.departments[dep_name]
         dev_items = [item for item in dep.items if item.dev_name == dev_name]
 
-        finish_items = OrderedDict()
-        ordinal_list = []
-
         type_class_id = 0
         for type in c_d.TYPES_L:
-            finish_items[type_class_id] = OrderedDict()
             typed_items = [item for item in dev_items if item.item_type == type]
 
             unic_nums = sorted([key for key in dict.fromkeys([item.item_num for item in typed_items]).keys()],
                                reverse=False)
 
             for num in unic_nums:
-                # first_s_t = True
+                first_s_t = True
                 nummed_items = [item for item in typed_items if item.item_num == num]
-                finish_items[type_class_id][num] = OrderedDict()
 
                 soft_type_by_num = []
                 for n_item in nummed_items:
@@ -481,9 +431,43 @@ class WebGenerator:
 
                     ld_item = max(s_typed_items, key=lambda item: item.tag_date)
 
-                    ordinal_list.append(ld_item.tag_date_ord)
+                    file.w_o_tag(h_d.T_TR,
+                                 h_d.A_CLASS.format(str(type_class_id)) +
+                                 h_d.A_ON_MOUSE_OVER.format(c_d.CALC_METRICS_FUNC) +
+                                 h_d.A_ON_MOUSE_OUT.format(c_d.CALC_DEF_METR_FUNC))
 
-                    finish_items[type_class_id][num][soft_t] = ld_item, str(len(soft_type_by_num)), str(len(nummed_items))
+                    # order num
+                    if first_s_t:
+                        first_s_t = False
+                        order_link_attrs = (self.__get_num_by_type(ld_item.item_type, ld_item.item_num),
+                                            os.path.join(c_d.ORDERS_DIR,
+                                                         self.__get_order_file_name(dev_name, ld_item.item_num)),
+                                            h_d.A_TITLE.format(c_d.CNT_TXT + str(len(nummed_items))))
+
+                        self.__gen_order_num(file,
+                                             h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
+                                                                + " " + c_d.CL_TD_NUM
+                                                                + " " + c_d.CL_BORDER)
+                                             + h_d.A_ROWSPAN.format(str(len(soft_type_by_num))),
+                                             [order_link_attrs])
+
+                    # order soft type
+                    soft_type_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
+                                                         + " " + c_d.CL_TEXT_CENTER
+                                                         + " " + c_d.CL_BORDER)
+                    self.__gen_item_soft_type(file,
+                                              soft_t,
+                                              soft_type_class)
+
+                    # tag date and commit hash
+                    repo = model.departments[dep_name].repos[ld_item.repo_i]
+                    commit = model.departments[dep_name].commits[ld_item.cm_i]
+                    self.__gen_common_columns(file,
+                                              repo,
+                                              commit,
+                                              ld_item,
+                                              type_class_id)
+                    file.w_c_tag(h_d.T_TR)
 
                 # generate page for item
                 self.__gen_items_page(model,
@@ -495,101 +479,18 @@ class WebGenerator:
 
             type_class_id += 1
 
-        # prepare max dates for soft_types
-        s_t_max_ordinal = OrderedDict()
-        for cl_type in finish_items.keys():
-            for item_num in finish_items[cl_type].keys():
-                first_s_t = True
-                for s_type in finish_items[cl_type][item_num].keys():
-                    ld_item, _, _ = finish_items[cl_type][item_num][s_type]
-
-                    if s_type not in s_t_max_ordinal.keys():
-                        s_t_max_ordinal[s_type] = []
-
-                    s_t_max_ordinal[s_type].append(ld_item.tag_date_ord)
-
-        # gen devices page content
-        for cl_type in finish_items.keys():
-            for item_num in finish_items[cl_type].keys():
-                first_s_t = True
-                for s_type in finish_items[cl_type][item_num].keys():
-                    ld_item, s_t_nums, n_nums = finish_items[cl_type][item_num][s_type]
-
-                    file.w_o_tag(h_d.T_TR,
-                                 h_d.A_CLASS.format(str(cl_type)) +
-                                 h_d.A_ON_MOUSE_OVER.format(c_d.CALC_METRICS_FUNC) +
-                                 h_d.A_ON_MOUSE_OUT.format(c_d.CALC_DEF_METR_FUNC))
-
-                    # order num
-                    if first_s_t:
-                        first_s_t = False
-                        order_link_attrs = (self.__get_num_by_type(ld_item.item_type, ld_item.item_num),
-                                            os.path.join(c_d.ORDERS_DIR,
-                                                         self.__get_order_file_name(dev_name, ld_item.item_num)),
-                                            h_d.A_TITLE.format(c_d.CNT_TXT + n_nums))
-
-                        self.__gen_order_num(file,
-                                             h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(cl_type))
-                                                                + " " + c_d.CL_TD_NUM
-                                                                + " " + c_d.CL_BORDER)
-                                             + h_d.A_ROWSPAN.format(s_t_nums),
-                                             [order_link_attrs])
-
-                    file.w_o_tag(h_d.T_DIV,
-                                 h_d.A_DATE.format(c_d.DATE_ATR_ORDINAL,
-                                                   str(ld_item.tag_date_ord)))
-                    # order soft type
-                    soft_type_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(cl_type))
-                                                         + " " + c_d.CL_TEXT_CENTER
-                                                         + " " + c_d.CL_BORDER)
-                    self.__gen_item_soft_type(file,
-                                              s_type,
-                                              soft_type_class)
-
-                    # tag date and commit hash
-                    date_metric = 0
-                    s_t_max = max(s_t_max_ordinal[s_type] if s_type in s_t_max_ordinal.keys() else 0)
-                    if ld_item.tag_date_ord != s_t_max:
-                        date_metric = ld_item.tag_date_ord - s_t_max
-
-                    repo = model.departments[dep_name].repos[ld_item.repo_i]
-                    commit = model.departments[dep_name].commits[ld_item.cm_i]
-                    self.__gen_common_columns(file,
-                                              repo,
-                                              commit,
-                                              ld_item,
-                                              cl_type,
-                                              date_metric)
-                    file.w_c_tag(h_d.T_DIV)
-                    file.w_c_tag(h_d.T_TR)
-
-    def __gen_common_columns(self, file, repo, commit, item, type_class_id, date_metric=-1):
-        # date metric
-        d_m_clr = ""
-        date_metric_text = "(0)"
-
-        if date_metric >= 0:
-            d_m_clr = c_d.CL_GREEN_BGRND
-        elif date_metric < 0:
-            d_m_clr = c_d.CL_RED_BGRND
-            date_metric = -1 * date_metric
-            date_metric_text = "({:s} д.)".format(str(date_metric))
+    def __gen_common_columns(self, file, repo, commit, item, type_class_id):
 
         column_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
                                           + " " + c_d.CL_TEXT_LEFT
                                           + " " + c_d.CL_BORDER)
-        d_m_class = h_d.A_CLASS.format(c_d.CL_TEXT_RIGHT
-                                       + " " + d_m_clr
-                                       + " " + c_d.CL_NO_WRAP)
         # tag date
         self.__gen_tag_date(file,
                             item.tag_date,
-                            date_metric_text,
                             column_class,
                             h_d.A_TITLE.format(c_d.TAG_TXT + item.tag)
                             + h_d.A_CLASS.format(c_d.CL_TEXT_LEFT
-                                                 + " " + c_d.CL_NO_WRAP),
-                            d_m_class)
+                                                 + " " + c_d.CL_NO_WRAP))
 
         # commit hash
         link_hash = commit.p_hash
@@ -641,8 +542,8 @@ class WebGenerator:
         gen.w_o_tag(h_d.T_TD, cl)
 
         gen.w_tag(h_d.T_P,
-                  "{:s} д. / {:s} пр.".format(str(metric.diff_d.days),
-                                              str(metric.jumps)),
+                  "{0:4d} д. / {1:4d} пр.".format(metric.diff_d.days,
+                                                  metric.jumps).replace(" ", h_d.WS),
                   h_d.A_CLASS.format(c_d.CL_TEXT_LEFT
                                      + " " + c_d.CL_NO_WRAP))
 

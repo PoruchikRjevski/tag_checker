@@ -155,19 +155,20 @@ tr.tr_1 {
 }
 
 .green {
-    background-color: #78e780;
+    background-color: #94ef94;
 }
 
 .yellow {
-    background-color: #e5da00;
+    background-color: #efef94;
 }
 
 .red {
-    background-color: #ffb7b7;
+    background-color: #ef9494;
 }
 
 .circle {
     border-radius: 50%;
+    border: 1px solid #dddddd
 }
 
 p.header {

@@ -299,6 +299,7 @@ class GitMan:
             out_err("EXCEPT Bad jumps between: {:s} and {:s} out: {:s}".format(comm_a_hash,
                                                                                comm_b_hash,
                                                                                out))
+            jumps = -1
 
         return jumps
 
@@ -605,6 +606,14 @@ class GitMan:
 
                 max_item_cm_d = dep_obj.commits[max_item.cm_i].date_obj
 
+                # find jumps
+                unic_hashes = list(set([item.cm_hash for item in dev_s_items]))
+                unic_hashes_jumps = {}
+
+                for hash in unic_hashes:
+                    unic_hashes_jumps[hash] = self.__get_jumps_between_commits(max_item.cm_hash, hash)
+
+                # fill all metric info
                 for item in dev_s_items:
                     it_ind = dep_obj.items.index(item)
 
@@ -614,8 +623,7 @@ class GitMan:
                         if item.tag_date_obj > max_item.tag_date_obj:
                             dep_obj.items[it_ind].metric.forced = True
 
-                        jumps = self.__get_jumps_between_commits(max_item.cm_hash, item.cm_hash)
-                        dep_obj.items[it_ind].metric.jumps = jumps
+                        dep_obj.items[it_ind].metric.jumps = unic_hashes_jumps[item.cm_hash]
 
                     item_cm_d = dep_obj.commits[item.cm_i].date_obj
 
