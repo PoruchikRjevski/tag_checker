@@ -194,4 +194,5 @@ class MetricsInfo:
         self.forced = False # if tag not in develop
         self.last = False # if it is the last version of soft
         self.jumps = 0 # number of commits between this and last if this is not last
+        self.jmp_clr_mult = 1 # multiplier for red color step+ for shows metric
         self.diff_d = None # number of days between this and last if this is not last

@@ -55,6 +55,7 @@ A_ST_H              = "height:{:s};"
 A_ST_W              = "width:{:s};"
 A_ST_BORDER         = "border:{:s};"
 A_ST_POS            = "position:{:s};"
+A_ST_BCKGRND_COL    = "background-color: #{:x}"
 
 A_T_JS              = "text/javascript"
 

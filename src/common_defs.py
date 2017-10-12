@@ -45,6 +45,13 @@ CL_WHITE_TXT        = "txt_white"
 CL_NO_WRAP          = "no_wrap"
 CL_CIRCLE           = "circle"
 
+CLR_GREEN           = 0x94ef94
+CLR_RED_STEPS       = 96
+CLR_RED_MAX         = 0xff0d0d
+CLR_RED_MIN         = 0xffcdcd
+CLR_RED_STEP        = 0x000202
+CLR_YEL             = 0xefef94
+
 DATE_ATR_ORDINAL    = "ordinal"
 
 D_TABLE_COLSPAN     = "5"

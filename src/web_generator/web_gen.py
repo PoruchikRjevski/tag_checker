@@ -533,12 +533,16 @@ class WebGenerator:
     def __gen_metrics_column(self, gen, cl, metric):
         # todo do item metric magic
         color_cl = ""
+        color = 0x00
         if metric.last:
             color_cl = c_d.CL_GREEN_BGRND
+            color = c_d.CLR_GREEN
         elif metric.forced:
             color_cl = c_d.CL_YELLOW_BGRND
+            color = c_d.CLR_YEL
         else:
             color_cl = c_d.CL_RED_BGRND
+            color = c_d.CLR_RED_MIN - (metric.jmp_clr_mult * c_d.CLR_RED_STEP)
         gen.w_o_tag(h_d.T_TD, cl)
 
         gen.w_tag(h_d.T_P,
@@ -551,8 +555,8 @@ class WebGenerator:
                   2 * h_d.WS,
                   h_d.A_CLASS.format(c_d.CL_TEXT_RIGHT
                                      + " " + c_d.CL_NO_WRAP
-                                     + " " + color_cl
-                                     + " " + c_d.CL_CIRCLE))
+                                     + " " + c_d.CL_CIRCLE)
+                  + h_d.A_STYLE.format(h_d.A_ST_BCKGRND_COL.format(color)))
 
         gen.w_c_tag(h_d.T_TD)
 

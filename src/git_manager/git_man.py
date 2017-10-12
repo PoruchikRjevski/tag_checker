@@ -613,6 +613,17 @@ class GitMan:
                 for hash in unic_hashes:
                     unic_hashes_jumps[hash] = self.__get_jumps_between_commits(max_item.cm_hash, hash)
 
+                max_jump = max(unic_hashes_jumps.values())
+                max_jump_step = 0
+
+                if max_jump < c_d.CLR_RED_STEPS:
+                    max_jump_step = 1
+                else:
+                    max_jump_step = round((max_jump/c_d.CLR_RED_STEPS) + 0.5)
+
+                print("max {:s} by step {:s}".format(str(max_jump),
+                                                     str(max_jump_step)))
+
                 # fill all metric info
                 for item in dev_s_items:
                     it_ind = dep_obj.items.index(item)
@@ -623,7 +634,12 @@ class GitMan:
                         if item.tag_date_obj > max_item.tag_date_obj:
                             dep_obj.items[it_ind].metric.forced = True
 
-                        dep_obj.items[it_ind].metric.jumps = unic_hashes_jumps[item.cm_hash]
+                        jmp_tmp = unic_hashes_jumps[item.cm_hash]
+                        dep_obj.items[it_ind].metric.jumps = jmp_tmp
+
+                        dep_obj.items[it_ind].metric.jmp_clr_mult = round((jmp_tmp/max_jump_step) + 0.5)
+                        print("jmp {:s} res {:s}".format(str(jmp_tmp),
+                                                         str(dep_obj.items[it_ind].metric.jmp_clr_mult)))
 
                     item_cm_d = dep_obj.commits[item.cm_i].date_obj
 
