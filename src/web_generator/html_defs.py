@@ -42,6 +42,9 @@ A_TARGET            = " target=\"{:s}\""
 A_HTTP_EQUIV        = " http-equiv=\"{:s}\""
 A_CONTENT           = " content=\"{:s}\""
 A_NAME              = " name=\"{:s}\""
+A_ON_MOUSE_OVER     = " onmouseover=\"{:s}\""
+A_ON_MOUSE_OUT      = " onmouseout=\"{:s}\""
+A_DATE              = " date-{:s}=\"{:s}\""
 
 # params
 A_REL_SS            = "stylesheet"

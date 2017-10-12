@@ -1,5 +1,6 @@
 import multiprocessing
 import os
+import datetime
 from multiprocessing.dummy import Pool as ThreadPool
 
 import common_defs as c_d
@@ -52,6 +53,31 @@ class GitMan:
 
         return False
 
+    def __get_tag_datetime_object(self, tag_date):
+        splitted = tag_date.split(" ")
+
+        cur_date_str = splitted[0].split("-")
+        cur_time_str = None
+        if len(splitted) > 1:
+            cur_time_str = splitted[1].split(":")
+
+        cur_datetime = None
+
+        year = int(cur_date_str[0])
+        month = int(cur_date_str[1])
+        day = 1 if int(cur_date_str[2]) == 0 else int(cur_date_str[2])
+
+        hour = 0
+        minute = 0
+
+        if not cur_time_str is None:
+            hour = int(cur_time_str[0])
+            minute = int(cur_time_str[1])
+
+        cur_datetime = datetime.datetime(year, month, day, hour, minute)
+
+        return cur_datetime
+
     def __parce_tag_sm(self, tag_part, pos, item_out, state):
         # offset
         if state[0] == W_OFFSET:
@@ -100,12 +126,15 @@ class GitMan:
         # W_DATE
         elif state[0] == W_DATE:
             item_out.tag_date = self.__repair_tag_date(tag_part)
+
             if g_v.DEBUG: out_log("date: {:s}".format(item_out.tag_date))
 
             if item_out.tag_date == c_d.BAD_DATE:
                 state[0] = W_BREAK
             else:
                 state[0] = W_DOMEN
+                item_out.tag_date_obj = self.__get_tag_datetime_object(item_out.tag_date)
+                item_out.tag_date_ord = item_out.tag_date_obj.toordinal()
         # W_DOMEN
         elif state[0] == W_DOMEN:
             item_out.platform = tag_part

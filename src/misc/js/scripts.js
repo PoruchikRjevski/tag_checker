@@ -29,17 +29,18 @@ function highlight(hash) {
 
 // parce hash from url
 function getHashFromUrl(url) {
-        var splitted = url.split(';');
+    var splitted = url.split(';');
 
-        for (var i = 0; i < splitted.length; i++) {
-            if (splitted[i].includes("ch=")) {
-                var hash = splitted[i];
+    for (var i = 0; i < splitted.length; i++) {
+        if (splitted[i].includes("ch=")) {
+            var hash = splitted[i];
 
-                hash = hash.replace("ch=", "");
+            hash = hash.replace("ch=", "");
 
-                return hash;
-            }
+            return hash;
         }
+    }
+
     return "";
 
 }

@@ -8,6 +8,10 @@ SETUP_DIR="/opt/tag_checker/"
 OUT_DIR="/var/www/swver_hist/"
 OUT_DEV_DIR=$OUT_DIR"devices/"
 OUT_ORD_DIR=$OUT_DEV_DIR"orders/"
+CSS_DIR="css/"
+JS_DIR="js/"
+OUT_JS_DIR=$OUT_DIR$JS_DIR
+OUT_CSS_DIR=$OUT_DIR$CSS_DIR
 SRC_DIR="src/"
 PY_FILES="*.py"
 CONFIG_DIR="/etc/"
@@ -192,9 +196,17 @@ create_dirs() {
         check_and_make_d "$SETUP_DIR"
         chmod +x $SETUP_DIR
 
-        progress_step "making $OUT_ORD_DIR ..." 75
+        progress_step "making $OUT_ORD_DIR ..." 40
         check_and_make_d "$OUT_ORD_DIR"
-        chmod +x $OUT_DIR*
+        chmod +x $OUT_ORD_DIR*
+        
+        progress_step "making $OUT_CSS_DIR ..." 55
+        check_and_make_d "$OUT_CSS_DIR"
+        chmod +x $OUT_CSS_DIR*
+        
+        progress_step "making $OUT_JS_DIR ..." 75
+        check_and_make_d "$OUT_JS_DIR"
+        chmod +x $OUT_JS_DIR*
 
         progress_step "making $LOG_DIR ..." 100
         check_and_make_d "$LOG_DIR"
@@ -285,18 +297,18 @@ update_files() {
     (
         progress_step "Init updating files..." 0
 
-        progress_step "Script files was copied..." 10
+        progress_step "Source files was copied..." 10
         yes | cp -rf $SRC_DIR* $SETUP_DIR
 
         progress_step "Config file was checked..." 15
         cp -rfn $CUR_DIR$CONFIG_FILE $CONFIG_DIR
         chmod 777 $CONFIG_DIR$CONFIG_FILE
-
-        progress_step "Copy scripts..." 20
-        cp $CUR_DIR$SRC_DIR$MISC_DIR$SCRIPTS_FILE $OUT_DIR
-
-        progress_step "Copy styles..." 25
-        cp $CUR_DIR$SRC_DIR$MISC_DIR$STYLE_FILE $OUT_DIR
+        
+        progress_step "CSS files was copied..." 20
+        yes | cp -rf $CUR_DIR$SRC_DIR$MISC_DIR$CSS_DIR* $OUT_DIR$CSS_DIR
+        
+        progress_step "JS files was copied..." 30
+        yes | cp -rf $CUR_DIR$SRC_DIR$MISC_DIR$JS_DIR* $OUT_DIR$JS_DIR
 
         progress_step "Create build version..." 50
         build_ver

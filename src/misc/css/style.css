@@ -109,6 +109,18 @@ td {
     text-align: center;
 }
 
+.t_right {
+    text-align: right;
+}
+
+.t_left {
+    text-align: left;
+}
+
+.no_wrap {
+    display: inline;
+}
+
 td.td_inc_0 {
     background-color: #eeeeee
 }
@@ -136,6 +148,14 @@ tr.mt_foot {
 
 tr.tr_1 {
     background-color: #eeeeee;
+}
+
+.green {
+    color: #008800;
+}
+
+.red {
+    color: #880000;
 }
 
 p.header {

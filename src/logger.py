@@ -112,11 +112,6 @@ def out_err(msg):
     else:
         out_msg(out, c_d.ERR_T)
 
-    # if pid in threads_list and g_v.MULTITH:
-    #     threads_errs[pid].append(out)
-    # else:
-    #     out_msg(out, c_d.ERR_T)
-
 
 def gen_log_msg(msg, type, level):
     (c_name, c_line) = get_caller_info(level)
