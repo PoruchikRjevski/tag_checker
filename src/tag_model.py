@@ -177,6 +177,7 @@ class CommitInfo:
         self.p_hash = ""
         self.date = ""
         self.date_full = ""
+        self.date_obj = None
         self.msg = ""
         self.auth = ""
         self.valid = False
@@ -193,4 +194,4 @@ class MetricsInfo:
         self.forced = False # if tag not in develop
         self.last = False # if it is the last version of soft
         self.jumps = 0 # number of commits between this and last if this is not last
-        self.days = 0 # number of days between this and last if this is not last
+        self.diff_d = None # number of days between this and last if this is not last

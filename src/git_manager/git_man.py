@@ -283,6 +283,25 @@ class GitMan:
             else:
                 return -1
 
+    def __get_jumps_between_commits(self, comm_a_hash, comm_b_hash):
+        cmd = g_d.GIT_CMD.format(g_d.A_LOG
+                                 + " {:s}...{:s}".format(comm_a_hash,
+                                                        comm_b_hash)
+                                 + g_d.A_PRETTY.format(g_d.A_P_ONELINE)
+                                 + g_d.A_WS_L)
+
+        out = run_cmd(cmd)
+
+        jumps = 0
+        try:
+            jumps = int(out)
+        except ValueError:
+            out_err("EXCEPT Bad jumps between: {:s} and {:s} out: {:s}".format(comm_a_hash,
+                                                                               comm_b_hash,
+                                                                               out))
+
+        return jumps
+
     def __gen_notes_by_tag_list(self, tag_list):
         items = []
 
@@ -511,6 +530,7 @@ class GitMan:
         (sh_date, full_date) = self.__repair_commit_date(date)
         commit.date = sh_date
         commit.date_full = full_date
+        commit.date_obj = datetime.datetime.strptime(sh_date, "%Y-%m-%d %H:%M")
         if g_v.DEBUG: out_log("item commit date: {:s}".format(commit.date))
 
         commit.auth = self.__get_commit_author_by_short_hash(hash)
@@ -530,7 +550,7 @@ class GitMan:
 
         return commit
 
-    def __do_work(self, tags_list, commits, repo_i):
+    def __do_main_work(self, tags_list, commits, repo_i):
         self.__get_cpus()
 
         items_out = []
@@ -568,6 +588,39 @@ class GitMan:
 
         return items_out
 
+    def __do_get_metrics(self, items, dep_obj):
+        for dev_name in dep_obj.devices:
+            for soft_t in dep_obj.soft_types:
+                dev_s_items = [item for item in items if (item.dev_name == dev_name
+                                                          and dep_obj.repos[item.repo_i].soft_type == soft_t
+                                                          and item.cm_i < len(dep_obj.commits))]
+
+                if not dev_s_items:
+                    continue
+
+                max_item = max(dev_s_items, key=lambda item: item.tag_date)
+                max_item_ind = dep_obj.items.index(max_item)
+
+                dep_obj.items[max_item_ind].metric.last = True
+
+                max_item_cm_d = dep_obj.commits[max_item.cm_i].date_obj
+
+                for item in dev_s_items:
+                    it_ind = dep_obj.items.index(item)
+
+                    if max_item_cm_d == dep_obj.commits[item.cm_i].date_obj:
+                        dep_obj.items[it_ind].metric.last = True
+                    else:
+                        if item.tag_date_obj > max_item.tag_date_obj:
+                            dep_obj.items[it_ind].metric.forced = True
+
+                        jumps = self.__get_jumps_between_commits(max_item.cm_hash, item.cm_hash)
+                        dep_obj.items[it_ind].metric.jumps = jumps
+
+                    item_cm_d = dep_obj.commits[item.cm_i].date_obj
+
+                    dep_obj.items[it_ind].metric.diff_d = max_item_cm_d - item_cm_d
+
     def scanning(self, model):
         if g_v.DEBUG: out_log("start scanning")
 
@@ -595,7 +648,7 @@ class GitMan:
                     if g_v.DEBUG:
                         out_log("Tags number: {:s}".format(str(len(tags_list))))
 
-                    items_list = self.__do_work(tags_list, dep_obj.commits, dep_obj.repos.index(repo))
+                    items_list = self.__do_main_work(tags_list, dep_obj.commits, dep_obj.repos.index(repo))
 
                     g_v.PROC_TAGS_NUM += len(items_list)
 
@@ -608,6 +661,16 @@ class GitMan:
                         dep_obj.items.append(item)
                         if item.dev_name not in dep_obj.devices:
                             dep_obj.devices.append(item.dev_name)
+
+                    # todo do get metrics
+                    metr_t = start()
+                    self.__do_get_metrics(items_list, dep_obj)
+                    stop(metr_t)
+                    if g_v.TIMEOUTS: out_log("Metrics time: {:s}".format(get_pass_time(metr_t)))
+
+                    # add items to model
+                    # for item in items_list:
+                    #     dep_obj.items.append(item)
 
         if g_v.DEBUG: out_log("stop scanning")
 

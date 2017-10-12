@@ -242,7 +242,8 @@ class WebGenerator:
                                   c_d.DEVICE_PATH + self.__get_device_file_name(dev_name),
                                   h_d.A_TITLE.format(c_d.TO_DEV_TXT))
                 self.__gen_device_name(file,
-                                       h_d.A_ROWSPAN.format(c_d.BTM_ROWS) + h_d.A_CLASS.format(c_d.CL_BORDER),
+                                       h_d.A_ROWSPAN.format(c_d.BTM_ROWS) + h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(0)),
+                                                                                               c_d.CL_BORDER),
                                        [dev_link_attrs])
 
                 file.w_c_tag(h_d.T_TR)
@@ -255,7 +256,8 @@ class WebGenerator:
     def __gen_department(self, file, text, span):
         file.w_tag(h_d.T_TD,
                    text,
-                   h_d.A_ROWSPAN.format(span) + h_d.A_CLASS.format(c_d.CL_BORDER))
+                   h_d.A_ROWSPAN.format(span) + h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(0)),
+                                                                   c_d.CL_BORDER))
 
     def __gen_device_name(self, file, td_attr, link_attrs):
         self.__gen_linked_td(file, td_attr, link_attrs)
@@ -567,9 +569,9 @@ class WebGenerator:
         date_metric_text = "(0)"
 
         if date_metric >= 0:
-            d_m_clr = c_d.CL_GREEN_TXT
+            d_m_clr = c_d.CL_GREEN_BGRND
         elif date_metric < 0:
-            d_m_clr = c_d.CL_RED_TXT
+            d_m_clr = c_d.CL_RED_BGRND
             date_metric = -1 * date_metric
             date_metric_text = "({:s} д.)".format(str(date_metric))
 
@@ -623,25 +625,33 @@ class WebGenerator:
                                       links_list)
 
         metr_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
-                                        + " " + c_d.CL_TEXT_CENTER
+                                        + " " + c_d.CL_TEXT_RIGHT
                                         + " " + c_d.CL_BORDER)
         self.__gen_metrics_column(file, metr_class, item.metric)
 
     def __gen_metrics_column(self, gen, cl, metric):
-        gen.w_o_tag(h_d.T_TD, cl)
         # todo do item metric magic
         color_cl = ""
         if metric.last:
-            color_cl = c_d.CL_GREEN_TXT
+            color_cl = c_d.CL_GREEN_BGRND
         elif metric.forced:
-            color_cl = c_d.CL_YELLOW_TXT
+            color_cl = c_d.CL_YELLOW_BGRND
         else:
-            color_cl = c_d.CL_RED_TXT
+            color_cl = c_d.CL_RED_BGRND
+        gen.w_o_tag(h_d.T_TD, cl)
 
         gen.w_tag(h_d.T_P,
-                  "{:s} д. / {:s} пр.".format(str(metric.days),
-                                     str(metric.jumps)),
-                  h_d.A_CLASS.format(color_cl))
+                  "{:s} д. / {:s} пр.".format(str(metric.diff_d.days),
+                                              str(metric.jumps)),
+                  h_d.A_CLASS.format(c_d.CL_TEXT_LEFT
+                                     + " " + c_d.CL_NO_WRAP))
+
+        gen.w_tag(h_d.T_P,
+                  2 * h_d.WS,
+                  h_d.A_CLASS.format(c_d.CL_TEXT_RIGHT
+                                     + " " + c_d.CL_NO_WRAP
+                                     + " " + color_cl
+                                     + " " + c_d.CL_CIRCLE))
 
         gen.w_c_tag(h_d.T_TD)
 

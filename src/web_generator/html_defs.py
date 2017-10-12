@@ -6,6 +6,7 @@ TAG_C               = "/"
 
 # addings
 CR                  = "\n\r"
+WS                  = "&nbsp;"
 
 # tags
 T_HTML              = "html"
