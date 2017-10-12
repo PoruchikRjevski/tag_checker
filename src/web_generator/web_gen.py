@@ -219,6 +219,9 @@ class WebGenerator:
         gen.w_tag(h_d.T_TH,
                   c_d.HASH_TXT,
                   h_d.A_ROWSPAN.format(c_d.BTM_ROWS) + h_d.A_CLASS.format(c_d.CL_BORDER))
+        gen.w_tag(h_d.T_TH,
+                  c_d.METRICS_TXT,
+                  h_d.A_ROWSPAN.format(c_d.BTM_ROWS) + h_d.A_CLASS.format(c_d.CL_BORDER))
         gen.w_c_tag(h_d.T_TR)
 
     def __gen_main_content(self, model, file):
@@ -280,21 +283,13 @@ class WebGenerator:
 
     def __gen_tag_date(self, file, date, date_metric, attr, date_cl, d_m_cl):
         file.w_o_tag(h_d.T_TD, attr)
-        # file.w_o_tag(h_d.T_DIV)
         file.w_o_tag(h_d.T_P, date_cl)
         file.w_txt(date)
         file.w_c_tag(h_d.T_P)
         file.w_o_tag(h_d.T_P, d_m_cl)
         file.w_txt(date_metric)
         file.w_c_tag(h_d.T_P)
-        # file.w_c_tag(h_d.T_DIV)
         file.w_c_tag(h_d.T_TD)
-
-
-        # file.w_tag(h_d.T_TD,
-        #            date,
-        #            attr,
-        #            True)
 
     def __gen_tag_commit_version(self, file, td_attr, link_attrs):
         self.__gen_linked_td(file, td_attr, link_attrs)
@@ -572,9 +567,9 @@ class WebGenerator:
         date_metric_text = "(0)"
 
         if date_metric >= 0:
-            d_m_clr = c_d.CL_GREEN
+            d_m_clr = c_d.CL_GREEN_TXT
         elif date_metric < 0:
-            d_m_clr = c_d.CL_RED
+            d_m_clr = c_d.CL_RED_TXT
             date_metric = -1 * date_metric
             date_metric_text = "({:s} д.)".format(str(date_metric))
 
@@ -626,6 +621,29 @@ class WebGenerator:
         self.__gen_tag_commit_version(file,
                                       ver_class,
                                       links_list)
+
+        metr_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
+                                        + " " + c_d.CL_TEXT_CENTER
+                                        + " " + c_d.CL_BORDER)
+        self.__gen_metrics_column(file, metr_class, item.metric)
+
+    def __gen_metrics_column(self, gen, cl, metric):
+        gen.w_o_tag(h_d.T_TD, cl)
+        # todo do item metric magic
+        color_cl = ""
+        if metric.last:
+            color_cl = c_d.CL_GREEN_TXT
+        elif metric.forced:
+            color_cl = c_d.CL_YELLOW_TXT
+        else:
+            color_cl = c_d.CL_RED_TXT
+
+        gen.w_tag(h_d.T_P,
+                  "{:s} д. / {:s} пр.".format(str(metric.days),
+                                     str(metric.jumps)),
+                  h_d.A_CLASS.format(color_cl))
+
+        gen.w_c_tag(h_d.T_TD)
 
     def __change_class_type(self, c_type):
         if c_type == c_d.CL_TD_1:

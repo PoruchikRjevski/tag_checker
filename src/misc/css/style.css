@@ -80,7 +80,7 @@ th {
 }
 
 .border {
-    border: 1px solid #ffffff;
+    border: 1px solid #aaaaaa;
 }
 
 td {
@@ -152,6 +152,10 @@ tr.tr_1 {
 
 .green {
     color: #008800;
+}
+
+.yellow {
+    color: #ffaa00;
 }
 
 .red {
