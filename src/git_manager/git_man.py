@@ -601,30 +601,40 @@ class GitMan:
 
                 # max_item = max(dev_s_items, key=lambda item: item.tag_date) OR  dep_obj.commits[item.cm_i].date ???
                 base_exist = True
-                max_item = None
+                max_base_item = None
                 base_list = [item for item in dev_s_items if item.item_type == c_d.TYPE_ALL]
+                last_indexes_dict = {}
 
                 if base_list:
-                    max_item = max(base_list, key=lambda item: item.tag_date)
+                    max_base_item = max(base_list, key=lambda item: item.tag_date)
+
+                    # todo find lasts for other nums
+                    unic_nums = sorted([key for key in dict.fromkeys([item.item_num for item in dev_s_items if item.item_type != c_d.TYPE_ALL]).keys()],
+                                       reverse=False)
+                    for num in unic_nums:
+                        nummed_items = [item for item in dev_s_items if item.item_num == num]
+                        max_by_num =  max(nummed_items, key=lambda item: item.tag_date)
+
+                        if max_by_num:
+                            num_it_ind = dep_obj.items.index(max_by_num)
+                            last_indexes_dict[num_it_ind] = max_by_num.item_num
                 else:
-                    max_item = max(dev_s_items, key=lambda item: item.tag_date)
+                    max_base_item = max(dev_s_items, key=lambda item: item.tag_date)
                     base_exist = False
 
-                if max_item is None:
+                if max_base_item is None:
                     continue
 
-                max_item_ind = dep_obj.items.index(max_item)
-
+                max_item_ind = dep_obj.items.index(max_base_item)
                 dep_obj.items[max_item_ind].metric.last = True
-
-                max_item_cm_d = dep_obj.commits[max_item.cm_i].date_obj
+                max_item_cm_d = dep_obj.commits[max_base_item.cm_i].date_obj
 
                 # find jumps
                 unic_hashes = list(set([item.cm_hash for item in dev_s_items]))
                 unic_hashes_jumps = {}
 
                 for hash in unic_hashes:
-                    unic_hashes_jumps[hash] = self.__get_jumps_between_commits(max_item.cm_hash, hash)
+                    unic_hashes_jumps[hash] = self.__get_jumps_between_commits(max_base_item.cm_hash, hash)
 
                 max_jump = max(unic_hashes_jumps.values())
                 max_jump_step = 0
@@ -632,37 +642,106 @@ class GitMan:
                 if max_jump < c_d.CLR_RED_STEPS:
                     max_jump_step = 1
                 else:
-                    max_jump_step = round((max_jump/c_d.CLR_RED_STEPS) + 0.5)
+                    max_jump_step = round((max_jump / c_d.CLR_RED_STEPS) + 0.5)
 
-                # fill all metric info
-                for item in dev_s_items:
-                    it_ind = dep_obj.items.index(item)
-                    jmp_tmp = unic_hashes_jumps[item.cm_hash]
+                # true fill
+                for type in c_d.TYPES_L:
+                    typed_items = [item for item in dev_s_items if item.item_type == type]
 
-                    if max_item_cm_d == dep_obj.commits[item.cm_i].date_obj:
-                        dep_obj.items[it_ind].metric.last = True
-                    else:
-                        if base_exist:
-                            if max_item_cm_d < dep_obj.commits[item.cm_i].date_obj:
-                                if max_item.tag_date_obj <= item.tag_date_obj:
-                                    dep_obj.items[it_ind].metric.exp = True
-                                else:
-                                    dep_obj.items[it_ind].metric.exp_canceled = True
-                            else:
-                                if max_item.tag_date_obj < item.tag_date_obj:
-                                    dep_obj.items[it_ind].metric.forced = True
-                                else:
-                                    dep_obj.items[it_ind].metric.prom_to_cur = True
+                    for item in typed_items:
+                        old_item = False
+                        it_ind = dep_obj.items.index(item)
+                        jmp_tmp = unic_hashes_jumps[item.cm_hash]
+
+                        if type == c_d.TYPE_ALL:
+                            if max_item_cm_d != dep_obj.commits[item.cm_i].date_obj:
+                                old_item = True
                         else:
+                            if it_ind in last_indexes_dict.keys():
+                                if base_exist:
+                                    if max_item_cm_d < dep_obj.commits[item.cm_i].date_obj:
+                                        if max_base_item.tag_date_obj <= item.tag_date_obj:
+                                            dep_obj.items[it_ind].metric.exp = True
+                                        else:
+                                            dep_obj.items[it_ind].metric.exp_canceled = True
+                                    elif max_item_cm_d == dep_obj.commits[item.cm_i].date_obj:
+                                        dep_obj.items[it_ind].metric.last = True
+                                    else:
+                                        if max_base_item.tag_date_obj < item.tag_date_obj:
+                                            dep_obj.items[it_ind].metric.forced = True
+                                        else:
+                                            dep_obj.items[it_ind].metric.prom_to_cur = True
+                                else:
+                                    old_item = True
+                            else:
+                                old_item = True
+
+                            # if it_ind in last_indexes_dict:
+                            #     if base_exist:
+                            #         if max_item_cm_d < dep_obj.commits[item.cm_i].date_obj:
+                            #             if max_base_item.tag_date_obj <= item.tag_date_obj:
+                            #                 dep_obj.items[it_ind].metric.exp = True
+                            #             else:
+                            #                 dep_obj.items[it_ind].metric.exp_canceled = True
+                            #         else:
+                            #             if max_base_item.tag_date_obj < item.tag_date_obj:
+                            #                 dep_obj.items[it_ind].metric.forced = True
+                            #             else:
+                            #                 dep_obj.items[it_ind].metric.prom_to_cur = True
+                            #     else:
+                            #         old_item = True
+                            # else:
+                            #     old_item = True
+
+                        if old_item:
                             dep_obj.items[it_ind].metric.old = True
                             dep_obj.items[it_ind].metric.jmp_clr_mult = round((jmp_tmp / max_jump_step) + 0.5)
 
-                    dep_obj.items[it_ind].metric.jumps = jmp_tmp
-                    item_cm_d = dep_obj.commits[item.cm_i].date_obj
-                    if not dep_obj.items[it_ind].metric.exp:
-                        dep_obj.items[it_ind].metric.diff_d = max_item_cm_d - item_cm_d
-                    else:
-                        dep_obj.items[it_ind].metric.diff_d = item_cm_d - max_item_cm_d
+                        dep_obj.items[it_ind].metric.jumps = jmp_tmp
+                        item_cm_d = dep_obj.commits[item.cm_i].date_obj
+                        if not dep_obj.items[it_ind].metric.exp:
+                            dep_obj.items[it_ind].metric.diff_d = max_item_cm_d - item_cm_d
+                        else:
+                            dep_obj.items[it_ind].metric.diff_d = item_cm_d - max_item_cm_d
+
+                # unic_nums = sorted([key for key in [item.item_num for item in dev_s_items if item.item_type != c_d.TYPE_ALL]],
+                #                    reverse=False)
+
+                # for num in unic_nums:
+                #     nummed_items = [item for item in typed_items if item.item_num == num]
+
+
+
+
+                # fill all metric info
+                # for item in dev_s_items:
+                #     it_ind = dep_obj.items.index(item)
+                #     jmp_tmp = unic_hashes_jumps[item.cm_hash]
+                #
+                #     if max_item_cm_d == dep_obj.commits[item.cm_i].date_obj:
+                #         dep_obj.items[it_ind].metric.last = True
+                #     else:
+                #         if base_exist:
+                #             if max_item_cm_d < dep_obj.commits[item.cm_i].date_obj:
+                #                 if max_base_item.tag_date_obj <= item.tag_date_obj:
+                #                     dep_obj.items[it_ind].metric.exp = True
+                #                 else:
+                #                     dep_obj.items[it_ind].metric.exp_canceled = True
+                #             else:
+                #                 if max_base_item.tag_date_obj < item.tag_date_obj:
+                #                     dep_obj.items[it_ind].metric.forced = True
+                #                 else:
+                #                     dep_obj.items[it_ind].metric.prom_to_cur = True
+                #         else:
+                #             dep_obj.items[it_ind].metric.old = True
+                #             dep_obj.items[it_ind].metric.jmp_clr_mult = round((jmp_tmp / max_jump_step) + 0.5)
+                #
+                #     dep_obj.items[it_ind].metric.jumps = jmp_tmp
+                #     item_cm_d = dep_obj.commits[item.cm_i].date_obj
+                #     if not dep_obj.items[it_ind].metric.exp:
+                #         dep_obj.items[it_ind].metric.diff_d = max_item_cm_d - item_cm_d
+                #     else:
+                #         dep_obj.items[it_ind].metric.diff_d = item_cm_d - max_item_cm_d
 
     def scanning(self, model):
         if g_v.DEBUG: out_log("start scanning")
