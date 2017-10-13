@@ -131,7 +131,7 @@ class WebGenerator:
                     h_d.A_CLASS.format(c_d.CL_FOOTER))
 
         # todo add info about flags
-        flags_txt = "Flags: {:s}".format(" -{:s}".format(str(c_d.F_MULT_TXT)) if g_v.MULTITH else ""
+        flags_txt = "Флаги: {:s}".format(" -{:s}".format(str(c_d.F_MULT_TXT)) if g_v.MULTITH else ""
                                   + " -{:s}".format(str(c_d.F_LOG_TXT)) if g_v.LOGGING else ""
                                   + " -{:s}".format(str(c_d.F_QUIET_TXT)) if g_v.QUIET else ""
                                   + " -{:s}".format(str(c_d.F_SUDO_TXT)) if g_v.SUDOER else ""
@@ -541,12 +541,36 @@ class WebGenerator:
 
     def __gen_metrics_column(self, gen, cl, metric):
         color = 0x00
+        background_clr = None
+        p_title = None
+        is_circle = True
+
         if metric.last:
             color = c_d.CLR_GREEN
+            p_title = c_d.CLR_GREEN_TXT
         elif metric.forced:
             color = c_d.CLR_YEL
-        else:
+            p_title = c_d.CLR_YEL_TXT
+        elif metric.exp:
+            color = c_d.CLR_BLUE
+            p_title = c_d.CLR_BLUE_TXT
+        elif metric.exp_canceled:
+            is_circle = False
+            color = c_d.CLR_BLUE
+            p_title = c_d.CLR_BLUE_BAGEL_TXT
+        elif metric.prom_to_cur:
+            is_circle = False
+            color = c_d.CLR_GREEN
+            p_title = c_d.CLR_GREEN_BAGEL_TXT
+        elif metric.old:
             color = c_d.CLR_RED_MAX - (metric.jmp_clr_mult * c_d.CLR_RED_STEP)
+            p_title = c_d.CLR_RED_TXT
+
+        if is_circle:
+            background_clr = color
+
+        colored_thing = h_d.A_ST_BAGEL.format(color)
+
         gen.w_o_tag(h_d.T_TD, cl)
 
         gen.w_tag(h_d.T_P,
@@ -558,9 +582,10 @@ class WebGenerator:
         gen.w_tag(h_d.T_P,
                   2 * h_d.WS,
                   h_d.A_CLASS.format(c_d.CL_TEXT_RIGHT
-                                     + " " + c_d.CL_NO_WRAP
-                                     + " " + c_d.CL_CIRCLE)
-                  + h_d.A_STYLE.format(h_d.A_ST_BCKGRND_COL.format(color)))
+                                     + " " + c_d.CL_NO_WRAP)
+                  + (h_d.A_STYLE.format( (h_d.A_ST_BCKGRND_COL.format(background_clr) if not background_clr is None else "")
+                                         + colored_thing))
+                  + (h_d.A_TITLE.format(p_title) if not p_title is None else ""))
 
         gen.w_c_tag(h_d.T_TD)
 

@@ -53,9 +53,13 @@ A_ST_FONT_FAM       = "font-family:{:s};"
 A_ST_FONT_SZ        = "font-size:{:s};"
 A_ST_H              = "height:{:s};"
 A_ST_W              = "width:{:s};"
-A_ST_BORDER         = "border:{:s};"
+A_ST_BORDER         = "border{:s};"
 A_ST_POS            = "position:{:s};"
-A_ST_BCKGRND_COL    = "background-color: #{:x}"
+A_ST_BCKGRND_COL    = "background-color: #{:x};"
+
+A_ST_B_RAD          = "-radius: {:s};"
+
+A_ST_BAGEL          = " border-radius: 50%; border: 2px solid #{:x};"
 
 A_T_JS              = "text/javascript"
 

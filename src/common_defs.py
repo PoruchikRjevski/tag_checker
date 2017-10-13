@@ -43,10 +43,23 @@ CL_RED_BGRND        = "red"
 CL_YELLOW_BGRND     = "yellow"
 CL_WHITE_TXT        = "txt_white"
 CL_NO_WRAP          = "no_wrap"
+
+
+
+
 CL_CIRCLE           = "circle"
+CL_BAGEL_BLUE       = "bagel_blue"
+CL_BAGEL_GREEN      = "bagel_green"
+
+CLR_GREEN_TXT       = "Текущая версия"
+CLR_GREEN_BAGEL_TXT = "Форсированная до текущей базовой версии"
+CLR_RED_TXT         = "Старая версия"
+CLR_YEL_TXT         = "Форсированная старая версия"
+CLR_BLUE_TXT        = "Экспериментальная версия"
+CLR_BLUE_BAGEL_TXT  = "Отмененная экспериментальная версия"
 
 CLR_BLUE            = 0x3f3fff
-CLR_GREEN           = 0x94ef94
+CLR_GREEN           = 0x3fef3f
 CLR_RED_MAX         = 0xfff0f0
 CLR_RED_MIN         = 0xff0f0f
 CLR_RED_STEP        = 0x000101
