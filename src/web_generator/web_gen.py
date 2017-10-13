@@ -130,13 +130,22 @@ class WebGenerator:
         gen.w_o_tag(h_d.T_DIV,
                     h_d.A_CLASS.format(c_d.CL_FOOTER))
 
+        # todo add info about flags
+        flags_txt = "Flags: {:s}".format(" -{:s}".format(str(c_d.F_MULT_TXT)) if g_v.MULTITH else ""
+                                  + " -{:s}".format(str(c_d.F_LOG_TXT)) if g_v.LOGGING else ""
+                                  + " -{:s}".format(str(c_d.F_QUIET_TXT)) if g_v.QUIET else ""
+                                  + " -{:s}".format(str(c_d.F_SUDO_TXT)) if g_v.SUDOER else ""
+                                  + " -{:s}".format(str(c_d.F_DEBUG_TXT)) if g_v.DEBUG else ""
+                                  + " -{:s}".format(str(c_d.F_TIMINGS_TXT)) if g_v.TIMEOUTS else "")
+
         gen.w_tag(h_d.T_P,
                   c_d.LAST_UPD_TXT + datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
                   h_d.A_CLASS.format(c_d.CL_FOOT_INFO)
                   + h_d.A_TITLE.format(c_d.REPOS_NUM_TXT.format(str(g_v.REPOS_NUM)) + "\n"
                                        + c_d.TAGS_NUM_TXT.format(str(g_v.TAGS_NUM)) + "\n"
                                        + c_d.PROC_TAGS_NUM_TXT.format(str(g_v.PROC_TAGS_NUM)) + "\n"
-                                       + c_d.SCAN_TIME_TXT.format(g_v.SCAN_TIME)))
+                                       + c_d.SCAN_TIME_TXT.format(g_v.SCAN_TIME) + "\n"
+                                       + flags_txt))
         gen.w_tag(h_d.T_P,
                   c_d.CR_TXT,
                   h_d.A_CLASS.format(c_d.CL_FOOT_INFO))

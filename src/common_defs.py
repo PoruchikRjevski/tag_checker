@@ -45,6 +45,7 @@ CL_WHITE_TXT        = "txt_white"
 CL_NO_WRAP          = "no_wrap"
 CL_CIRCLE           = "circle"
 
+CLR_BLUE            = 0x3f3fff
 CLR_GREEN           = 0x94ef94
 CLR_RED_MAX         = 0xfff0f0
 CLR_RED_MIN         = 0xff0f0f
@@ -118,6 +119,13 @@ DEPART_TXT          = "Отдел: "
 TO_DEV_TXT          = "Перейти к списку приборов"
 
 VER_TXT             = "Версия: {:s}.{:s}.{:s}({:s}) {:s}"
+
+F_MULT_TXT          = "m"
+F_LOG_TXT           = "l"
+F_QUIET_TXT         = "q"
+F_SUDO_TXT          = "s"
+F_DEBUG_TXT         = "d"
+F_TIMINGS_TXT       = "t"
 
 REPOS_NUM_TXT       = "Репозиторев: {:s}"
 TAGS_NUM_TXT        = "Всего тэгов: {:s}"

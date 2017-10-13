@@ -599,7 +599,16 @@ class GitMan:
                 if not dev_s_items:
                     continue
 
-                max_item = max(dev_s_items, key=lambda item: item.tag_date)
+                # max_item = max(dev_s_items, key=lambda item: item.tag_date)
+                base_exist = True
+                base_list = []
+
+
+                max_item = max(dev_s_items, key=lambda item: dep_obj.commits[item.cm_i].date and item.item_type == c_d.TYPE_ALL)
+                if not max_item:
+                    base_exist = False
+                    max_item = max(dev_s_items, key=lambda item: dep_obj.commits[item.cm_i].date)
+
                 max_item_ind = dep_obj.items.index(max_item)
 
                 dep_obj.items[max_item_ind].metric.last = True
@@ -628,8 +637,9 @@ class GitMan:
                     if max_item_cm_d == dep_obj.commits[item.cm_i].date_obj:
                         dep_obj.items[it_ind].metric.last = True
                     else:
-                        if item.tag_date_obj > max_item.tag_date_obj:
-                            dep_obj.items[it_ind].metric.forced = True
+                        if base_exist:
+                            if item.tag_date_obj > max_item.tag_date_obj:
+                                dep_obj.items[it_ind].metric.forced = True
 
                         jmp_tmp = unic_hashes_jumps[item.cm_hash]
                         dep_obj.items[it_ind].metric.jumps = jmp_tmp
