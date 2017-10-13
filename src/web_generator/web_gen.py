@@ -539,6 +539,9 @@ class WebGenerator:
                                         + " " + c_d.CL_BORDER)
         self.__gen_metrics_column(file, metr_class, item.metric)
 
+    def __get_red_tone(self, metric):
+        return c_d.CLR_RED_MAX - (metric.jmp_clr_mult * c_d.CLR_RED_STEP)
+
     def __gen_metrics_column(self, gen, cl, metric):
         color = 0x00
         background_clr = None
@@ -561,9 +564,10 @@ class WebGenerator:
         elif metric.prom_to_cur:
             is_circle = False
             color = c_d.CLR_GREEN
+            background_clr = self.__get_red_tone(metric)
             p_title = c_d.CLR_GREEN_BAGEL_TXT
         elif metric.old:
-            color = c_d.CLR_RED_MAX - (metric.jmp_clr_mult * c_d.CLR_RED_STEP)
+            color = self.__get_red_tone(metric)
             p_title = c_d.CLR_RED_TXT
 
         if is_circle:

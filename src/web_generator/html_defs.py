@@ -59,7 +59,7 @@ A_ST_BCKGRND_COL    = "background-color: #{:x};"
 
 A_ST_B_RAD          = "-radius: {:s};"
 
-A_ST_BAGEL          = " border-radius: 50%; border: 2px solid #{:x};"
+A_ST_BAGEL          = " border-radius: 50%; border: 3px solid #{:x};"
 
 A_T_JS              = "text/javascript"
 

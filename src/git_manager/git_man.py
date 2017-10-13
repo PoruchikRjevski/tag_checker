@@ -650,6 +650,7 @@ class GitMan:
 
                     for item in typed_items:
                         old_item = False
+                        do_mult = False
                         it_ind = dep_obj.items.index(item)
                         jmp_tmp = unic_hashes_jumps[item.cm_hash]
 
@@ -671,6 +672,7 @@ class GitMan:
                                             dep_obj.items[it_ind].metric.forced = True
                                         else:
                                             dep_obj.items[it_ind].metric.prom_to_cur = True
+                                            do_mult = True
                                 else:
                                     old_item = True
                             else:
@@ -695,6 +697,9 @@ class GitMan:
 
                         if old_item:
                             dep_obj.items[it_ind].metric.old = True
+                            do_mult = True
+
+                        if do_mult:
                             dep_obj.items[it_ind].metric.jmp_clr_mult = round((jmp_tmp / max_jump_step) + 0.5)
 
                         dep_obj.items[it_ind].metric.jumps = jmp_tmp
