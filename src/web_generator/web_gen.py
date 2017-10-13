@@ -542,7 +542,7 @@ class WebGenerator:
             color = c_d.CLR_YEL
         else:
             color_cl = c_d.CL_RED_BGRND
-            color = c_d.CLR_RED_MIN - (metric.jmp_clr_mult * c_d.CLR_RED_STEP)
+            color = c_d.CLR_RED_MAX - (metric.jmp_clr_mult * c_d.CLR_RED_STEP)
         gen.w_o_tag(h_d.T_TD, cl)
 
         gen.w_tag(h_d.T_P,

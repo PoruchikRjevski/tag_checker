@@ -46,10 +46,10 @@ CL_NO_WRAP          = "no_wrap"
 CL_CIRCLE           = "circle"
 
 CLR_GREEN           = 0x94ef94
-CLR_RED_STEPS       = 96
-CLR_RED_MAX         = 0xff0d0d
-CLR_RED_MIN         = 0xffcdcd
-CLR_RED_STEP        = 0x000202
+CLR_RED_MAX         = 0xfff0f0
+CLR_RED_MIN         = 0xff0f0f
+CLR_RED_STEP        = 0x000101
+CLR_RED_STEPS       = (CLR_RED_MAX - CLR_RED_MIN) / CLR_RED_STEP
 CLR_YEL             = 0xefef94
 
 DATE_ATR_ORDINAL    = "ordinal"
