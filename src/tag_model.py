@@ -10,8 +10,8 @@ __all__ = ['TagModel', 'Department', 'Repo', 'Device', 'Item', 'CommitInfo']
 
 class TagModel:
     """
-    __departments           is ordered {dep_name, Department object}
-    __tr_dev_names          is {orig_name, tr_name}
+    __departments               is ordered {dep_name, Department object}
+    __tr_dev_names              is {orig_name, tr_name}
     """
     def __init__(self):
         self.__departments = OrderedDict()
@@ -44,12 +44,12 @@ class TagModel:
 
 class Department:
     """
-    __name                  is name of department from config
-    __repos                 is [Repo...]
-    __commits                is [CommitInfo object]
-    __items                 is [Item...]
-    __devices               is [dev_1...dev_n]
-    __soft_types            is [type...]
+    __name                      is name of department from config
+    __repos                     is [Repo...]
+    __commits                   is [CommitInfo object]
+    __items                     is [Item...]
+    __devices                   is [dev_1...dev_n]
+    __soft_types                is [type...]
     """
     def __init__(self, name=""):
         self.__name = name
@@ -90,9 +90,9 @@ class Department:
 
 class Repo:
     """
-    __name                  is repo name
-    __link                  is link to location
-    __soft_type             is belong to type of soft
+    __name                      is repo name
+    __link                      is link to location
+    __soft_type                 is belong to type of soft
     """
     def __init__(self):
         self.__name = ""
@@ -165,6 +165,8 @@ class Item:
         self.valid = False
         self.repo_i = -1
         self.cm_i = -1
+        self.metric = MetricsInfo()
+
 
 class CommitInfo:
     """
@@ -175,7 +177,22 @@ class CommitInfo:
         self.p_hash = ""
         self.date = ""
         self.date_full = ""
+        self.date_obj = None
         self.msg = ""
         self.auth = ""
         self.valid = False
         self.repo_i = -1
+
+
+class MetricsInfo:
+    def __init__(self):
+        """
+        forced                  if tag not in develop
+        last                    if it is the last version of soft
+        jumps                   number of commits between this and last if this is not last
+        """
+        self.forced = False # if tag not in develop
+        self.last = False # if it is the last version of soft
+        self.jumps = 0 # number of commits between this and last if this is not last
+        self.jmp_clr_mult = 1 # multiplier for red color step+ for shows metric
+        self.diff_d = None # number of days between this and last if this is not last

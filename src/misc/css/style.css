@@ -80,7 +80,7 @@ th {
 }
 
 .border {
-    border: 1px solid #ffffff;
+    border: 1px solid #dddddd;
 }
 
 td {
@@ -122,15 +122,19 @@ td {
 }
 
 td.td_inc_0 {
-    background-color: #eeeeee
+    background-color: #eeeeee;
 }
 
 td.td_inc_1 {
-    background-color: #cecece
+    background-color: #cecece;
 }
 
 td.td_inc_2 {
-    background-color: #bebebe
+    background-color: #bebebe;
+}
+
+td.td_inc_0, td.td_inc_1, td.td_inc_2 {
+    color: #000000;
 }
 
 tr.mt_head {
@@ -147,15 +151,24 @@ tr.mt_foot {
 }
 
 tr.tr_1 {
-    background-color: #eeeeee;
+    color: #eeeeee;
 }
 
 .green {
-    color: #008800;
+    background-color: #94ef94;
+}
+
+.yellow {
+    background-color: #efef94;
 }
 
 .red {
-    color: #880000;
+    background-color: #ef9494;
+}
+
+.circle {
+    border-radius: 50%;
+    border: 0px solid #ffffff
 }
 
 p.header {

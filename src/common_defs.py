@@ -38,17 +38,27 @@ CL_MAIN_HEAD        = "main_head"
 CL_MID_HEAD         = "mid_head"
 CL_IFRAME           = "main_frame"
 CL_BACK_CIRLE       = "back_circle"
-CL_GREEN            = "green"
-CL_RED              = "red"
+CL_GREEN_BGRND      = "green"
+CL_RED_BGRND        = "red"
+CL_YELLOW_BGRND     = "yellow"
+CL_WHITE_TXT        = "txt_white"
 CL_NO_WRAP          = "no_wrap"
+CL_CIRCLE           = "circle"
+
+CLR_GREEN           = 0x94ef94
+CLR_RED_MAX         = 0xfff0f0
+CLR_RED_MIN         = 0xff0f0f
+CLR_RED_STEP        = 0x000101
+CLR_RED_STEPS       = (CLR_RED_MAX - CLR_RED_MIN) / CLR_RED_STEP
+CLR_YEL             = 0xefef94
 
 DATE_ATR_ORDINAL    = "ordinal"
 
-D_TABLE_COLSPAN     = "4"
+D_TABLE_COLSPAN     = "5"
 M_TABLE_COLSPAN     = "2"
-M_TABLE_CS_ITEM     = "3"
+M_TABLE_CS_ITEM     = "4"
 MID_ROWS            = "2"
-DEV_MID_ROWS        = "2"
+DEV_MID_ROWS        = "3"
 BTM_ROWS            = "1"
 M_TABLE_H_NUM       = "2"
 
