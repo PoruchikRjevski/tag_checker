@@ -531,17 +531,12 @@ class WebGenerator:
         self.__gen_metrics_column(file, metr_class, item.metric)
 
     def __gen_metrics_column(self, gen, cl, metric):
-        # todo do item metric magic
-        color_cl = ""
         color = 0x00
         if metric.last:
-            color_cl = c_d.CL_GREEN_BGRND
             color = c_d.CLR_GREEN
         elif metric.forced:
-            color_cl = c_d.CL_YELLOW_BGRND
             color = c_d.CLR_YEL
         else:
-            color_cl = c_d.CL_RED_BGRND
             color = c_d.CLR_RED_MAX - (metric.jmp_clr_mult * c_d.CLR_RED_STEP)
         gen.w_o_tag(h_d.T_TD, cl)
 

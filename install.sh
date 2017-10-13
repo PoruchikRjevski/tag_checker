@@ -101,51 +101,51 @@ main_menu() {
                    --title "Tag Checker Installer" \
                    --menu "Main menu" $wnd_sz_f)
 
-    m_m_opts=(3 "Install"
-              4 "Uninstall"
-              5 "Upgrade files"
-              6 "Change parameters"
-              7 "Edit crontab"
-              8 "Run from source"
-              9 "Run from installed"
-              10 "Exit from installer")
+    m_m_opts=(1 "Install"
+              2 "Uninstall"
+              3 "Upgrade files"
+              4 "Change parameters"
+              5 "Edit crontab"
+              6 "Run from source"
+              7 "Run from installed"
+              8 "Exit from installer")
 
     clear
     choise_p=$("${dialog[@]}" "${main_menu_dlg[@]}" "${m_m_opts[@]}" 2>&1 >/dev/tty)
     clear
     case $choise_p in
-        3 ) 
+        1 ) 
             full_install
             main_menu
             ;;
-        4 ) 
+        2 ) 
             full_uninstall
             main_menu
             ;;
-        5 ) 
+        3 ) 
             upgrade_files
             main_menu
             ;;
-        6 ) 
+        4 ) 
             change_parameters
             accept_params
             show_msg "Parameters accepted: ${setted_params[*]} . Use link: $TAG_CHECKER."
             clear
             main_menu
             ;;
-        7 ) 
+        5 ) 
             edit_crontab
             main_menu
             ;;
-        8 ) 
+        6 ) 
             run_from_source
             main_menu
             ;;
-        9 ) 
+        7 ) 
             run_now
             main_menu
             ;;
-        10 ) close_all_dialogs ;;
+        8 ) close_all_dialogs ;;
         255 ) close_all_dialogs ;;
         * ) close_all_dialogs ;;
     esac

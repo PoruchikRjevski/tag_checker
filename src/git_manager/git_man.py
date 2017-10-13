@@ -621,9 +621,6 @@ class GitMan:
                 else:
                     max_jump_step = round((max_jump/c_d.CLR_RED_STEPS) + 0.5)
 
-                print("max {:s} by step {:s}".format(str(max_jump),
-                                                     str(max_jump_step)))
-
                 # fill all metric info
                 for item in dev_s_items:
                     it_ind = dep_obj.items.index(item)
@@ -638,8 +635,6 @@ class GitMan:
                         dep_obj.items[it_ind].metric.jumps = jmp_tmp
 
                         dep_obj.items[it_ind].metric.jmp_clr_mult = round((jmp_tmp/max_jump_step) + 0.5)
-                        print("jmp {:s} res {:s}".format(str(jmp_tmp),
-                                                         str(dep_obj.items[it_ind].metric.jmp_clr_mult)))
 
                     item_cm_d = dep_obj.commits[item.cm_i].date_obj
 
@@ -691,10 +686,6 @@ class GitMan:
                     self.__do_get_metrics(items_list, dep_obj)
                     stop(metr_t)
                     if g_v.TIMEOUTS: out_log("Metrics time: {:s}".format(get_pass_time(metr_t)))
-
-                    # add items to model
-                    # for item in items_list:
-                    #     dep_obj.items.append(item)
 
         if g_v.DEBUG: out_log("stop scanning")
 
