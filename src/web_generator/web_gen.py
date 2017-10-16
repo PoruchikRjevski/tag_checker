@@ -641,6 +641,7 @@ class WebGenerator:
         background_clr = None
         p_title = None
         is_circle = True
+        sign = h_d.WS
 
         if metric.last:
             color = c_d.CLR_GREEN
@@ -648,21 +649,26 @@ class WebGenerator:
         elif metric.forced:
             color = c_d.CLR_YEL
             p_title = c_d.CLR_YEL_TXT
+            sign = "-"
         elif metric.exp:
             color = c_d.CLR_BLUE
             p_title = c_d.CLR_BLUE_TXT
+            sign = "+"
         elif metric.exp_canceled:
             is_circle = False
             color = c_d.CLR_BLUE
             p_title = c_d.CLR_BLUE_BAGEL_TXT
+            sign = "+"
         elif metric.prom_to_cur:
             is_circle = False
             color = c_d.CLR_GREEN
             background_clr = self.__get_red_tone(metric)
             p_title = c_d.CLR_GREEN_BAGEL_TXT
+            sign = "-"
         elif metric.old:
             color = self.__get_red_tone(metric)
             p_title = c_d.CLR_RED_TXT
+            sign = "-"
 
         if is_circle:
             background_clr = color
@@ -672,8 +678,9 @@ class WebGenerator:
         gen.w_o_tag(h_d.T_TD, cl)
 
         gen.w_tag(h_d.T_P,
-                  "{0:4d} д. / {1:4d} пр.".format(metric.diff_d.days,
-                                                  metric.jumps).replace(" ", h_d.WS),
+                  "{0:s}{1:4d} д. / {0:s}{2:4d} пр.".format(sign,
+                                                            metric.diff_d.days,
+                                                            metric.jumps).replace(" ", h_d.WS),
                   h_d.A_CLASS.format(c_d.CL_TEXT_LEFT
                                      + " " + c_d.CL_NO_WRAP))
 
