@@ -17,6 +17,7 @@ SCRIPTS_F_NAME      = "scripts.js"
 JS_METRICS_F_NAME   = "metrics.js"
 
 CL_MAIN_TABLE       = "main_table"
+CL_HELP_TABLE       = "help_table"
 CL_FOOT_INFO        = "foot_info"
 CL_FOOT_BACK        = "foot_back"
 CL_WRAPPER          = "wrapper"
@@ -44,9 +45,6 @@ CL_YELLOW_BGRND     = "yellow"
 CL_WHITE_TXT        = "txt_white"
 CL_NO_WRAP          = "no_wrap"
 
-
-
-
 CL_CIRCLE           = "circle"
 CL_BAGEL_BLUE       = "bagel_blue"
 CL_BAGEL_GREEN      = "bagel_green"
@@ -68,6 +66,7 @@ CLR_YEL             = 0xefef94
 
 DATE_ATR_ORDINAL    = "ordinal"
 
+H_TABLE_CS          = "3"
 D_TABLE_COLSPAN     = "5"
 M_TABLE_COLSPAN     = "2"
 M_TABLE_CS_ITEM     = "4"
@@ -77,6 +76,7 @@ BTM_ROWS            = "1"
 M_TABLE_H_NUM       = "2"
 
 MAIN_F_NAME         = "main.html"
+HELP_METR_F_NAME    = "how_to_read_metrics.html"
 INDEX_F_NAME        = "index.html"
 
 CALC_METRICS_FUNC   = "calcTimeMetrics(this);"
@@ -111,7 +111,7 @@ GW_COMMIT           = "commit"
 
 # footer
 LAST_UPD_TXT        = "Последнее обновление: "
-CR_TXT              = "&copy;140 отдел. Буревестник."
+CR_TXT              = "&copy; 2017 - 140 отдел. Буревестник."
 M_HEAD_TXT          = "Актуальные прошивки"
 DEP_TXT             = "Отдел"
 DEV_TXT             = "Прибор"
@@ -130,6 +130,10 @@ HISTORY_TXT         = "История прошивок для устройств
 DEPART_TXT          = "Отдел: "
 
 TO_DEV_TXT          = "Перейти к списку приборов"
+READ_METR_TXT       = "Расшифровка цветовых обозначений метрик?"
+CLRD_DESIGN_TXT     = "Цветовое обозначение"
+TXT_DESIGN_TXT      = "Текстовое обозначение"
+DESCRIPTION_TXT     = "Описание"
 
 VER_TXT             = "Версия: {:s}.{:s}.{:s}({:s}) {:s}"
 

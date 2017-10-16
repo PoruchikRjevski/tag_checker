@@ -75,6 +75,10 @@ th {
     height: 15%;
 }
 
+.help_table {
+    width: 50%;
+}
+
 .mid_head {
     font-size: 14;
 }

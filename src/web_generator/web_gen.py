@@ -44,6 +44,98 @@ class WebGenerator:
         index.close()
         if g_v.DEBUG: out_log("finish gen index")
 
+    def __gen_read_metrics_help_page(self):
+        if g_v.DEBUG: out_log("start gen read metrics help page")
+        help = HtmlGen(g_v.OUT_PATH, c_d.HELP_METR_F_NAME)
+
+        self.__gen_page_head(help, "", h_d.A_CLASS.format(c_d.CL_BACK_CIRLE))
+
+        self.__gen_content_start(help)
+
+        self.__gen_rmhp_content(help)
+
+        self.__gen_back_link(help)
+        self.__gen_content_end(help)
+
+        self.__gen_page_foot(help)
+
+        help.close()
+        if g_v.DEBUG: out_log("finish gen read metrics help page")
+
+    def __gen_rmhp_table_head(self, gen):
+        gen.w_o_tag(h_d.T_TR,
+                    h_d.A_CLASS.format(c_d.CL_MT_F),
+                    True)
+        gen.w_tag(h_d.T_TH,
+                  c_d.CLRD_DESIGN_TXT,
+                  h_d.A_CLASS.format(c_d.CL_BORDER + " " + c_d.CL_MID_HEAD)
+                  )
+        gen.w_tag(h_d.T_TH,
+                  c_d.TXT_DESIGN_TXT,
+                  h_d.A_CLASS.format(c_d.CL_BORDER))
+        gen.w_tag(h_d.T_TH,
+                  c_d.DESCRIPTION_TXT,
+                  h_d.A_CLASS.format(c_d.CL_BORDER))
+        gen.w_c_tag(h_d.T_TR)
+
+    def __gen_rmhp_content_line(self, gen, color, bg_color, text_design, text_descr):
+        gen.w_o_tag(h_d.T_TR,
+                     h_d.A_CLASS.format(c_d.CL_TR_1))
+
+        metr_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(0))
+                                        + " " + c_d.CL_TEXT_CENTER
+                                        + " " + c_d.CL_BORDER)
+
+        gen.w_o_tag(h_d.T_TD,
+                    metr_class)
+        gen.w_tag(h_d.T_P,
+                  2 * h_d.WS,
+                  h_d.A_CLASS.format(c_d.CL_TEXT_CENTER
+                                     + " " + c_d.CL_NO_WRAP)
+                  + (h_d.A_STYLE.format((h_d.A_ST_BCKGRND_COL.format(bg_color) if not bg_color is None else "")
+                                        + h_d.A_ST_BAGEL.format(color))))
+        gen.w_c_tag(h_d.T_TD)
+
+        gen.w_tag(h_d.T_TD,
+                  text_design,
+                  metr_class)
+        gen.w_tag(h_d.T_TD,
+                  text_descr,
+                  metr_class)
+
+        gen.w_c_tag(h_d.T_TR)
+
+    def __gen_rmhp_content(self, gen):
+        gen.w_o_tag(h_d.T_TABLE,
+                    h_d.A_CLASS.format(c_d.CL_HELP_TABLE),
+                    True)
+
+        self.__gen_top_main_table_head(gen, c_d.READ_METR_TXT, c_d.H_TABLE_CS)
+        self.__gen_rmhp_table_head(gen)
+
+        # gen body table
+        self.__gen_rmhp_content_line(gen, c_d.CLR_GREEN, c_d.CLR_GREEN, c_d.CLR_GREEN_TXT,
+                                     "Последняя версия по дате коммита")
+        self.__gen_rmhp_content_line(gen, c_d.CLR_RED_MIN, c_d.CLR_RED_MIN, c_d.CLR_RED_TXT,
+                                     "Старой версия считается, если базовая версия "
+                                     "не существует и при этом дата коммита и дата установки "
+                                     "рассматриваемой версии старше, чем у базовой.")
+        self.__gen_rmhp_content_line(gen, c_d.CLR_GREEN, c_d.CLR_RED_MIN, c_d.CLR_GREEN_BAGEL_TXT,
+                                     "Форсированной до текущей базовой версия считается, если существует базовая версия "
+                                     "и при этом дата коммита и дата установки рассматриваемой версии старше, чем у базовой.")
+        self.__gen_rmhp_content_line(gen, c_d.CLR_YEL, c_d.CLR_YEL, c_d.CLR_YEL_TXT,
+                                     "Форсированной старой версия считается, если существует базовая версия и при этом "
+                                     "дата коммита рассматриваемой версиии старше, чем у базовой, а дата установки младше.")
+        self.__gen_rmhp_content_line(gen, c_d.CLR_BLUE, c_d.CLR_BLUE, c_d.CLR_BLUE_TXT,
+                                     "Экспериментальной версия считается, если существует базовая версия и при этом "
+                                     "дата коммита и дата установки рассматриваемой версии младше, чем у базовой версии.")
+        self.__gen_rmhp_content_line(gen, c_d.CLR_BLUE, None, c_d.CLR_BLUE_BAGEL_TXT,
+                                     "Отменненой экспериментальной версия считается, если существует базовая версия "
+                                     "и при этом дата коммита рассматриваемой версии младше, чем у базовой, а "
+                                     "дата установки старше.")
+
+        gen.w_c_tag(h_d.T_TABLE)
+
     def __gen_pages(self, model):
         if g_v.DEBUG: out_log("start gen main")
         main = HtmlGen(g_v.OUT_PATH, c_d.MAIN_F_NAME)
@@ -81,9 +173,6 @@ class WebGenerator:
         gen.w_o_tag(h_d.T_LINK,
                     h_d.A_REL.format(h_d.A_REL_SS)
                     + h_d.A_HREF.format(os.path.join(level, c_d.CSS_DIR, c_d.STYLE_F_NAME)), True)
-        # gen.w_o_tag(h_d.T_LINK,
-        #             h_d.A_REL.format(h_d.A_REL_SS)
-        #             + h_d.A_HREF.format(os.path.join(level, c_d.CSS_DIR, c_d.STYLE_F_NAME)), True)
 
         self.__gen_script(gen, os.path.join(level, c_d.JS_DIR, c_d.JS_METRICS_F_NAME))
 
@@ -146,9 +235,6 @@ class WebGenerator:
                                        + c_d.PROC_TAGS_NUM_TXT.format(str(g_v.PROC_TAGS_NUM)) + "\n"
                                        + c_d.SCAN_TIME_TXT.format(g_v.SCAN_TIME) + "\n"
                                        + flags_txt))
-        gen.w_tag(h_d.T_P,
-                  c_d.CR_TXT,
-                  h_d.A_CLASS.format(c_d.CL_FOOT_INFO))
 
         gen.w_o_tag(h_d.T_P,
                   h_d.A_CLASS.format(c_d.CL_FOOT_INFO))
@@ -163,26 +249,38 @@ class WebGenerator:
                                                                 v.HASH,
                                                                 v.HASH))
                   + h_d.A_TITLE.format(c_d.LAST_AUTH_TXT.format(v.COMMITER))
+                  + h_d.A_TARGET.format(c_d.FRAME_ID))\
+
+        gen.w_txt(" {:s} | {:s} ".format(h_d.WS,
+                                     h_d.WS))
+        gen.w_tag(h_d.T_A,
+                  c_d.READ_METR_TXT,
+                  h_d.A_HREF.format(c_d.HELP_METR_F_NAME)
                   + h_d.A_TARGET.format(c_d.FRAME_ID))
+
         gen.w_c_tag(h_d.T_P)
+
+        gen.w_tag(h_d.T_P,
+                  c_d.CR_TXT,
+                  h_d.A_CLASS.format(c_d.CL_FOOT_INFO))
 
         gen.w_c_tag(h_d.T_DIV)
 
     def __gen_main_table_head(self, gen):
-        self.__gen_top_main_table_head(gen)
+        self.__gen_top_main_table_head(gen, c_d.M_HEAD_TXT, c_d.M_TABLE_COLSPAN)
         self.__gen_mid_table_head(gen)
         self.__gen_mid_main_table_body(gen)
 
-    def __gen_top_main_table_head(self, gen):
+    def __gen_top_main_table_head(self, gen, text, columns):
         gen.w_o_tag(h_d.T_TR,
                     h_d.A_CLASS.format(c_d.CL_MT_H),
                     True)
         gen.w_o_tag(h_d.T_TH,
-                    h_d.A_COLSPAN.format(c_d.M_TABLE_COLSPAN) + h_d.A_CLASS.format(c_d.CL_BORDER),
+                    h_d.A_COLSPAN.format(columns) + h_d.A_CLASS.format(c_d.CL_BORDER),
                     True)
 
         gen.w_tag(h_d.T_H.format(""),
-                  c_d.M_HEAD_TXT,
+                  text,
                   h_d.A_CLASS.format(c_d.CL_MAIN_HEAD))
 
         gen.w_c_tag(h_d.T_TH)
@@ -336,9 +434,7 @@ class WebGenerator:
         self.__gen_device_content(page, model, dep_name, dev_name)
 
         self.__gen_table_foot(page)
-        self.__gen_back_link(page,
-                             os.path.join(c_d.LEVEL_UP,
-                                          c_d.MAIN_F_NAME))
+        self.__gen_back_link(page)
         self.__gen_content_end(page)
 
         self.__gen_page_foot(page)
@@ -364,9 +460,7 @@ class WebGenerator:
         self.__gen_items_content(page, dep, items)
 
         self.__gen_table_foot(page)
-        self.__gen_back_link(page,
-                             os.path.join(c_d.LEVEL_UP,
-                                          self.__get_device_file_name(dev_name)))
+        self.__gen_back_link(page)
         self.__gen_content_end(page)
         self.__gen_page_foot(page)
 
@@ -601,12 +695,12 @@ class WebGenerator:
 
         return c_type
 
-    def __gen_back_link(self, gen, path):
+    def __gen_back_link(self, gen):
         gen.w_o_tag(h_d.T_P,
                     h_d.A_CLASS.format(c_d.CL_FOOT_BACK))
         gen.w_tag(h_d.T_A,
                   c_d.BACK_TXT,
-                  h_d.A_HREF.format(path))
+                  h_d.BLK_ONCLICK_BACK)
         gen.w_c_tag(h_d.T_P)
 
 
@@ -664,6 +758,7 @@ class WebGenerator:
         self.__clear_out_dir(g_v.OUT_PATH)
 
         self.__gen_index(model)
+        self.__gen_read_metrics_help_page()
         self.__gen_pages(model)
 
         if g_v.DEBUG: out_log("finish gen web")

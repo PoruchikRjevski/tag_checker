@@ -7,6 +7,7 @@ TAG_C               = "/"
 # addings
 CR                  = "\n\r"
 WS                  = "&nbsp;"
+SHARP               = "#"
 
 # tags
 T_HTML              = "html"
@@ -46,6 +47,7 @@ A_NAME              = " name=\"{:s}\""
 A_ON_MOUSE_OVER     = " onmouseover=\"{:s}\""
 A_ON_MOUSE_OUT      = " onmouseout=\"{:s}\""
 A_DATE              = " date-{:s}=\"{:s}\""
+A_ON_CLICK          = " onclick=\"{:s}\""
 
 # params
 A_REL_SS            = "stylesheet"
@@ -83,3 +85,8 @@ A_COLOR             = "color=\"{0!s}\""
 A_LINK              = "link=\"{0!s}\""
 A_ALINK             = "alink=\"{0!s}\""
 A_VLINK             = "vlink=\"{0!s}\""
+
+
+# finished blocks
+HISTORY_BACK = "history.back();"
+BLK_ONCLICK_BACK    = A_HREF.format(SHARP) + A_ON_CLICK.format(HISTORY_BACK)
