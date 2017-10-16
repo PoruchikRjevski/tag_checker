@@ -50,7 +50,7 @@ CL_BAGEL_BLUE       = "bagel_blue"
 CL_BAGEL_GREEN      = "bagel_green"
 
 CLR_GREEN_TXT       = "Текущая версия"
-CLR_GREEN_BAGEL_TXT = "Форсированная до текущей базовой версии"
+CLR_GREEN_BAGEL_TXT = "Форсированная до текущей базовой версия"
 CLR_RED_TXT         = "Старая версия"
 CLR_YEL_TXT         = "Форсированная старая версия"
 CLR_BLUE_TXT        = "Экспериментальная версия"
