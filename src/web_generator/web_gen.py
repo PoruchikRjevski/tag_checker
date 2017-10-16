@@ -120,7 +120,7 @@ class WebGenerator:
                                      "Старой версия считается, если базовая версия "
                                      "не существует и при этом дата коммита и дата установки "
                                      "рассматриваемой версии старше, чем у базовой.")
-        self.__gen_rmhp_content_line(gen, c_d.CLR_GREEN, c_d.CLR_RED_MIN, c_d.CLR_GREEN_BAGEL_TXT,
+        self.__gen_rmhp_content_line(gen, c_d.CLR_RED_MIN, c_d.CLR_GREEN, c_d.CLR_GREEN_BAGEL_TXT,
                                      "Форсированной до текущей базовой версия считается, если существует базовая версия "
                                      "и при этом дата коммита и дата установки рассматриваемой версии старше, чем у базовой.")
         self.__gen_rmhp_content_line(gen, c_d.CLR_YEL, c_d.CLR_YEL, c_d.CLR_YEL_TXT,
@@ -657,8 +657,8 @@ class WebGenerator:
             p_title = c_d.CLR_BLUE_BAGEL_TXT
         elif metric.prom_to_cur:
             is_circle = False
-            color = c_d.CLR_GREEN
-            background_clr = self.__get_red_tone(metric)
+            color = self.__get_red_tone(metric)
+            background_clr = c_d.CLR_GREEN
             p_title = c_d.CLR_GREEN_BAGEL_TXT
         elif metric.old:
             color = self.__get_red_tone(metric)

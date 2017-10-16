@@ -56,8 +56,8 @@ CLR_YEL_TXT         = "Форсированная старая версия"
 CLR_BLUE_TXT        = "Экспериментальная версия"
 CLR_BLUE_BAGEL_TXT  = "Отмененная экспериментальная версия"
 
-CLR_BLUE            = 0x3f3fff
-CLR_GREEN           = 0x3fef3f
+CLR_BLUE            = 0x96b0ff#0x3f3fff
+CLR_GREEN           = 0xb2fca6#0x3fef3f
 CLR_RED_MAX         = 0xfff0f0
 CLR_RED_MIN         = 0xff0f0f
 CLR_RED_STEP        = 0x000101
