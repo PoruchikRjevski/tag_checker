@@ -27,30 +27,48 @@
     
 - add "metric" column after version column. Metric for tags A and B for one device class defined as:
  
-    INST(A, B) - install date and time diff:       -,0,+     A < B => "-",  A = B => "0"  A > B "+"    A relative to B
-    DIST(A, B) - direct path commits count diff: x,-,0,+ 
+    def: INST(A, B) - install date and time diff:       -,0,+     A < B => "-",  A = B => "0"  A > B "+"    A relative to B
+    def: DIST(A, B) - direct path commits count diff: x,-,0,+ 
     
-    - - lesser
-    0 - equals
-    + - greater
-    * - any
-    x - not exist
+    Values:
     
-    DIST(A, B) = x => A and B in diff branches without direct way to eash other
+        -   : lesser
+        0   : equals
+        +   : greater
+        *   : any
+        x   : not exist
     
-    item specific branch name is in form "release/<device_class>/item-<id>"
+    def: DIST(A, B) = x   =>   A and B in different branches without direct way to each other
+    
+    ISB - [I]tem [S]pecific [B]ranch name is in form "release/<device_class>/item-<id>"
         
-    if A in item special branch : x => DIST(A,B) = '+'
-    if A in any other    branch : x => DIST(A,B) = '-'
+    if A in ISB              : x => DIST(A, B) = '+'
+    if A in any other branch : x => DIST(A, B) = '-'
 
-    DI(A, B)   B - is the BASE commit, A - testable
-    ===:==A is==:==================================
-    x* : ****** : see branch specialization
-    -+ : FORCED : A forced to install old version 
-    -* : OLD    : A < B
-    0* : OK     : A == B
-    +- : OK/EXP : Too scary to move base upper, but A is ok or EXPerimental
-    +* : OK     : A >= B
+    DI(A, B)   B - is the BASE commit, A - testable, D - DIST, I - INST
+    ===:==A is==:==============================================================:===============
+    x* : ****** : see branch specialization                                    :
+    -+ : FORCED : A forced to install old version                              :
+    -* : OLD    : A < B                                                        :
+    0* : OK     : A == B                                                       :
+    +- : OK+EXP : Too scary to move base upper, but A is ok or EXPerimental    :
+    +* : OK     : A >= B                                                       :
+    xxx: ERROR  : base is not exists
+    
+    Realized
+    
+    def: CREAT(A, B) - commit creation date:     x,-,0,+
+    
+    CURRENT realized: 
+    
+    CI (A, B)   B - is the BASE commit, A - testable, I - INST, C - commit create 
+    ===:==A is=====:==============================================================:=========:==============:=============:
+    -+ : FORCED OLD: YLW :                                                        : FORCED  : FORCED OLD   : GRN+RED/BLK :
+    -- : FORCED BB : R+G : why FORCED? m.b. simply old?                           : OLD     : OLD          : YELLOW      :
+    0* : BASE      : GRN : Last by CMT.DATE - ? m.b. simply equals to base?       : OK      : BASE         : GRN+GRN     :
+    +- : EXP_CAN   : BLO : Cancelled experimental?                                : OK+EXP  : EXPERIMENTAL : BLU+BLU     :
+    ++ : EXP       : BLU :                                                        : OK      : BASE+        : GRN+BLU     :
+    ?? : OLD       : RED :                                                        : ERROR   : ERROR        : RED         :
     
     Show in metric:
         <RES> (d/c)
