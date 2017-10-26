@@ -112,3 +112,17 @@
     then show table in table
         | ASW-1 | #14 | HL | 2017-xx-xx-xxxx
                         DRV| 2017-xx-xx-xxxx
+
+- separate project for true update repo:
+
+    db                  -> current model
+
+    git_hook            -> [when repo updated] -> runs update_adder with arg repo_name
+
+    update_adder.py     -> add to db:update note with repo_name(check equals)
+
+    repo_control.py     -> funcs: add and remove repo or translate note in db
+
+    runner.py           -> [runs one time per minute] -> check [if main_app alerady in processes] -> do nothing -> [else] -> run main_app
+
+    main_app.py         -> check db:update -> [if not empty] -> update info for all repo notes in db -> after that generate pages
