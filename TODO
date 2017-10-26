@@ -100,6 +100,17 @@
     
     - show "for all" version for each found domains and for root domain
     - check versions metrics with base in same domain or in upper domain (if same domain base is not exists)
+
+- separate updating repos
+    Project struct:
+    - main app
+    - git hook
+    - updater
+    - db
+    db: deps(repos), translates, to_update
+    Throw main app can access to db: add(+ configure and add git hook to .git/hooks/), remove(+ del git hook), modify notes of deps, repos and translates. update all repos
+    Git hook add to db::to_update - link to repo
+    Updater run's one time per minute and update pages by list bd::to_update
     
 + for each repo add sw name prefix in config:
 
