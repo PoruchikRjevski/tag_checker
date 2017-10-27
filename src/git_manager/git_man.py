@@ -272,11 +272,15 @@ class GitMan:
                 return -1
 
     def __get_jumps_between_commits(self, comm_a_hash, comm_b_hash):
-        cmd = g_d.GIT_CMD.format(g_d.A_LOG
+        # cmd = g_d.GIT_CMD.format(g_d.A_LOG
+        #                          + " {:s}...{:s}".format(comm_a_hash,
+        #                                                 comm_b_hash)
+        #                          + g_d.A_PRETTY.format(g_d.A_P_ONELINE)
+        #                          + g_d.A_WS_L)
+        cmd = g_d.GIT_CMD.format(g_d.A_REV_LIST
+                                 + g_d.A_COUNT
                                  + " {:s}...{:s}".format(comm_a_hash,
-                                                        comm_b_hash)
-                                 + g_d.A_PRETTY.format(g_d.A_P_ONELINE)
-                                 + g_d.A_WS_L)
+                                                         comm_b_hash))
 
         out = run_cmd(cmd)
 
