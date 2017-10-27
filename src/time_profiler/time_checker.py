@@ -45,7 +45,7 @@ def stop(id, no_matter=False):
 
 def get_pass_time(id):
     if id in times_dict:
-        time = "{:s}(sec)".format(str(round(times_dict[id], 4)))
+        time = "{:.4f}(sec)".format(round(times_dict[id], 4))
         del times_dict[id]
     else:
         time = "id is not available"
