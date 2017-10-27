@@ -240,8 +240,7 @@ class GitMan:
     def __get_parent_commit_hash_in_dev_branch(self, note_hash, branch, date):
         cmd = g_d.GIT_CMD.format(g_d.A_LOG
                                  + g_d.A_FORMAT.format(g_d.AA_SHASH)
-                                 + g_d.A_AFTER.format(date)
-                                 + " " + branch
+                                 + " " + note_hash + "..." + branch
                                  + g_d.A_TAIL.format(str(c_d.GIT_PAR_SH_NEST))
                                  + g_d.A_HEAD.format(str(c_d.GIT_AUTHOR_DEEP)))
 
