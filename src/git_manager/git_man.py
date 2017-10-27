@@ -254,13 +254,13 @@ class GitMan:
         if branch is None:
             return -1
 
-        # last_commit_s_hash = self.__get_last_commit_on_branch(branch)
-        # if g_v.DEBUG: out_log("last commit short hash: {:s}".format(str(last_commit_s_hash)))
-        # if last_commit_s_hash is None:
-        #     return -1
+        last_commit_s_hash = self.__get_last_commit_on_branch(branch)
+        if g_v.DEBUG: out_log("last commit short hash: {:s}".format(str(last_commit_s_hash)))
+        if last_commit_s_hash is None:
+            return -1
 
-        # parents_hash = self.__get_parent_commit_hash(note_hash, last_commit_s_hash)
-        parents_hash = self.__get_parent_commit_hash_in_dev_branch(note_hash, branch, date)
+        parents_hash = self.__get_parent_commit_hash(note_hash, last_commit_s_hash)
+        # parents_hash = self.__get_parent_commit_hash_in_dev_branch(note_hash, branch, date)
         if g_v.DEBUG: out_log("parent's hash: {:s}".format(str(parents_hash)))
         if parents_hash is None or not parents_hash:
             return -1
