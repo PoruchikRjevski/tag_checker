@@ -571,7 +571,10 @@ class GitMan:
                 unic_hashes_jumps = {}
 
                 for hash in unic_hashes:
-                    unic_hashes_jumps[hash] = self.__get_jumps_between_commits(max_base_item.cm_hash, hash)
+                    if hash == max_base_item.cm_hash:
+                        unic_hashes_jumps[hash] = 0
+                    else:
+                        unic_hashes_jumps[hash] = self.__get_jumps_between_commits(max_base_item.cm_hash, hash)
 
                 max_jump = max(unic_hashes_jumps.values())
                 max_jump_step = 0
