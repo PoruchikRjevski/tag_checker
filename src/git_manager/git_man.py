@@ -176,37 +176,12 @@ class GitMan:
 
         return tag, run_cmd(cmd)
 
-    def __get_commit_date_by_short_hash(self, hash):
-        cmd = g_d.GIT_CMD.format(g_d.A_LOG
-                                 + g_d.A_NN.format(str(1))
-                                 + g_d.A_PRETTY.format(g_d.A_P_FORMAT.format(g_d.AA_COMMIT_DATE))
-                                 + g_d.A_DATE.format(g_d.A_D_ISO)
-                                 + " " + hash)
-
-        return run_cmd(cmd)
-
-    def __get_commit_author_by_short_hash(self, hash):
-        cmd = g_d.GIT_CMD.format(g_d.A_LOG
-                                 + g_d.A_NN.format(str(c_d.GIT_AUTHOR_DEEP))
-                                 + g_d.A_FORMAT.format(g_d.AA_AUTHOR)
-                                 + " " + hash)
-
-        return run_cmd(cmd)
-
     def __repair_commit_msg(self, msg):
         size = len(msg)
         msg = msg[:c_d.COMMIT_MSG_SIZE]
         if size > c_d.COMMIT_MSG_SIZE:
             msg += " ..."
         return msg
-
-    def __get_commit_msg_by_short_hash(self, hash):
-        cmd = g_d.GIT_CMD.format(g_d.A_LOG
-                                 + g_d.A_NN.format(str(c_d.GIT_AUTHOR_DEEP))
-                                 + g_d.A_FORMAT.format(g_d.AA_COMMIT_MSG)
-                                 + " " + hash)
-
-        return run_cmd(cmd)
 
     def __find_develop_branche(self, branches):
         res = None
@@ -302,6 +277,23 @@ class GitMan:
             jumps = -1
 
         return jumps
+
+    def __get_commit_info_by_hash(self, hash):
+        cmd = g_d.GIT_CMD.format(g_d.A_LOG
+                                 + g_d.A_NN.format(str(c_d.GIT_AUTHOR_DEEP))
+                                 + g_d.A_FORMAT.format(g_d.AA_COMMIT_DATE + "&|"
+                                                       + g_d.AA_AUTHOR + "&|"
+                                                       + g_d.AA_COMMIT_MSG)
+                                 + g_d.A_DATE.format(g_d.A_D_ISO)
+                                 + " " + hash)
+
+        answ = run_cmd(cmd).split("&|")
+
+        cm_date = answ[0] if len(answ) >= 1 else ""
+        cm_auth = answ[1] if len(answ) >= 2 else ""
+        cm_msg = answ[2] if len(answ) >= 3 else ""
+
+        return cm_date, cm_auth, cm_msg
 
     def __gen_notes_by_tag_list(self, tag_list):
         items = []
@@ -527,17 +519,19 @@ class GitMan:
 
         commit.hash = hash
 
-        date = self.__get_commit_date_by_short_hash(hash)
+        raw_date, raw_auth, raw_msg = self.__get_commit_info_by_hash(commit.hash)
+
+        date = raw_date
         (sh_date, full_date) = self.__repair_commit_date(date)
         commit.date = sh_date
         commit.date_full = full_date
         commit.date_obj = datetime.datetime.strptime(sh_date, "%Y-%m-%d %H:%M")
         if g_v.DEBUG: out_log("item commit date: {:s}".format(commit.date))
 
-        commit.auth = self.__get_commit_author_by_short_hash(hash)
+        commit.auth = raw_auth
         if g_v.DEBUG: out_log("item author: {:s}".format(commit.auth))
 
-        msg = self.__get_commit_msg_by_short_hash(hash)
+        msg = raw_msg
         commit.msg = self.__repair_commit_msg(msg)
         if g_v.DEBUG: out_log("item commMsg: {:s}".format(commit.msg))
 
