@@ -22,6 +22,7 @@ A_DATE              = " --date={:s}"
 A_COUNT             = " --count"
 A_FORMAT            = " --format=\"{:s}\""
 A_TAIL              = " | tail -{:s}"
+A_HEAD              = " | head -{:s}"
 A_WS_L              = " | wc -l"
 
 A_P_FORMAT          = "format:\"{:s}\""

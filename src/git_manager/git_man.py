@@ -237,20 +237,32 @@ class GitMan:
 
         return out
 
+    def __get_parent_commit_hash_in_dev_branch(self, note_hash):
+        cmd = g_d.GIT_CMD.format(g_d.A_REV_LIST
+                                 + g_d.A_ABBREV.format(g_d.A_AB_COMMIT)
+                                 + " " + note_hash + "..." + g_d.BRANCH_DEVELOP
+                                 + g_d.A_TAIL.format(str(c_d.GIT_PAR_SH_NEST))
+                                 + g_d.A_HEAD.format(str(c_d.GIT_AUTHOR_DEEP)))
+
+        out = run_cmd(cmd)
+
+        return out
+
     def __get_parents_short_hash(self, note_hash):
-        branch = self.__get_develop_branch_by_hash(note_hash)
-        if g_v.DEBUG: out_log("finded branch: {:s}".format(str(branch)))
-        if branch is None:
-            return -1
+        # branch = self.__get_develop_branch_by_hash(note_hash)
+        # if g_v.DEBUG: out_log("finded branch: {:s}".format(str(branch)))
+        # if branch is None:
+        #     return -1
+        #
+        # last_commit_s_hash = self.__get_last_commit_on_branch(branch)
+        # if g_v.DEBUG: out_log("last commit short hash: {:s}".format(str(last_commit_s_hash)))
+        # if last_commit_s_hash is None:
+        #     return -1
 
-        last_commit_s_hash = self.__get_last_commit_on_branch(branch)
-        if g_v.DEBUG: out_log("last commit short hash: {:s}".format(str(last_commit_s_hash)))
-        if last_commit_s_hash is None:
-            return -1
-
-        parents_hash = self.__get_parent_commit_hash(note_hash, last_commit_s_hash)
+        # parents_hash = self.__get_parent_commit_hash(note_hash, last_commit_s_hash)
+        parents_hash = self.__get_parent_commit_hash_in_dev_branch(note_hash)
         if g_v.DEBUG: out_log("parent's hash: {:s}".format(str(parents_hash)))
-        if parents_hash is None:
+        if parents_hash is None or not parents_hash:
             return -1
         else:
             parents_hash = parents_hash.strip()
