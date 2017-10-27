@@ -237,10 +237,11 @@ class GitMan:
 
         return out
 
-    def __get_parent_commit_hash_in_dev_branch(self, note_hash):
+    def __get_parent_commit_hash_in_dev_branch(self, note_hash, branch, date):
         cmd = g_d.GIT_CMD.format(g_d.A_LOG
                                  + g_d.A_FORMAT.format(g_d.AA_SHASH)
-                                 + " " + note_hash + "..." + g_d.BRANCH_DEVELOP
+                                 + g_d.A_AFTER.format(date)
+                                 + " " + branch
                                  + g_d.A_TAIL.format(str(c_d.GIT_PAR_SH_NEST))
                                  + g_d.A_HEAD.format(str(c_d.GIT_AUTHOR_DEEP)))
 
@@ -248,19 +249,19 @@ class GitMan:
 
         return out
 
-    def __get_parents_short_hash(self, note_hash):
-        # branch = self.__get_develop_branch_by_hash(note_hash)
-        # if g_v.DEBUG: out_log("finded branch: {:s}".format(str(branch)))
-        # if branch is None:
-        #     return -1
-        #
+    def __get_parents_short_hash(self, note_hash, date):
+        branch = self.__get_develop_branch_by_hash(note_hash)
+        if g_v.DEBUG: out_log("finded branch: {:s}".format(str(branch)))
+        if branch is None:
+            return -1
+
         # last_commit_s_hash = self.__get_last_commit_on_branch(branch)
         # if g_v.DEBUG: out_log("last commit short hash: {:s}".format(str(last_commit_s_hash)))
         # if last_commit_s_hash is None:
         #     return -1
 
         # parents_hash = self.__get_parent_commit_hash(note_hash, last_commit_s_hash)
-        parents_hash = self.__get_parent_commit_hash_in_dev_branch(note_hash)
+        parents_hash = self.__get_parent_commit_hash_in_dev_branch(note_hash, branch, date)
         if g_v.DEBUG: out_log("parent's hash: {:s}".format(str(parents_hash)))
         if parents_hash is None or not parents_hash:
             return -1
@@ -272,11 +273,6 @@ class GitMan:
                 return -1
 
     def __get_jumps_between_commits(self, comm_a_hash, comm_b_hash):
-        # cmd = g_d.GIT_CMD.format(g_d.A_LOG
-        #                          + " {:s}...{:s}".format(comm_a_hash,
-        #                                                 comm_b_hash)
-        #                          + g_d.A_PRETTY.format(g_d.A_P_ONELINE)
-        #                          + g_d.A_WS_L)
         cmd = g_d.GIT_CMD.format(g_d.A_REV_LIST
                                  + g_d.A_COUNT
                                  + " {:s}...{:s}".format(comm_a_hash,
@@ -465,7 +461,7 @@ class GitMan:
             if not raw_hash or not raw_date or not cm_auth or not raw_msg:
                 return commit
 
-            commit.hash = raw_hash
+            commit.hash = self.__strict_f_hash(raw_hash)
 
             date = raw_date
             (sh_date, full_date) = self.__repair_commit_date(date)
@@ -484,7 +480,7 @@ class GitMan:
             commit.repo_i = repo_i
 
             # get pHash
-            commit.p_hash = self.__get_parents_short_hash(commit.hash)
+            commit.p_hash = self.__get_parents_short_hash(commit.hash, commit.date)
             if commit.p_hash == -1:
                 commit.p_hash = commit.hash
             if g_v.DEBUG: out_log("item pHash: {:s}".format(str(commit.p_hash)))

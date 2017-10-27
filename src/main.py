@@ -148,11 +148,11 @@ def update(cfg_loader, git_man, tag_model):
     out_log("Scan time: {:s}".format(g_v.SCAN_TIME))
 
     # generate web
-    # web_gen_t = start()
-    # web_gen = WebGenerator()
-    # web_gen.generate_web(tag_model)
-    # stop(web_gen_t)
-    # if g_v.TIMEOUTS: out_log("web gen time: {:s}".format(get_pass_time(web_gen_t)))
+    web_gen_t = start()
+    web_gen = WebGenerator()
+    web_gen.generate_web(tag_model)
+    stop(web_gen_t)
+    if g_v.TIMEOUTS: out_log("web gen time: {:s}".format(get_pass_time(web_gen_t)))
 
 
 def main():
