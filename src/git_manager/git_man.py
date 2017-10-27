@@ -296,6 +296,18 @@ class GitMan:
 
         return cm_date, cm_auth, cm_mess
 
+    def __get_commit_info_for_all_tags(self):
+        cmd = g_d.GIT_CMD.format(g_d.A_LOG
+                                 + g_d.A_PRETTY.format(g_d.A_P_FORMAT.format(g_d.AA_FHASH + "&|"
+                                                                             + g_d.AA_COMMIT_DATE + "&|"
+                                                                             + g_d.AA_AUTHOR + "&|"
+                                                                             + g_d.AA_COMMIT_MSG))
+                                 + g_d.A_DATE.format(g_d.A_D_ISO)
+                                 + g_d.A_TAGS
+                                 + g_d.A_NO_WALK)
+
+        return run_cmd(cmd)
+
     def __is_numeric(self, part):
         try:
             int(part)
@@ -416,61 +428,56 @@ class GitMan:
 
         return items_out
 
-    def __get_commits(self, unic_hashes, repo_i):
+    def __get_commits_info(self, unic_hashes, repo_i):
         commits_out = []
 
-        if g_v.MULTITH and len(unic_hashes) >= self.__m_tasks:
-            pool = ThreadPool(self.__cpus)
+        cm_tags_info = self.__get_commit_info_for_all_tags().split("\n")
+        cm_tags_info_true = [cm_tag_info for cm_tag_info in cm_tags_info if cm_tag_info.split("&|")[0] in unic_hashes]
 
-            commits_out = pool.map(self.__gen_commit, unic_hashes)
+        for cm_tag_info in cm_tags_info_true:
+            if g_v.DEBUG:
+                out_log("Gen commit for: {:s}".format(cm_tag_info))
 
-            pool.close()
-            pool.join()
-        else:
-            for hash in unic_hashes:
-                commits_out.append(self.__gen_commit(hash))
+            separated = cm_tag_info.split("&|")
+            raw_hash = separated[0] if len(separated) >= 1 else ""
+            raw_date = separated[1] if len(separated) >= 2 else ""
+            cm_auth = separated[2] if len(separated) >= 3 else ""
+            raw_msg = separated[3] if len(separated) >= 4 else ""
 
-        for commit in commits_out:
+            commit = CommitInfo()
+
+            if not raw_hash or not raw_date or not cm_auth or not raw_msg:
+                return commit
+
+            commit.hash = raw_hash
+
+            date = raw_date
+            (sh_date, full_date) = self.__repair_commit_date(date)
+            commit.date = sh_date
+            commit.date_full = full_date
+            commit.date_obj = datetime.datetime.strptime(sh_date, "%Y-%m-%d %H:%M")
+            if g_v.DEBUG: out_log("item commit date: {:s}".format(commit.date))
+
+            commit.auth = cm_auth
+            if g_v.DEBUG: out_log("item author: {:s}".format(commit.auth))
+
+            msg = raw_msg
+            commit.msg = self.__repair_commit_msg(msg)
+            if g_v.DEBUG: out_log("item commMsg: {:s}".format(commit.msg))
+
             commit.repo_i = repo_i
 
+            # get pHash
+            commit.p_hash = self.__get_parents_short_hash(commit.hash)
+            if commit.p_hash == -1:
+                commit.p_hash = commit.hash
+            if g_v.DEBUG: out_log("item pHash: {:s}".format(str(commit.p_hash)))
+
+            commit.valid = True
+
+            commits_out.append(commit)
+
         return commits_out
-
-    def __gen_commit(self, hash):
-        if g_v.DEBUG:
-            out_log("Gen commit for hash: {:s}".format(str(hash)))
-
-        commit = CommitInfo()
-
-        if not hash:
-            return commit
-
-        commit.hash = hash
-
-        raw_date, raw_auth, raw_msg = self.__get_commit_info_by_hash(commit.hash)
-
-        date = raw_date
-        (sh_date, full_date) = self.__repair_commit_date(date)
-        commit.date = sh_date
-        commit.date_full = full_date
-        commit.date_obj = datetime.datetime.strptime(sh_date, "%Y-%m-%d %H:%M")
-        if g_v.DEBUG: out_log("item commit date: {:s}".format(commit.date))
-
-        commit.auth = raw_auth
-        if g_v.DEBUG: out_log("item author: {:s}".format(commit.auth))
-
-        msg = raw_msg
-        commit.msg = self.__repair_commit_msg(msg)
-        if g_v.DEBUG: out_log("item commMsg: {:s}".format(commit.msg))
-
-        # get pHash
-        commit.p_hash = self.__get_parents_short_hash(hash)
-        if commit.p_hash == -1:
-            commit.p_hash = hash
-        if g_v.DEBUG: out_log("item pHash: {:s}".format(str(commit.p_hash)))
-
-        commit.valid = True
-
-        return commit
 
     def __do_main_work(self, tags_list, commits, repo_i):
         self.__get_cpus()
@@ -491,13 +498,13 @@ class GitMan:
 
         # create helper lists
         work_t = start()
-        unic_hashes = list(set([item.cm_hash for item in items_out]))
+        unic_hashes = list(set([item.f_hash for item in items_out]))
         stop(work_t)
         if g_v.TIMEOUTS: out_log("Create helpers lists: {:s}".format(get_pass_time(work_t)))
 
         # get commits info
         work_t = start()
-        commits_out = self.__get_commits(unic_hashes, repo_i)
+        commits_out = self.__get_commits_info(unic_hashes, repo_i)
 
         for commit in commits_out:
             commits.append(commit)

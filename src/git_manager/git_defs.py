@@ -13,6 +13,7 @@ A_REVERSE           = " --reverse"
 A_ALL               = " --all"
 A_TAGS              = " --tags"
 A_NO_MERGES         = " --no-merges"
+A_NO_WALK           = " --no-walk"
 A_ABBREV            = " --abbrev-{:s}"
 A_SHORT             = " --short"
 A_PRETTY            = " --pretty={:s}"
@@ -40,6 +41,7 @@ A_NN                = " -{:s}"
 AA_AUTHOR           = "%ae"
 AA_PARENT_SHASH     = "%p"
 AA_COMMIT_MSG       = "%s"
+AA_FHASH            = "%H"
 AA_SHASH            = "%h"
 AA_COMMIT_DATE      = "%cd"
 
@@ -50,4 +52,4 @@ BRANCH_DEVELOP      = "develop"
 REV_HEAD            = " HEAD"
 
 REFS_TAGS           = "refs/tags/"
-SHORT_HASH_SIZE     = 8
+SHORT_HASH_SIZE     = 9
