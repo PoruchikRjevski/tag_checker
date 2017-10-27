@@ -7,9 +7,11 @@ A_BRANCH            = " branch"
 A_CHECKOUT          = " checkout {:s}"
 A_REV_PARSE         = " rev-parse"
 A_REV_LIST          = " rev-list"
+A_SHOW_REF          = " show-ref"
 A_VERSION           = " --version"
 A_REVERSE           = " --reverse"
 A_ALL               = " --all"
+A_TAGS              = " --tags"
 A_NO_MERGES         = " --no-merges"
 A_ABBREV            = " --abbrev-{:s}"
 A_SHORT             = " --short"
@@ -46,3 +48,6 @@ AA_COMMIT_DATE      = "%cd"
 BRANCH_DEVELOP      = "develop"
 
 REV_HEAD            = " HEAD"
+
+REFS_TAGS           = "refs/tags/"
+SHORT_HASH_SIZE     = 8

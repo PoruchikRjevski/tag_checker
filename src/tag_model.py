@@ -161,6 +161,7 @@ class Item:
         self.tag_date_obj = None
         self.tag_date_ord = 0
         self.cm_hash = ""
+        self.f_hash = None
         self.platform = c_d.D_LINUX
         self.valid = False
         self.repo_i = -1

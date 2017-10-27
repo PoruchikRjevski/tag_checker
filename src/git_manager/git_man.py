@@ -41,8 +41,10 @@ class GitMan:
     def __go_to_dir(self, link):
         os.chdir(link)
 
-    def __get_tags(self):
-        cmd = g_d.GIT_CMD.format(g_d.A_TAG)
+    def __get_tags_with_fhash(self):
+        # cmd = g_d.GIT_CMD.format(g_d.A_TAG)
+        cmd = g_d.GIT_CMD.format(g_d.A_SHOW_REF
+                                 + g_d.A_TAGS)
 
         return run_cmd(cmd)
 
@@ -281,9 +283,9 @@ class GitMan:
     def __get_commit_info_by_hash(self, hash):
         cmd = g_d.GIT_CMD.format(g_d.A_LOG
                                  + g_d.A_NN.format(str(c_d.GIT_AUTHOR_DEEP))
-                                 + g_d.A_FORMAT.format(g_d.AA_COMMIT_DATE + "&|"
-                                                       + g_d.AA_AUTHOR + "&|"
-                                                       + g_d.AA_COMMIT_MSG)
+                                 + g_d.A_PRETTY.format(g_d.A_P_FORMAT.format(g_d.AA_COMMIT_DATE + "&|"
+                                                                             + g_d.AA_AUTHOR + "&|"
+                                                                             + g_d.AA_COMMIT_MSG))
                                  + g_d.A_DATE.format(g_d.A_D_ISO)
                                  + " " + hash)
 
@@ -291,9 +293,9 @@ class GitMan:
 
         cm_date = answ[0] if len(answ) >= 1 else ""
         cm_auth = answ[1] if len(answ) >= 2 else ""
-        cm_msg = answ[2] if len(answ) >= 3 else ""
+        cm_mess = answ[2] if len(answ) >= 3 else ""
 
-        return cm_date, cm_auth, cm_msg
+        return cm_date, cm_auth, cm_mess
 
     def __gen_notes_by_tag_list(self, tag_list):
         items = []
@@ -430,12 +432,31 @@ class GitMan:
 
         return (sh_res, full_res)
 
-    def __gen_item(self, tag):
+    def __repair_tag_info(self, tag_info):
+        if g_d.REFS_TAGS not in tag_info:
+            return None, None
+
+        temp = tag_info.split(" {:s}".format(g_d.REFS_TAGS))
+        f_hash = temp[0] if len(temp) >= 1 else None
+        tag = temp[1] if len(temp) >= 2 else None
+
+        return tag, f_hash
+
+    def __strict_f_hash(self, f_hash):
+        return f_hash[:g_d.SHORT_HASH_SIZE] if len(f_hash) >= g_d.SHORT_HASH_SIZE else f_hash
+
+    def __gen_item(self, tag_info):
         if g_v.DEBUG:
-            out_log("Gen item for tag: {:s}".format(tag))
+            out_log("Gen item for tag: {:s}".format(tag_info))
 
         item = Item()
+        tag, f_hash = self.__repair_tag_info(tag_info)
+
+        if tag is None or f_hash is None:
+            return item
+
         item.tag = tag
+        item.f_hash = f_hash
 
         if not self.__parce_tag(item):
             out_err("Bad tag: " + tag)
@@ -465,29 +486,6 @@ class GitMan:
             item.repo_i = repo_i
 
         return items_out
-
-    def __get_short_hashes(self, tags_list, items):
-        # {tag, cm_hash}
-        hashes = {}
-
-        if g_v.MULTITH and len(tags_list) >= self.__m_tasks:
-            pool = ThreadPool(self.__cpus)
-
-            hashes_list = pool.map(self.__get_short_hash, tags_list)
-
-            pool.close()
-            pool.join()
-
-            for (tag, hash) in hashes_list:
-                hashes[tag] = hash
-        else:
-            for tag in tags_list:
-                (_, hash) = self.__get_short_hash(tag)
-                hashes[tag] = hash
-
-        for item in items:
-            if item.tag in hashes.keys():
-                item.cm_hash = hashes[item.tag]
 
     def __get_commits(self, unic_hashes, repo_i):
         commits_out = []
@@ -560,8 +558,10 @@ class GitMan:
 
         # get commits hashes from git
         work_t = start()
-        tags_list_str = [item.tag for item in items_out]
-        self.__get_short_hashes(tags_list_str, items_out)
+        for item in items_out:
+            item.cm_hash = self.__strict_f_hash(item.f_hash)
+        # tags_list_str = [item.tag for item in items_out]
+        # self.__get_short_hashes(tags_list_str, items_out)
         stop(work_t)
         if g_v.TIMEOUTS: out_log("Get commit's hashes from git time: {:s}".format(get_pass_time(work_t)))
 
@@ -703,7 +703,7 @@ class GitMan:
                 if self.__is_dir_exist(repo.link):
                     self.__go_to_dir(repo.link)
 
-                tags = self.__get_tags()
+                tags = self.__get_tags_with_fhash()
 
                 if tags:
                     tags_list = tags.split("\n")
