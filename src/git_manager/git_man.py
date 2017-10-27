@@ -42,7 +42,6 @@ class GitMan:
         os.chdir(link)
 
     def __get_tags_with_fhash(self):
-        # cmd = g_d.GIT_CMD.format(g_d.A_TAG)
         cmd = g_d.GIT_CMD.format(g_d.A_SHOW_REF
                                  + g_d.A_TAGS)
 
@@ -297,76 +296,6 @@ class GitMan:
 
         return cm_date, cm_auth, cm_mess
 
-    def __gen_notes_by_tag_list(self, tag_list):
-        items = []
-
-        for tag in tag_list:
-            items.append(self.__gen_note_by_tag(tag, items))
-
-        return items
-
-    def __gen_note_by_tag(self, tag, items=[]):
-        gen_t = start()
-
-        res_flag = True
-
-        if g_v.DEBUG:
-            out_log("Gen item for tag: {:s}".format(tag))
-
-        item = Item()
-        item.tag = tag
-
-        if self.__parce_tag(item):
-            item.cm_hash = self.__get_short_hash(tag)
-            if g_v.DEBUG: out_log("item short hash: {:s}".format(item.cm_hash))
-
-            do_cmds = True
-            if items:
-                for (fl, it) in items:
-                    if fl:
-                        if item.cm_hash == it.cm_hash:
-                            item.cm_date = it.cm_date
-                            item.cm_date_full = it.cm_date_full
-                            item.cm_auth = it.cm_auth
-                            item.cm_msg = it.cm_msg
-                            item.p_hash = it.p_hash
-
-                            do_cmds = False
-                            break
-
-            if do_cmds:
-                date = self.__get_commit_date_by_short_hash(item.cm_hash)
-                (sh_date, full_date) = self.__repair_commit_date(date)
-                item.cm_date = sh_date
-                item.cm_date_full = full_date
-                if g_v.DEBUG: out_log("item commit date: {:s}".format(item.cm_date))
-
-                item.cm_auth = self.__get_commit_author_by_short_hash(item.cm_hash)
-                if g_v.DEBUG: out_log("item author: {:s}".format(item.cm_auth))
-
-                msg = self.__get_commit_msg_by_short_hash(item.cm_hash)
-                item.cm_msg = self.__repair_commit_msg(msg)
-                if g_v.DEBUG: out_log("item commMsg: {:s}".format(item.cm_msg))
-
-                # get pHash
-                item.p_hash = self.__get_parents_short_hash(item.cm_hash)
-                if item.p_hash == -1:
-                    item.p_hash = item.cm_hash
-                if g_v.DEBUG: out_log("item pHash: {:s}".format(str(item.p_hash)))
-
-            item.valid = True
-        else:
-            out_err("Bad tag: " + tag)
-            res_flag = False
-
-        stop(gen_t)
-
-        if res_flag:
-            if g_v.TIMEOUTS: out_log("gen item time: {:s}".format(get_pass_time(gen_t)))
-            return (res_flag, item)
-        else:
-            return (res_flag, None)
-
     def __is_numeric(self, part):
         try:
             int(part)
@@ -556,14 +485,9 @@ class GitMan:
                                                                                  str(len(tags_list)),
                                                                                  get_pass_time(work_t)))
 
-        # get commits hashes from git
-        work_t = start()
+        # strict commits hashes from
         for item in items_out:
             item.cm_hash = self.__strict_f_hash(item.f_hash)
-        # tags_list_str = [item.tag for item in items_out]
-        # self.__get_short_hashes(tags_list_str, items_out)
-        stop(work_t)
-        if g_v.TIMEOUTS: out_log("Get commit's hashes from git time: {:s}".format(get_pass_time(work_t)))
 
         # create helper lists
         work_t = start()
