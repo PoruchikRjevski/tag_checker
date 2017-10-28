@@ -1,5 +1,4 @@
 import os
-import re
 import configparser
 
 import common_defs as c_d
@@ -13,7 +12,6 @@ __all__ = ['CfgLoader']
 # TODO: maybe json will be simpler?
 
 class CfgLoader:
-    re_repo_server_path = re.compile('$[^@]+[@][^:]+:(.+)$')
 
     def __init__(self):
         if g_v.DEBUG: out_log("init")  # TODO: used logger?
@@ -59,7 +57,21 @@ class CfgLoader:
 
     @staticmethod
     def get_sw_module_id_from_repo_full_link(repo_full_link):
-        return re_repo_server_path.match(repo_full_link).group(1).replace('/', '.')
+
+        id = repo_full_link
+
+        std_prefix = "/home/git/repositories/"
+        std_suffix = ".git"
+
+        if id.startswith(std_prefix):
+            id = id[len(std_prefix):]
+
+        if id.endswith(std_suffix):
+            id = id[:-len(std_suffix)]
+
+        id = id.replace('/', '.')
+
+        return id
 
     def __add_department(self, block, model):
         prefix = ""
