@@ -1,4 +1,5 @@
 import os
+import re
 import configparser
 
 import common_defs as c_d
@@ -9,14 +10,17 @@ from tag_model import *
 __all__ = ['CfgLoader']
 
 
+# TODO: maybe json will be simpler?
+
 class CfgLoader:
     re_repo_server_path = re.compile('$[^@]+[@][^:]+:(.+)$')
 
     def __init__(self):
-        if g_v.DEBUG: out_log("init")
+        if g_v.DEBUG: out_log("init")  # TODO: used logger?
 
+        self.__cfg = None
         self.__gen_paths()
-        self.__set_default_out_path()
+        CfgLoader.__set_default_out_path()
 
     def __gen_paths(self):
         self.__config_def_path = ""
@@ -26,7 +30,8 @@ class CfgLoader:
         elif g_v.CUR_PLATFORM == c_d.WINDOWS_P:
             self.__config_def_path = os.path.join(c_d.WIN_CFG_P, c_d.CFG_F_NAME)
 
-    def __set_default_out_path(self):
+    @staticmethod
+    def __set_default_out_path():
         if g_v.CUR_PLATFORM == c_d.LINUX_P:
             g_v.OUT_PATH = c_d.LIN_OUT_P_DEF
         elif g_v.CUR_PLATFORM == c_d.WINDOWS_P:
@@ -106,7 +111,6 @@ class CfgLoader:
 
         return None
 
-
     def load_config(self, model):
         if g_v.DEBUG: out_log("start load config")
 
@@ -130,7 +134,7 @@ class CfgLoader:
                 if block == c_d.BLOCK_TRAN:
                     for name in self.__cfg[block]:
                         print(name, " : ", self.__cfg.get(block, name))
-                if block == c_d.BLOCK_CONFIG:
+                elif block == c_d.BLOCK_CONFIG:
                     pass
                 else:
                     if self.__cfg.has_option(block, c_d.SECT_PREFIX):
