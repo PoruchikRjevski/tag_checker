@@ -126,3 +126,11 @@
     runner.py           -> [runs one time per minute] -> check [if main_app alerady in processes] -> do nothing -> [else] -> run main_app
 
     main_app.py         -> check db:update -> [if not empty] -> update info for all repo notes in db -> after that generate pages
+
+- change table view:
+    - separate column Version to Release date and Version
+    - change style to more simplicity
+
+- delete forced to base version
+
+- move jumps to title

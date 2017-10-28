@@ -17,10 +17,10 @@ def run_cmd(cmd):
 
     command += cmd
 
-    if g_v.DEBUG: out_log("cmd: " + command)
+    if g_v.DEBUG: out_log("cmd: {:s}".format(command))
 
     cmd_run_t = start()
-    proc = subprocess.Popen([command + '\n'],
+    proc = subprocess.Popen(['{:s}\n'.format(command)],
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE,
                             shell=True)
