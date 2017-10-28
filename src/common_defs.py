@@ -178,7 +178,7 @@ SECT_DIST_LINK_PREFIX = "dist_link_prefix"
 SECT_PAIRS          = "pairs"
 OUT_P               = "out"
 
-CFG_F_NAME          = "tag_checker.ini"
+CFG_F_NAME          = "config.ini"
 
 # LOGGER
 LOG_T               = "LOG"
@@ -224,7 +224,7 @@ WIN_OUT_P_DEF       = "../out/"
 WIN_LOG_P_DEF       = "../log/"
 LIN_LOG_P_DEF       = "/tmp/tag_checker_log/"
 
-LIN_CFG_P           = "/etc/"
+LIN_CFG_P           = "/etc/tag_checker/"
 WIN_CFG_P           = "../cfg/"
 
 # CMD WRAP ----------------------------------------------------------

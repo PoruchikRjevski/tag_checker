@@ -1,10 +1,11 @@
 #!/bin/bash
 
 # MAIN CONSTS
+SOLUTION_NAME=tag_checker
 CUR_DIR="./"
-LOG_DIR="/tmp/tag_checker_log/"
+LOG_DIR="/tmp/${SOLUTION_NAME}_log/"
 LINK_PATH="/usr/local/bin/"
-SETUP_DIR="/opt/tag_checker/"
+SETUP_DIR="/opt/${SOLUTION_NAME}/"
 OUT_DIR="/var/www/swver_hist/"
 OUT_DEV_DIR=$OUT_DIR"devices/"
 OUT_ORD_DIR=$OUT_DEV_DIR"orders/"
@@ -14,15 +15,15 @@ OUT_JS_DIR=$OUT_DIR$JS_DIR
 OUT_CSS_DIR=$OUT_DIR$CSS_DIR
 SRC_DIR="src/"
 PY_FILES="*.py"
-CONFIG_DIR="/etc/"
-CONFIG_FILE="tag_checker.ini"
+CONFIG_DIR="/etc/${SOLUTION_NAME}"
+CONFIG_FILE="config.ini"
 NAME="main.py"
 SCRIPTS_FILE="scripts.js"
 STYLE_FILE="style.css"
 VERSION_FILE="version.py"
 MISC_DIR="misc/"
 UPDATE_A="--update"
-TAG_CHECKER="tag_checker"
+EXECUTABLE_NAME="${SOLUTION_NAME}"
 
 EXEC_F="run.sh"
 EXEC_CT_F="run_ct.sh"
@@ -129,7 +130,7 @@ main_menu() {
         4 ) 
             change_parameters
             accept_params
-            show_msg "Parameters accepted: ${setted_params[*]} . Use link: $TAG_CHECKER."
+            show_msg "Parameters accepted: ${setted_params[*]} . Use link: ${EXECUTABLE_NAME}."
             clear
             main_menu
             ;;
@@ -231,7 +232,7 @@ full_uninstall() {
     ) | $("${dialog[@]}" "${progress_dlg[@]}" "${full_uninstall_dlg[@]}" 2>&1 >/dev/tty)
 
     check_and_rem_f "$CONFIG_DIR$CONFIG_FILE"
-    check_and_rem_f "$LINK_PATH$TAG_CHECKER"
+    check_and_rem_f "$LINK_PATH${EXECUTABLE_NAME}"
 
     (
         progress_step "Removing note from crontab" 90
@@ -301,8 +302,9 @@ update_files() {
         yes | cp -rf $SRC_DIR* $SETUP_DIR
 
         progress_step "Config file was checked..." 15
+        mkdir -p "${CONFIG_DIR}"
         cp -rfn $CUR_DIR$CONFIG_FILE $CONFIG_DIR
-        chmod 777 $CONFIG_DIR$CONFIG_FILE
+        chmod 664 $CONFIG_DIR$CONFIG_FILE
         
         progress_step "CSS files was copied..." 20
         yes | cp -rf $CUR_DIR$SRC_DIR$MISC_DIR$CSS_DIR* $OUT_DIR$CSS_DIR
@@ -408,9 +410,9 @@ create_exec_file() {
 }
 
 create_link() {
-    check_and_rem_f "$LINK_PATH$TAG_CHECKER"
+    check_and_rem_f "$LINK_PATH${EXECUTABLE_NAME}"
 
-    ln -s $SETUP_DIR$EXEC_F $LINK_PATH$TAG_CHECKER
+    ln -s $SETUP_DIR$EXEC_F $LINK_PATH${EXECUTABLE_NAME}
 }
 
 edit_crontab() {
@@ -463,7 +465,7 @@ run_from_source() {
 }
 
 run_now() {
-    $TAG_CHECKER $UPDATE_A
+    ${EXECUTABLE_NAME} $UPDATE_A
 
     show_info "installed script was finish work."
 }
