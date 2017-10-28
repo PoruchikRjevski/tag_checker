@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # MAIN CONSTS
+INERACTIVE="y"
 SOLUTION_NAME=tag_checker
 CUR_DIR="./"
 LOG_DIR="/tmp/${SOLUTION_NAME}_log/"
@@ -73,6 +74,13 @@ main() {
     exit 0
 }
 
+
+is_interactive() {
+	[ "$INERACTIVE" == "y" ] && return 0
+	return 1
+}
+
+
 check_soft() {
     # check dialog or whiptail
     if which $DIALOG > /dev/null; then
@@ -97,6 +105,12 @@ check_soft() {
     fi
 }
 
+
+ui_clear() {
+	is_interactive && clear
+}
+
+
 main_menu() {
     main_menu_dlg=(--clear \
                    --title "Tag Checker Installer" \
@@ -111,9 +125,9 @@ main_menu() {
               7 "Run from installed"
               8 "Exit from installer")
 
-    clear
+    ui_clear
     choise_p=$("${dialog[@]}" "${main_menu_dlg[@]}" "${m_m_opts[@]}" 2>&1 >/dev/tty)
-    clear
+    ui_clear
     case $choise_p in
         1 ) 
             full_install
@@ -131,7 +145,7 @@ main_menu() {
             change_parameters
             accept_params
             show_msg "Parameters accepted: ${setted_params[*]} . Use link: ${EXECUTABLE_NAME}."
-            clear
+            ui_clear
             main_menu
             ;;
         5 ) 
@@ -151,7 +165,7 @@ main_menu() {
         * ) close_all_dialogs ;;
     esac
 
-    # clear
+    # ui_clear
 }
 
 full_install() {
@@ -187,7 +201,7 @@ full_install() {
         progress_step "Finishing installing..." 100
     ) | $("${dialog[@]}" "${progress_dlg[@]}" "${full_install_dlg[@]}" 2>&1 >/dev/tty)
     
-    clear
+    ui_clear
 }
 
 create_dirs() {
@@ -214,7 +228,7 @@ create_dirs() {
         chmod +x $LOG_DIR
     ) | $("${dialog[@]}" "${progress_dlg[@]}" "${cr_dirs_dlg[@]}" 2>&1 >/dev/tty)
 
-    clear
+    ui_clear
 }
 
 full_uninstall() {
@@ -244,7 +258,7 @@ full_uninstall() {
         progress_step "Finishing uninstalling..." 100
     ) | $("${dialog[@]}" "${progress_dlg[@]}" "${full_uninstall_dlg[@]}" 2>&1 >/dev/tty)
 
-    clear
+    ui_clear
 }
 
 delete_dirs() {
@@ -262,13 +276,13 @@ delete_dirs() {
         check_and_rem_d "$LOG_DIR"
     ) | $("${dialog[@]}" "${progress_dlg[@]}" "${del_dirs_dlg[@]}" 2>&1 >/dev/tty)
 
-    clear
+    ui_clear
 }
 
 upgrade_files() {
     upgrade_prog=(--gauge "Upgrade files" $wnd_sz_g)
 
-    clear
+    ui_clear
     (
         progress_step "Updating files..." 0
 
@@ -291,11 +305,7 @@ upgrade_files() {
     show_info "Files was updated."
 }
 
-update_files() {
-    update_f_prog=(--gauge "Update files" $wnd_sz_g)
-
-    clear
-    (
+update_files_cli() {
         progress_step "Init updating files..." 0
 
         progress_step "Source files was copied..." 10
@@ -304,7 +314,7 @@ update_files() {
         progress_step "Config file was checked..." 15
         mkdir -p "${CONFIG_DIR}"
         cp -rfn $CUR_DIR$CONFIG_FILE $CONFIG_DIR
-        chmod 664 $CONFIG_DIR$CONFIG_FILE
+        chmod 664 "$CONFIG_DIR/$CONFIG_FILE"
         
         progress_step "CSS files was copied..." 20
         yes | cp -rf $CUR_DIR$SRC_DIR$MISC_DIR$CSS_DIR* $OUT_DIR$CSS_DIR
@@ -319,9 +329,22 @@ update_files() {
         accept_params
 
         progress_step "Finishing updating files..." 100
+}
+
+update_files() {
+	if ! is_interactive; then
+		update_files_cli
+		return 0
+	fi
+
+    update_f_prog=(--gauge "Update files" $wnd_sz_g)
+
+    ui_clear
+    (
+    	update_files_cli
     ) | $("${dialog[@]}" "${progress_dlg[@]}" "${update_f_prog[@]}" 2>&1 >/dev/tty)
 
-    clear
+    ui_clear
 }
 
 build_ver() {
@@ -363,7 +386,7 @@ change_parameters() {
 
 
     choises=$("${dialog[@]}" "${change_params_dlg[@]}" "${c_p_opts[@]}" 3>&1 1>&2 2>&3)
-    clear
+    ui_clear
 
     for choise in $choises
     do
@@ -386,18 +409,27 @@ change_parameters() {
     setted_params_sw=("${changed_sw[@]}")
 }
 
+accept_params_cli() {
+    progress_step "Init create addition files..." 0
+    progress_step "Create exec file..." 50
+    create_exec_file
+
+    progress_step "Create link..." 100
+    create_link
+}
+
 accept_params() {
+	if ! is_interactive; then
+		accept_params_cli
+		return 0
+	fi
+
     accept_params_dlg=(--gauge "Accept params" $wnd_sz_g)
     (
-        progress_step "Init create addition files..." 0
-        progress_step "Create exec file..." 50
-        create_exec_file
-
-        progress_step "Create link..." 100
-        create_link
+    	accept_params_cli
     ) | $("${dialog[@]}" "${progress_dlg[@]}" "${accept_params_dlg[@]}" 2>&1 >/dev/tty)
 
-    clear
+    ui_clear
 }
 
 create_exec_file() {
@@ -424,9 +456,9 @@ edit_crontab() {
               2 "REMOVE from crontab"
               3 "SKIP")
 
-    clear
+    ui_clear
     choise_cron=$("${dialog[@]}" "${crontab_menu_dlg[@]}" "${e_c_opts[@]}" 2>&1 >/dev/tty)
-    clear
+    ui_clear
     case $choise_cron in
         1 ) 
             remove_from_crontab
@@ -440,7 +472,7 @@ edit_crontab() {
         3 ) ;;
     esac
 
-    clear
+    ui_clear
 }
 
 remove_from_crontab() {
@@ -495,7 +527,7 @@ check_and_make_d() {
 show_msg() {
     msgbox_dlg=(--title "Message" --msgbox "$1" $wnd_sz)
     $("${dialog[@]}" "${msgbox_dlg[@]}" 2>&1 >/dev/tty)
-    clear
+    ui_clear
 }
 
 show_info() {
@@ -503,10 +535,11 @@ show_info() {
     $("${dialog[@]}" "${infobox_dlg[@]}" 2>&1 >/dev/tty)
 
     sleep 0.5
-    clear
+    ui_clear
 }
 
 progress_step() {
+	if is_interactive; then
         echo $2
 
         echo "XXX"
@@ -514,13 +547,52 @@ progress_step() {
         echo "XXX"
 
         sleep 0.1
+    else
+    	echo "[INFO] : $1 [$2 %]"
+    fi
 }
 
 close_all_dialogs() {
-    clear
+    ui_clear
     exit 0
+}
+
+run() {
+	/opt/tag_checker/run.sh --update
+}
+
+cli_main() {
+	local CMD="$1"
+
+	case "$CMD" in
+		u*) #update
+			update_files
+			;;
+		r*) #run
+			run
+			;;
+		d*) #devel
+			update_files
+			run
+			;;
+		*)
+			echo "TODO: implement usage"
+			echo "Usage: $0 <cmd>"
+			echo "  <cmd> ::= "
+			echo "  	update"
+			echo "  	run"
+			echo "  	devel"
+			;;
+	esac
 }
 
 
 # ENTER POINT
-main
+if [ -z "$1" ]; then
+	INERACTIVE="y"
+	#interactive mode
+	main
+else
+	INERACTIVE="n"
+	cli_main "$@"
+fi
