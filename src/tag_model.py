@@ -129,9 +129,9 @@ class Repo:
 
     @property
     def sw_archive_module_id(self):
-        return self.sw_archive_module_id
+        return self.__sw_archive_module_id
 
-    @link.setter
+    @sw_archive_module_id.setter
     def sw_archive_module_id(self, sw_archive_module_id):
         self.__sw_archive_module_id = sw_archive_module_id
 

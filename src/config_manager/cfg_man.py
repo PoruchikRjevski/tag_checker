@@ -88,7 +88,7 @@ class CfgLoader:
 
                 split = repo_name.split(":")
                 item_count = len(split)
-                repo.sw_archive_module_id = ""
+                sw_archive_module_id = ""
                 if isinstance(split, list) and item_count > 1:
                     repo.soft_type = split[0]
 
@@ -96,14 +96,17 @@ class CfgLoader:
                         dep.soft_types.append(repo.soft_type)
                     pre_link = split[1]
                     if item_count > 2:
-                        repo.sw_archive_module_id = split[2]
+                        sw_archive_module_id = split[2]
                 else:
                     pre_link = repo_name
 
                 repo.link = prefix + pre_link
                 repo.name = pre_link
-                if not repo.sw_archive_module_id:
+                
+                if not sw_archive_module_id:
                     repo.sw_archive_module_id = CfgLoader.get_sw_module_id_from_repo_full_link(repo.link)
+                else:
+                    repo.sw_archive_module_id = sw_archive_module_id
 
                 dep.repos.append(repo)
 
