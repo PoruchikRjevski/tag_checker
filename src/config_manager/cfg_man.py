@@ -10,6 +10,8 @@ __all__ = ['CfgLoader']
 
 
 class CfgLoader:
+    re_repo_server_path = re.compile('$[^@]+[@][^:]+:(.+)$')
+
     def __init__(self):
         if g_v.DEBUG: out_log("init")
 
@@ -30,9 +32,16 @@ class CfgLoader:
         elif g_v.CUR_PLATFORM == c_d.WINDOWS_P:
             g_v.OUT_PATH = c_d.WIN_OUT_P_DEF
 
+    def __try_load(self, block, item, default_value):
+        if self.__cfg.has_option(block, item):
+            return self.__cfg.get(block, item)
+        else:
+            return default_value
+
     def __load_config_block(self, block):
-        if self.__cfg.has_option(block, c_d.OUT_P):
-            g_v.OUT_PATH = self.__cfg.get(block, c_d.OUT_P)
+        g_v.OUT_PATH = self.__try_load(block, c_d.OUT_P, g_v.OUT_PATH)
+        g_v.DIST_LINK_PREFIX = self.__try_load(block, c_d.SECT_DIST_LINK_PREFIX, g_v.DIST_LINK_PREFIX)
+        g_v.DIST_LINK_PATTERN = self.__try_load(block, c_d.SECT_DIST_LINK_PATTERN, g_v.DIST_LINK_PATTERN)
 
     def __load_translate_block(self, block, model):
         if self.__cfg.has_option(block, c_d.SECT_PAIRS):
@@ -42,6 +51,10 @@ class CfgLoader:
             model.tr_dev_names.update(tr_dict)
         # for name in self.__cfg[block]:
         #     model.tr_dev_names[name] = self.__cfg.get(block, name)
+
+    @staticmethod
+    def get_sw_module_id_from_repo_full_link(repo_full_link):
+        return re_repo_server_path.match(repo_full_link).group(1).replace('/', '.')
 
     def __add_department(self, block, model):
         prefix = ""
@@ -56,18 +69,25 @@ class CfgLoader:
             for repo_name in repos_links:
                 repo = Repo()
 
-                pre_link = ""
-                splitted = repo_name.split(":")
-                if isinstance(splitted, list) and len(splitted) == 2:
-                    repo.soft_type = splitted[0]
-                    pre_link = splitted[1]
+                split = repo_name.split(":")
+                item_count = len(split)
+                repo.sw_archive_module_id = ""
+                if isinstance(split, list) and item_count > 1:
+                    repo.soft_type = split[0]
+
                     if repo.soft_type not in dep.soft_types:
                         dep.soft_types.append(repo.soft_type)
+                    pre_link = split[1]
+                    if item_count > 2:
+                        repo.sw_archive_module_id = split[2]
                 else:
                     pre_link = repo_name
 
                 repo.link = prefix + pre_link
                 repo.name = pre_link
+                if not repo.sw_archive_module_id:
+                    repo.sw_archive_module_id = CfgLoader.get_sw_module_id_from_repo_full_link(repo.link)
+
                 dep.repos.append(repo)
 
             model.departments[block] = dep

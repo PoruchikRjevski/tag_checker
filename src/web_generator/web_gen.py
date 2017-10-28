@@ -582,6 +582,18 @@ class WebGenerator:
 
             type_class_id += 1
 
+    @staticmethod
+    def form_dist_link(commit, repo):
+        link = g_v.DIST_LINK_PATTERN
+
+        version_id = "{:s}.{:s}".format(commit.date_full, commit.hash)
+
+        link = link.replace("${dist_prefix}", g_v.DIST_LINK_PREFIX)
+        link = link.replace("${sw_module_id}", repo.sw_archive_module_id)
+        link = link.replace("${sw_module_version_id}", version_id)
+
+        return link
+
     def __gen_common_columns(self, file, repo, commit, item, type_class_id):
 
         column_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
@@ -617,9 +629,7 @@ class WebGenerator:
 
         if item.item_type is c_d.TYPE_ALL:
             ftp_link_c = (c_d.REDIST_TXT,
-                          c_d.LINK_TO_FTP.format(item.dev_name,
-                                                 "{:s}.{:s}".format(commit.date_full,
-                                                                    commit.hash)),
+                          WebGenerator.form_dist_link(commit, repo),
                           h_d.A_TITLE.format(c_d.LINK_FTP_TXT)
                           + h_d.A_TARGET.format(h_d.A_TARGET_BLANK))
             links_list.append(ftp_link_c)
