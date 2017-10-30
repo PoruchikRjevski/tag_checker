@@ -93,11 +93,13 @@ class Repo:
     __name                      is repo name
     __link                      is link to location
     __soft_type                 is belong to type of soft
+    __sw_archive_module_id      software archive module identifier
     """
     def __init__(self):
         self.__name = ""
         self.__link = ""
         self.__soft_type = ""
+        self.__sw_archive_module_id = ""
 
     @property
     def name(self):
@@ -124,6 +126,14 @@ class Repo:
     @soft_type.setter
     def soft_type(self, soft_type):
         self.__soft_type = soft_type
+
+    @property
+    def sw_archive_module_id(self):
+        return self.__sw_archive_module_id
+
+    @sw_archive_module_id.setter
+    def sw_archive_module_id(self, sw_archive_module_id):
+        self.__sw_archive_module_id = sw_archive_module_id
 
 
 class Device:

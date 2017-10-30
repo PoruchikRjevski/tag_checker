@@ -7,6 +7,9 @@ TIMEOUTS            = False
 
 OUT_PATH            = ""
 
+DIST_LINK_PREFIX    = "ftp://172.16.20.64/bourevestnik.spb.ru/software/archive/"
+DIST_LINK_PATTERN   = "${dist_prefix}%5B${sw_module_id}%5D.MOD/%5B${sw_module_version_id}%5D.VER"
+
 CUR_PLATFORM        = None
 
 CUR_PATH            = ""

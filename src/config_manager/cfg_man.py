@@ -9,12 +9,16 @@ from tag_model import *
 __all__ = ['CfgLoader']
 
 
-class CfgLoader:
-    def __init__(self):
-        if g_v.DEBUG: out_log("init")
+# TODO: maybe json will be simpler?
 
+class CfgLoader:
+
+    def __init__(self):
+        if g_v.DEBUG: out_log("init")  # TODO: used logger?
+
+        self.__cfg = None
         self.__gen_paths()
-        self.__set_default_out_path()
+        CfgLoader.__set_default_out_path()
 
     def __gen_paths(self):
         self.__config_def_path = ""
@@ -24,15 +28,23 @@ class CfgLoader:
         elif g_v.CUR_PLATFORM == c_d.WINDOWS_P:
             self.__config_def_path = os.path.join(c_d.WIN_CFG_P, c_d.CFG_F_NAME)
 
-    def __set_default_out_path(self):
+    @staticmethod
+    def __set_default_out_path():
         if g_v.CUR_PLATFORM == c_d.LINUX_P:
             g_v.OUT_PATH = c_d.LIN_OUT_P_DEF
         elif g_v.CUR_PLATFORM == c_d.WINDOWS_P:
             g_v.OUT_PATH = c_d.WIN_OUT_P_DEF
 
+    def __try_load(self, block, item, default_value):
+        if self.__cfg.has_option(block, item):
+            return self.__cfg.get(block, item)
+        else:
+            return default_value
+
     def __load_config_block(self, block):
-        if self.__cfg.has_option(block, c_d.OUT_P):
-            g_v.OUT_PATH = self.__cfg.get(block, c_d.OUT_P)
+        g_v.OUT_PATH = self.__try_load(block, c_d.OUT_P, g_v.OUT_PATH)
+        g_v.DIST_LINK_PREFIX = self.__try_load(block, c_d.SECT_DIST_LINK_PREFIX, g_v.DIST_LINK_PREFIX)
+        g_v.DIST_LINK_PATTERN = self.__try_load(block, c_d.SECT_DIST_LINK_PATTERN, g_v.DIST_LINK_PATTERN)
 
     def __load_translate_block(self, block, model):
         if self.__cfg.has_option(block, c_d.SECT_PAIRS):
@@ -42,6 +54,24 @@ class CfgLoader:
             model.tr_dev_names.update(tr_dict)
         # for name in self.__cfg[block]:
         #     model.tr_dev_names[name] = self.__cfg.get(block, name)
+
+    @staticmethod
+    def get_sw_module_id_from_repo_full_link(repo_full_link):
+
+        id = repo_full_link
+
+        std_prefix = "/home/git/repositories/"
+        std_suffix = ".git"
+
+        if id.startswith(std_prefix):
+            id = id[len(std_prefix):]
+
+        if id.endswith(std_suffix):
+            id = id[:-len(std_suffix)]
+
+        id = id.replace('/', '.')
+
+        return id
 
     def __add_department(self, block, model):
         prefix = ""
@@ -56,18 +86,28 @@ class CfgLoader:
             for repo_name in repos_links:
                 repo = Repo()
 
-                pre_link = ""
-                splitted = repo_name.split(":")
-                if isinstance(splitted, list) and len(splitted) == 2:
-                    repo.soft_type = splitted[0]
-                    pre_link = splitted[1]
+                split = repo_name.split(":")
+                item_count = len(split)
+                sw_archive_module_id = ""
+                if isinstance(split, list) and item_count > 1:
+                    repo.soft_type = split[0]
+
                     if repo.soft_type not in dep.soft_types:
                         dep.soft_types.append(repo.soft_type)
+                    pre_link = split[1]
+                    if item_count > 2:
+                        sw_archive_module_id = split[2]
                 else:
                     pre_link = repo_name
 
                 repo.link = prefix + pre_link
                 repo.name = pre_link
+                
+                if not sw_archive_module_id:
+                    repo.sw_archive_module_id = CfgLoader.get_sw_module_id_from_repo_full_link(repo.link)
+                else:
+                    repo.sw_archive_module_id = sw_archive_module_id
+
                 dep.repos.append(repo)
 
             model.departments[block] = dep
@@ -85,7 +125,6 @@ class CfgLoader:
         self.__cfg.read(self.__config_def_path)
 
         return None
-
 
     def load_config(self, model):
         if g_v.DEBUG: out_log("start load config")
@@ -110,7 +149,7 @@ class CfgLoader:
                 if block == c_d.BLOCK_TRAN:
                     for name in self.__cfg[block]:
                         print(name, " : ", self.__cfg.get(block, name))
-                if block == c_d.BLOCK_CONFIG:
+                elif block == c_d.BLOCK_CONFIG:
                     pass
                 else:
                     if self.__cfg.has_option(block, c_d.SECT_PREFIX):
