@@ -589,6 +589,7 @@ class WebGenerator:
         version_id = "{:s}.{:s}".format(commit.date_full, commit.hash)
 
         link = link.replace("${dist_prefix}", g_v.DIST_LINK_PREFIX)
+        link = link.replace("${sw_module_group_id}", repo.sw_archive_module_group_id)
         link = link.replace("${sw_module_id}", repo.sw_archive_module_id)
         link = link.replace("${sw_module_version_id}", version_id)
 
