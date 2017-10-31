@@ -81,7 +81,7 @@ class CfgLoader:
         id = CfgLoader.get_sw_module_uid_from_repo_full_link(repo_full_link)
         id = os.path.split(id)
         if len(id) > 1:
-            return id[1]
+            return id[0]
         else:
             return ""
 
@@ -124,10 +124,12 @@ class CfgLoader:
                     repo.sw_archive_module_id = sw_archive_module_id
 
                 if not sw_archive_module_group_id:
-                    repo.sw_archive_module_group_id = CfgLoader.get_sw_module_group_id_from_repo_full_link(repo.link)
-                else:
-                    repo.sw_archive_module_group_id = sw_archive_module_group_id
+                    sw_archive_module_group_id = CfgLoader.get_sw_module_group_id_from_repo_full_link(repo.link)
 
+                if len(sw_archive_module_group_id) > 0:
+                    sw_archive_module_group_id = sw_archive_module_group_id + "/"
+                
+                repo.sw_archive_module_group_id = sw_archive_module_group_id
                 dep.repos.append(repo)
 
             model.departments[block] = dep
