@@ -100,6 +100,7 @@ class Repo:
         self.__link = ""
         self.__soft_type = ""
         self.__sw_archive_module_id = ""
+        self.__sw_archive_module_group_id = ""
 
     @property
     def name(self):
@@ -135,6 +136,13 @@ class Repo:
     def sw_archive_module_id(self, sw_archive_module_id):
         self.__sw_archive_module_id = sw_archive_module_id
 
+    @property
+    def sw_archive_module_group_id(self):
+        return self.__sw_archive_module_group_id
+
+    @sw_archive_module_group_id.setter
+    def sw_archive_module_group_id(self, sw_archive_module_group_id):
+        self.__sw_archive_module_group_id = sw_archive_module_group_id
 
 class Device:
     """

@@ -56,7 +56,7 @@ class CfgLoader:
         #     model.tr_dev_names[name] = self.__cfg.get(block, name)
 
     @staticmethod
-    def get_sw_module_id_from_repo_full_link(repo_full_link):
+    def get_sw_module_uid_from_repo_full_link(repo_full_link):
 
         id = repo_full_link
 
@@ -69,9 +69,21 @@ class CfgLoader:
         if id.endswith(std_suffix):
             id = id[:-len(std_suffix)]
 
-        id = id.replace('/', '.')
-
         return id
+
+    @staticmethod
+    def get_sw_module_id_from_repo_full_link(repo_full_link):
+        id = CfgLoader.get_sw_module_uid_from_repo_full_link(repo_full_link)
+        return os.path.basename(id)
+
+    @staticmethod
+    def get_sw_module_group_id_from_repo_full_link(repo_full_link):
+        id = CfgLoader.get_sw_module_uid_from_repo_full_link(repo_full_link)
+        id = os.path.split(id)
+        if len(id) > 1:
+            return id[1]
+        else:
+            return ""
 
     def __add_department(self, block, model):
         prefix = ""
@@ -89,6 +101,7 @@ class CfgLoader:
                 split = repo_name.split(":")
                 item_count = len(split)
                 sw_archive_module_id = ""
+                sw_archive_module_group_id = ""
                 if isinstance(split, list) and item_count > 1:
                     repo.soft_type = split[0]
 
@@ -96,7 +109,9 @@ class CfgLoader:
                         dep.soft_types.append(repo.soft_type)
                     pre_link = split[1]
                     if item_count > 2:
-                        sw_archive_module_id = split[2]
+                        sw_archive_module_group_id = split[2]
+                    if item_count > 3:
+                        sw_archive_module_id = split[3]
                 else:
                     pre_link = repo_name
 
@@ -107,6 +122,11 @@ class CfgLoader:
                     repo.sw_archive_module_id = CfgLoader.get_sw_module_id_from_repo_full_link(repo.link)
                 else:
                     repo.sw_archive_module_id = sw_archive_module_id
+
+                if not sw_archive_module_group_id:
+                    repo.sw_archive_module_group_id = CfgLoader.get_sw_module_group_id_from_repo_full_link(repo.link)
+                else:
+                    repo.sw_archive_module_group_id = sw_archive_module_group_id
 
                 dep.repos.append(repo)
 
