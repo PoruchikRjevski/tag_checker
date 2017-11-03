@@ -84,8 +84,6 @@ def setup_options(opts):
         g_v.QUIET = True
     if opts.log:
         g_v.LOGGING = True
-    if opts.sudoer:
-        g_v.SUDOER = True
     if opts.multithreading:
         g_v.MULTITH = True
     if opts.debug_out:
@@ -204,7 +202,6 @@ def main():
     if g_v.DEBUG:
         out_log("-q: " + str(g_v.QUIET))
         out_log("-l: " + str(g_v.LOGGING))
-        out_log("-s: " + str(g_v.SUDOER))
         out_log("-m: " + str(g_v.MULTITH))
         out_log("-d: " + str(g_v.DEBUG))
         out_log("-t: " + str(g_v.TIMEOUTS))

@@ -6,8 +6,9 @@ import os
 import subprocess
 
 def get_current_repo_name():
-    cur_path = os.getcwd()
-    print("cur path {:s}".format(cur_path))
+    cur_repo = os.path.basename(os.getcwd())
+    sys.stdout.write("Current repo({:s}) was added for tag_checker update list".format(cur_repo))
+    sys.stdout.flush()
 
 # refs = sys.stdin.read().split()
 
