@@ -12,33 +12,35 @@ from config_manager import CfgLoader
 from web_generator.web_gen import WebGenerator
 
 def set_options(parser):
-    usage = "usage: %prog [options]"
+    usage = "usage: %prog [options] [args]"
 
     parser.set_usage(usage)
 
-    parser.add_option("--update",
-                      action="store_true", dest="update",
+    parser.add_option("-u", "--update",
+                      action="store_true",
+                      dest="update",
                       default=False,
-                      help="update command, uses alone")
+                      help="update all")
 
-    parser.add_option("--show",
-                      action="store_true", dest="show",
+    parser.add_option("-s", "--show",
+                      action="store_true",
+                      dest="show",
                       default=False,
-                      help="show command, uses with '--dep [dep_name]' or alone")
+                      help="show config, uses with '--dep [dep_name]' or alone")
 
     parser.add_option("--pref",
                       action="store_true", dest="prefix",
                       default=False,
                       help="set or change department repo's prefix command, uses with arg: [dep_name] [prefix]")
 
-    parser.add_option("--add",
+    parser.add_option("-a", "--add",
                       action="store_true", dest="add",
                       default=False,
-                      help="add smth command, uses with --repo, --tran or --dep")
-    parser.add_option("--rem",
+                      help="add something, uses with --repo, --tr or --dep")
+    parser.add_option("-r", "--rem",
                       action="store_true", dest="remove",
                       default=False,
-                      help="remove smth command, uses with --repo, --tran or --dep")
+                      help="remove something, uses with --repo, --tr or --dep")
 
     parser.add_option("--repo",
                       action="store_true", dest="repo",
@@ -48,7 +50,7 @@ def set_options(parser):
                       action="store_true", dest="dep",
                       default=False,
                       help="dep command, uses with --add or --rem and args: dep_name")
-    parser.add_option("--tran",
+    parser.add_option("--tr",
                       action="store_true", dest="translate",
                       default=False,
                       help="translate command, uses with --add or --rem and args: \"orig\" \"trans\"")
@@ -61,14 +63,11 @@ def set_options(parser):
                       action="store_true", dest="quiet",
                       default=False,
                       help="don't print status messages to stdout")
-    parser.add_option("-s", "--sudoer",
-                      action="store_true", dest="sudoer",
-                      default=False,
-                      help="exec shell cmd from sudo")
-    parser.add_option("-m", "--multith",
+    parser.add_option("-m", "--mth",
                       action="store_true", dest="multithreading",
                       default=False,
-                      help="exec script with multithreading")
+                      help="exec script with using multithreading(may increase speed of esecution on really large "
+                           "numbers of cpu cores")
     parser.add_option("-d", "--debug",
                       action="store_true", dest="debug_out",
                       default=False,
