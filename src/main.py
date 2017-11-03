@@ -4,6 +4,7 @@ from optparse import OptionParser
 
 import common_defs as c_d
 import global_vars as g_v
+import version as v
 from git_manager import GitMan
 from logger import *
 from tag_model import TagModel
@@ -155,8 +156,14 @@ def update(cfg_loader, git_man, tag_model):
 
 
 def main():
+    ver = "Версия: {:s}.{:s}.{:s}({:s}) {:s}:{:s}".format(v.V_MAJ,
+                                                          v.V_MIN,
+                                                          str(int(v.V_BUILD) - int(v.LAST)),
+                                                          v.V_BUILD,
+                                                          v.V_STAT,
+                                                          v.HASH)
     # check options
-    optParser = OptionParser()
+    optParser = OptionParser(version=ver)
     set_options(optParser)
 
     (opts, args) = optParser.parse_args()

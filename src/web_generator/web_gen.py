@@ -252,7 +252,7 @@ class WebGenerator:
                   + h_d.A_TARGET.format(c_d.FRAME_ID))\
 
         gen.w_txt(" {:s} | {:s} ".format(h_d.WS,
-                                     h_d.WS))
+                                         h_d.WS))
         gen.w_tag(h_d.T_A,
                   c_d.READ_METR_TXT,
                   h_d.A_HREF.format(c_d.HELP_METR_F_NAME)
