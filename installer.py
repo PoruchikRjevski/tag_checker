@@ -122,12 +122,20 @@ def screen_refresh(func):
     return wrapped
 
 
-def check_existence(func):
+def check_existence_strong(func):
     def wrapped(arg, *argv):
         if not os.path.exists(arg):
             true_exit(1, "{:s} not exist".format(arg))
 
         return func(arg, *argv)
+
+    return wrapped
+
+
+def check_existence_weak(func):
+    def wrapped(arg, *argv):
+        if os.path.exists(arg):
+            return func(arg, *argv)
 
     return wrapped
 
@@ -161,18 +169,16 @@ def create_dirs():
     create_dir(OUT_CSS_DIR)
     create_dir(OUT_JS_DIR)
     create_dir(OUT_LOG_DIR)
+    create_dir(CONFIG_DIR)
     create_dir(BACKUP_DIR)
 
 
 @screen_height_update
 def remove_dirs():
     remove_dir(SETUP_DIR)
-    remove_dir(OUT_ORD_DIR)
-    remove_dir(OUT_CSS_DIR)
-    remove_dir(OUT_JS_DIR)
+    remove_dir(OUT_DIR)
     remove_dir(OUT_LOG_DIR)
     remove_dir(CONFIG_DIR)
-
 
 
 def exec_cmd(cmd):
@@ -181,40 +187,34 @@ def exec_cmd(cmd):
     proc.communicate()
 
 
-@check_existence
+@check_existence_weak
 def cp_dir(src, dst):
-    exec_cmd("yes | cp -rf {:s} {:s}".format(src, dst))
+    exec_cmd("yes | cp -rf {:s}* {:s}".format(src, dst))
 
 
-@check_existence
+@check_existence_weak
 def cp_file(src, dst=""):
-    exec_cmd("cp -rfn {:s}* {:s}".format(src, dst))
+    exec_cmd("cp -rfn {:s} {:s}".format(src, dst))
 
 
-@check_existence
+@check_existence_weak
 def rm_dir(dst):
     exec_cmd("rm -rf {:s}".format(dst))
 
 
-@check_existence
+@check_existence_weak
 def rm_file(dst):
     exec_cmd("rm -f {:s}".format(dst))
 
 
-@check_existence
+@check_existence_strong
 def add_runnable_rights(dst):
     exec_cmd("chmod +x {:s}".format(dst))
 
 
-@check_existence
+@check_existence_strong
 def create_ln(src, dst):
     exec_cmd("ln -s {:s} {:s}".format(src, dst))
-
-
-@check_existence
-def remove_ln(src):
-
-    pass
 
 
 @screen_refresh
@@ -240,6 +240,7 @@ def copy_config():
     SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, COPYING_TXT, curses.A_BOLD)
     src_conf_dir = os.path.join(os.getcwd(),
                                 CONFIG_EXMPL_DIR)
+
     cp_dir(src_conf_dir, CONFIG_DIR)
     SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Copied: {:s} to {:s}".format(SRC_DIR, SETUP_DIR), NORMAL)
 
@@ -284,6 +285,7 @@ def remove_symlink():
 
     symlink = os.path.join(LINK_PATH,
                            SOLUTION_NAME)
+
     rm_file(symlink)
 
     SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Remove symlink: {:s}".format(symlink), NORMAL)
@@ -295,16 +297,20 @@ def add_to_crontab(attr):
                              EXEC_FILE)
 
     exec_cmd("crontab -l > temp")
-    exec_cmd("echo \"0 * * * * {:s} --update\" >> temp".format(exec_file))
+    exec_cmd("echo \"0 * * * * {:s} {:s}\" >> temp".format(exec_file,
+                                                                    attr))
     exec_cmd("crontab temp")
-    exec_cmd("rm temp")
+    exec_cmd("rm -f temp")
 
 
 @screen_refresh
 def remove_from_crontab():
-    exec_cmd("crontab - l | grep - q !\"$NAME\" > temp")
+    exec_file = os.path.join(SETUP_DIR,
+                             EXEC_FILE)
+
+    exec_cmd("crontab -l | grep -q !\"{:s}\" > temp".format(exec_file))
     exec_cmd("crontab temp")
-    exec_cmd("rm temp")
+    exec_cmd("rm -f temp")
 
 
 def install():
@@ -329,7 +335,7 @@ def uninstall():
 
     remove_symlink()
 
-    remove_from_crontab(UPDATE_ATTR)
+    remove_from_crontab()
 
 
 def update_files():
