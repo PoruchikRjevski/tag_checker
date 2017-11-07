@@ -8,62 +8,87 @@ import datetime
 import curses
 
 # INSTALLER DEFS
-SOLUTION_NAME = "tag_checker"
-OUT_LOG_DIR= "/tmp/{:s}_log/".format(SOLUTION_NAME)
-SETUP_DIR = "/opt/{:s}/".format(SOLUTION_NAME)
-OUT_DIR = "/var/www/swver_hist/"
-OUT_DEV_DIR = "{:s}devices/".format(OUT_DIR)
-OUT_ORD_DIR = "{:s}orders/".format(OUT_DEV_DIR)
-BACKUP_DIR = "/tmp/{:s}_backups/".format(SOLUTION_NAME)
-CSS_DIR = "css/"
-JS_DIR = "js/"
-OUT_JS_DIR = "{:s}{:s}".format(OUT_DIR, JS_DIR)
-OUT_CSS_DIR = "{:s}{:s}".format(OUT_DIR, CSS_DIR)
-SRC_DIR = os.path.join(os.getcwd(), "src/")
-CONFIG_NAME = "config"
-CONFIG_EXT = ".ini"
-CONFIG_DIR = "/etc/{:s}/".format(SOLUTION_NAME)
-CONFIG_FILE = "{:s}{:s}".format(CONFIG_NAME,
-                                CONFIG_EXT)
-CONFIG_EXMPL_DIR = "config.example/"
-LINK_PATH = "/usr/local/bin/"
+SOLUTION_NAME               = "tag_checker"
+OUT_LOG_DIR                 = "/tmp/{:s}_log/".format(SOLUTION_NAME)
+SETUP_DIR                   = "/opt/{:s}/".format(SOLUTION_NAME)
+OUT_DIR                     = "/var/www/swver_hist/"
+OUT_DEV_DIR                 = "{:s}devices/".format(OUT_DIR)
+OUT_ORD_DIR                 = "{:s}orders/".format(OUT_DEV_DIR)
+BACKUP_DIR                  = "/tmp/{:s}_backups/".format(SOLUTION_NAME)
+CSS_DIR                     = "css/"
+JS_DIR                      = "js/"
+OUT_JS_DIR                  = "{:s}{:s}".format(OUT_DIR, JS_DIR)
+OUT_CSS_DIR                 = "{:s}{:s}".format(OUT_DIR, CSS_DIR)
+SRC_DIR                     = os.path.join(os.getcwd(), "src/")
+CONFIG_NAME                 = "config"
+CONFIG_EXT                  = ".ini"
+CONFIG_DIR                  = "/etc/{:s}/".format(SOLUTION_NAME)
+CONFIG_FILE                 = "{:s}{:s}".format(CONFIG_NAME,
+                                                CONFIG_EXT)
+CONFIG_EXMPL_DIR            = "config.example/"
+LINK_PATH                   = "/usr/local/bin/"
 
-MAIN_FILE = "main.py"
+MAIN_FILE                   = "main.py"
 
-EXEC_FILE = "run.sh"
+EXEC_FILE                   = "run.sh"
 
-UPDATE_ATTR = "--update"
+UPDATE_ATTR                 = "--update"
 
 # INSTALLER VARS
-SELECTED_PARAMS = []
+MENUS = {0: 0, 1:0}
 
 
-
-# CURSES MENU
-HIGHLIGHT = None
+# CURSES MAIN MENU
+HIGHLIGHT                   = None
 NORMAL = None
 
 SCREEN = None
 
-M_INSTALL = "Install"
-M_UNINSTALL = "Uninstall"
-M_UPDATE_FILES = "Update Files"
-M_CHANGE_PARAMS = "Change run parameters"
-M_EXIT = "Exit"
+M_INSTALL                   = "Install"
+M_UNINSTALL                 = "Uninstall"
+M_UPDATE_FILES              = "Update Files"
+M_CHANGE_PARAMS             = "Change run parameters"
+M_EXIT                      = "Exit"
 
 MAIN_M = [M_INSTALL, M_UNINSTALL, M_UPDATE_FILES, M_CHANGE_PARAMS, M_EXIT]
 MAIN_M_SZ = len(MAIN_M)
 
+HEAD_TXT                    = "Tag checker installer"
+MENU_NAME_TXT               = "Menu"
+CREATING_DIRS_TXT           = "Creating dirs"
+REMOVING_DIRS_TXT           = "Removing dirs"
+COPYING_TXT                 = "Copying"
+REMOVING_TXT                = "Removing"
+CREATE_EXEC_TXT             = "Create executable"
+CREATE_LN_TXT               = "Create symlink"
+REMOVE_LN_TXT               = "Remove symlink"
 
-HEAD_TXT = "Tag checker installer"
-MENU_NAME_TXT = "Menu"
-CREATING_DIRS_TXT = "Creating dirs"
-REMOVING_DIRS_TXT = "Removing dirs"
-COPYING_TXT = "Copying"
-REMOVING_TXT = "Removing"
-CREATE_EXEC_TXT = "Create executable"
-CREATE_LN_TXT = "Create symlink"
-REMOVE_LN_TXT = "Remove symlink"
+# CURSES PARAMS MENU
+PARAMS_MENU_NAME_TXT        = "Select parameters"
+
+M_P_VERBOSE                 = "Verbose"
+M_P_V                       = "-v"
+M_P_LOG                     = "Logging"
+M_P_L                       = "-l"
+M_P_MULTITHR                = "Multithreading"
+M_P_MT                      = "-m"
+M_P_DEBUG                   = "Debug"
+M_P_D                       = "-d"
+M_P_TIMINGS                 = "Timings"
+M_P_T                       = "-t"
+
+PARAMS_MENU_STATE = {M_P_DEBUG:     [0, False, M_P_D],
+                     M_P_LOG:       [1, False, M_P_L],
+                     M_P_MULTITHR:  [2, False, M_P_MT],
+                     M_P_TIMINGS:   [3, False, M_P_T],
+                     M_P_VERBOSE:   [4, False, M_P_V]}
+
+
+# CURSES OTHER
+PROGRESS_BAR = None
+
+KEY_RETURN = 10
+KEY_SPACE = 32
 
 HEAD_TXT_SZ = len(HEAD_TXT) // 2
 
@@ -72,11 +97,6 @@ NAME_HEIGHT = 4
 BODY_HEIGHT = 6
 SCROLLBAR_HEIGHT = 10
 CUR_WIDTH = 0
-
-PROGRESS_BAR = None
-
-
-KEY_RETURN = 10
 
 
 def screen_height_update(func):
@@ -125,7 +145,7 @@ def screen_refresh(func):
 def check_existence_strong(func):
     def wrapped(arg, *argv):
         if not os.path.exists(arg):
-            true_exit(1, "{:s} not exist".format(arg))
+            true_exit(1, "{:s} not exist. Try to execute install.".format(arg))
 
         return func(arg, *argv)
 
@@ -245,6 +265,27 @@ def copy_config():
     SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Copied: {:s} to {:s}".format(SRC_DIR, SETUP_DIR), NORMAL)
 
 
+def create_exec_file(dst, link):
+    with open(dst, 'w') as file:
+        file.write('#!/bin/bash\n')
+        file.write("{:s} {:s} $@".format(link,
+                                         get_params_str()))
+        file.flush()
+        file.close()
+
+
+@check_existence_weak
+def read_exec_file_same_line_splitted(dst):
+    same_line_splitted = []
+
+    with open(dst, 'r') as file:
+        same_line_splitted = file.read().split("\n")[1].split(" ")
+
+        file.close()
+
+    return same_line_splitted
+
+
 @screen_refresh
 def create_executable():
     SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, CREATE_EXEC_TXT, curses.A_BOLD)
@@ -254,10 +295,7 @@ def create_executable():
     main_file = os.path.join(SETUP_DIR,
                              MAIN_FILE)
 
-    with open(exec_file, 'w') as file:
-        file.write('#!/bin/bash\n')
-        file.write("{:s} {:s} $@".format(main_file,
-                                         " ".join(SELECTED_PARAMS)))
+    create_exec_file(exec_file, main_file)
 
     add_runnable_rights(exec_file)
 
@@ -318,12 +356,11 @@ def install():
 
     copy_source()
 
+    # set version
+
     copy_config()
 
-    # select run parameters
-
-    create_executable()
-    create_symlink()
+    change_params()
 
     add_to_crontab(UPDATE_ATTR)
 
@@ -343,12 +380,102 @@ def update_files():
 
 
 def change_params():
-    pass
+    set_default_selecting()
+
+    if params_menu_loop():
+        create_executable()
+        create_symlink()
+    else:
+        set_default_selecting()
+
+
+def try_load_params_from_executable():
+    exec_file = os.path.join(SETUP_DIR,
+                             EXEC_FILE)
+
+    same_line_splitted = read_exec_file_same_line_splitted(exec_file)
+
+    if same_line_splitted:
+        for part in same_line_splitted:
+            if len(part) == 2:
+                for key in PARAMS_MENU_STATE.keys():
+                    if part == PARAMS_MENU_STATE[key][2]:
+                        PARAMS_MENU_STATE[key][1] = True
+
+                        break
+
+        return True
+
+    return False
+
+
+def reset_params():
+    for key in PARAMS_MENU_STATE.keys():
+        PARAMS_MENU_STATE[key][1] = False
+
+
+def set_default_selecting():
+    if not try_load_params_from_executable():
+        reset_params()
+
+
+def params_menu_loop():
+    pos = 0
+
+    show_select_params_menu(pos)
+
+    key = get_key()
+    while key != 27:
+        if key == curses.KEY_UP:
+            if pos > 0:
+                pos = pos - 1
+        elif key == curses.KEY_DOWN:
+            if pos < MAIN_M_SZ - 1:
+                pos = pos + 1
+        elif key == curses.KEY_ENTER or key == KEY_RETURN:
+            return True
+        elif key == KEY_SPACE:
+            param_menu_accept_actions(pos)
+
+        show_select_params_menu(pos)
+        key = get_key()
+
+    return False
+
+
+def get_params_str():
+    params_str = " ".join([PARAMS_MENU_STATE[key][2] for key in PARAMS_MENU_STATE.keys() if PARAMS_MENU_STATE[key][1]])
+
+    return params_str
+
+@screen_height_update
+@screen_refresh
+def show_select_params_menu(pos):
+    SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, PARAMS_MENU_NAME_TXT, curses.A_BOLD)
+
+    max = 0
+
+    for key in PARAMS_MENU_STATE.keys():
+        id = PARAMS_MENU_STATE[key][0]
+
+        if id > max:
+            max = id
+
+        state = PARAMS_MENU_STATE[key][1]
+        text = "({:s}) {:s}".format(("*" if state else " "),
+                                    key)
+
+        if pos == id:
+            SCREEN.addstr(BODY_HEIGHT + id, CUR_WIDTH + 2, text, HIGHLIGHT)
+        else:
+            SCREEN.addstr(BODY_HEIGHT + id, CUR_WIDTH + 2, text, NORMAL)
+
+    SCREEN.addstr(BODY_HEIGHT + max + 2, CUR_WIDTH + 2, "SPACE - select, ENTER - accept, ESC - cancel", NORMAL)
 
 
 @screen_height_update
 @screen_refresh
-def show_menu(pos):
+def show_main_menu(pos):
     SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, MENU_NAME_TXT, curses.A_BOLD)
 
     for i in range(0, MAIN_M_SZ):
@@ -358,11 +485,11 @@ def show_menu(pos):
             SCREEN.addstr(BODY_HEIGHT + i, CUR_WIDTH + 2, MAIN_M[i], NORMAL)
 
 
-def true_exit(res, str=""):
+def true_exit(res, msg=""):
     curses.endwin()
 
     if res != 0:
-        print("Error number {:d}. Error Message: {:s}".format(res, str))
+        print("Error number {:d}. Error Message: {:s}".format(res, msg))
 
     exit(res)
 
@@ -376,7 +503,20 @@ def get_key():
     return key
 
 
-def accept_action(pos):
+def param_menu_accept_actions(pos):
+    for key in PARAMS_MENU_STATE.keys():
+        if pos == PARAMS_MENU_STATE[key][0]:
+            state = PARAMS_MENU_STATE[key][1]
+
+            if state:
+                state = False
+            else:
+                state = True
+
+            PARAMS_MENU_STATE[key][1] = state
+
+
+def main_menu_accept_action(pos):
     pos_text = MAIN_M[pos]
 
     if pos_text == M_INSTALL:
@@ -391,12 +531,33 @@ def accept_action(pos):
         true_exit(0)
 
 
-def main():
+def main_menu_loop():
+    pos = 0
+
+    show_main_menu(pos)
+
+    key = get_key()
+
+    while key != 27:
+        if key == curses.KEY_UP:
+            if pos > 0:
+                pos = pos - 1
+        elif key == curses.KEY_DOWN:
+            if pos < MAIN_M_SZ - 1:
+                pos = pos + 1
+        elif key == curses.KEY_ENTER or key == KEY_RETURN:
+            main_menu_accept_action(pos)
+
+        show_main_menu(pos)
+        key = get_key()
+
+
+def main(screen):
     global HIGHLIGHT
     global NORMAL
     global SCREEN
 
-    SCREEN = curses.initscr()
+    SCREEN = screen
     curses.noecho()
     curses.cbreak()
     curses.start_color()
@@ -412,28 +573,13 @@ def main():
     SCREEN.border(0)
     curses.curs_set(0)
 
-    pos = 0
-
-    show_menu(pos)
-
-    key = get_key()
-    while key != 27:
-        if key == curses.KEY_UP:
-            if pos > 0:
-                pos = pos - 1
-        elif key == curses.KEY_DOWN:
-            if pos < MAIN_M_SZ - 1:
-                pos = pos + 1
-        elif key == curses.KEY_ENTER or key == KEY_RETURN:
-            accept_action(pos)
-
-        show_menu(pos)
-        key = get_key()
+    main_menu_loop()
 
     true_exit(0)
 
 if __name__ == "__main__":
-    main()
+    curses.wrapper(main)
+    # main()
 
 
 
