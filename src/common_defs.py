@@ -137,7 +137,7 @@ VER_TXT             = "Версия: {:s}.{:s}.{:s}({:s}) {:s}"
 
 F_MULT_TXT          = "m"
 F_LOG_TXT           = "l"
-F_QUIET_TXT         = "q"
+F_VERBOSE_TXT       = "v"
 F_SUDO_TXT          = "s"
 F_DEBUG_TXT         = "d"
 F_TIMINGS_TXT       = "t"

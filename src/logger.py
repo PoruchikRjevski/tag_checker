@@ -127,7 +127,7 @@ def gen_log_msg(msg, type, level):
 
 
 def show_msg(msg):
-    if not g_v.QUIET:
+    if g_v.VERBOSE:
         print(msg)
 
 

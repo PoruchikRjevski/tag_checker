@@ -222,8 +222,8 @@ class WebGenerator:
         # todo add info about flags
         flags_txt = "Флаги: {:s}".format(" -{:s}".format(str(c_d.F_MULT_TXT)) if g_v.MULTITH else ""
                                   + " -{:s}".format(str(c_d.F_LOG_TXT)) if g_v.LOGGING else ""
-                                  + " -{:s}".format(str(c_d.F_QUIET_TXT)) if g_v.QUIET else ""
-                                  + " -{:s}".format(str(c_d.F_SUDO_TXT)) if g_v.SUDOER else ""
+                                  + " -{:s}".format(str(c_d.F_VERBOSE_TXT)) if g_v.VERBOSE else ""
+                                                                                                + " -{:s}".format(str(c_d.F_SUDO_TXT)) if g_v.SUDOER else ""
                                   + " -{:s}".format(str(c_d.F_DEBUG_TXT)) if g_v.DEBUG else ""
                                   + " -{:s}".format(str(c_d.F_TIMINGS_TXT)) if g_v.TIMEOUTS else "")
 

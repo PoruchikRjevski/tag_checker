@@ -60,10 +60,10 @@ def set_options(parser):
                       action="store_true", dest="log",
                       default=False,
                       help="don't write status messages to log-files")
-    parser.add_option("-q", "--quiet",
-                      action="store_true", dest="quiet",
+    parser.add_option("-v", "--verbose",
+                      action="store_true", dest="verbose",
                       default=False,
-                      help="don't print status messages to stdout")
+                      help="print status messages to stdout")
     parser.add_option("-m", "--mth",
                       action="store_true", dest="multithreading",
                       default=False,
@@ -80,8 +80,8 @@ def set_options(parser):
 
 
 def setup_options(opts):
-    if opts.quiet:
-        g_v.QUIET = True
+    if opts.verbose:
+        g_v.VERBOSE = True
     if opts.log:
         g_v.LOGGING = True
     if opts.multithreading:
@@ -200,7 +200,7 @@ def main():
         sys.exit(res)
 
     if g_v.DEBUG:
-        out_log("-q: " + str(g_v.QUIET))
+        out_log("-q: " + str(g_v.VERBOSE))
         out_log("-l: " + str(g_v.LOGGING))
         out_log("-m: " + str(g_v.MULTITH))
         out_log("-d: " + str(g_v.DEBUG))
