@@ -41,9 +41,6 @@ VERSION_FILE                = "version.py"
 
 UPDATE_ATTR                 = "--update"
 
-# INSTALLER VARS
-MENUS = {0: 0, 1:0}
-
 
 # CURSES MAIN MENU
 HIGHLIGHT                   = None
@@ -69,6 +66,7 @@ REMOVING_TXT                = "Removing"
 CREATE_EXEC_TXT             = "Create executable"
 CREATE_LN_TXT               = "Create symlink"
 REMOVE_LN_TXT               = "Remove symlink"
+
 
 # CURSES PARAMS MENU
 PARAMS_MENU_NAME_TXT        = "Select parameters"
@@ -431,7 +429,11 @@ def uninstall():
 
 
 def update_files():
-    pass
+    copy_source()
+
+    copy_misc()
+
+    set_version()
 
 
 def change_params():
@@ -474,34 +476,11 @@ def set_default_selecting():
         reset_params()
 
 
-def params_menu_loop():
-    pos = 0
-
-    show_select_params_menu(pos)
-
-    key = get_key()
-    while key != 27:
-        if key == curses.KEY_UP:
-            if pos > 0:
-                pos = pos - 1
-        elif key == curses.KEY_DOWN:
-            if pos < MAIN_M_SZ - 1:
-                pos = pos + 1
-        elif key == curses.KEY_ENTER or key == KEY_RETURN:
-            return True
-        elif key == KEY_SPACE:
-            param_menu_accept_actions(pos)
-
-        show_select_params_menu(pos)
-        key = get_key()
-
-    return False
-
-
 def get_params_str():
     params_str = " ".join([PARAMS_MENU_STATE[key][2] for key in PARAMS_MENU_STATE.keys() if PARAMS_MENU_STATE[key][1]])
 
     return params_str
+
 
 @screen_height_update
 @screen_refresh
@@ -607,7 +586,31 @@ def main_menu_loop():
         key = get_key()
 
 
-def main(screen):
+def params_menu_loop():
+    pos = 0
+
+    show_select_params_menu(pos)
+
+    key = get_key()
+    while key != 27:
+        if key == curses.KEY_UP:
+            if pos > 0:
+                pos = pos - 1
+        elif key == curses.KEY_DOWN:
+            if pos < MAIN_M_SZ - 1:
+                pos = pos + 1
+        elif key == curses.KEY_ENTER or key == KEY_RETURN:
+            return True
+        elif key == KEY_SPACE:
+            param_menu_accept_actions(pos)
+
+        show_select_params_menu(pos)
+        key = get_key()
+
+    return False
+
+
+def init_curses(screen):
     global HIGHLIGHT
     global NORMAL
     global SCREEN
@@ -628,13 +631,17 @@ def main(screen):
     SCREEN.border(0)
     curses.curs_set(0)
 
+
+def main(screen):
+    init_curses(screen)
+
     main_menu_loop()
 
     true_exit(0)
 
+
 if __name__ == "__main__":
     curses.wrapper(main)
-    # main()
 
 
 
