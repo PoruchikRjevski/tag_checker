@@ -115,24 +115,14 @@ class WebGenerator:
 
         # gen body table
         self.__gen_rmhp_content_line(gen, c_d.CLR_GREEN, c_d.CLR_GREEN, c_d.CLR_GREEN_TXT,
-                                     "Последняя версия по дате коммита")
+                                     "Последняя версия по дате коммита(обычно это элемент типа \"Для всех\")")
         self.__gen_rmhp_content_line(gen, c_d.CLR_RED_MIN, c_d.CLR_RED_MIN, c_d.CLR_RED_TXT,
-                                     "Старой версия считается, если базовая версия "
-                                     "не существует и при этом дата коммита и дата установки "
-                                     "рассматриваемой версии старше, чем у базовой.")
-        self.__gen_rmhp_content_line(gen, c_d.CLR_RED_MIN, c_d.CLR_GREEN, c_d.CLR_GREEN_BAGEL_TXT,
-                                     "Форсированной до текущей базовой версия считается, если существует базовая версия "
-                                     "и при этом дата коммита и дата установки рассматриваемой версии старше, чем у базовой.")
+                                     "Версия и дата установки рассматриваемого элемента{:s}, чем у базового.".format(h_d.ARR_DOWN))
         self.__gen_rmhp_content_line(gen, c_d.CLR_YEL, c_d.CLR_YEL, c_d.CLR_YEL_TXT,
-                                     "Форсированной старой версия считается, если существует базовая версия и при этом "
-                                     "дата коммита рассматриваемой версиии старше, чем у базовой, а дата установки младше.")
+                                     "Версия рассматриваемого элемента {:s}, а дата установки {:s}, чем у базового".format(h_d.ARR_DOWN,
+                                                                                                                           h_d.ARR_UP))
         self.__gen_rmhp_content_line(gen, c_d.CLR_BLUE, c_d.CLR_BLUE, c_d.CLR_BLUE_TXT,
-                                     "Экспериментальной версия считается, если существует базовая версия и при этом "
-                                     "дата коммита и дата установки рассматриваемой версии младше, чем у базовой версии.")
-        self.__gen_rmhp_content_line(gen, c_d.CLR_BLUE, None, c_d.CLR_BLUE_BAGEL_TXT,
-                                     "Отменненой экспериментальной версия считается, если существует базовая версия "
-                                     "и при этом дата коммита рассматриваемой версии младше, чем у базовой, а "
-                                     "дата установки старше.")
+                                     "Версия и дата установки рассматриваемого элемента {:s}, чем у базового".format(h_d.ARR_UP))
 
         gen.w_c_tag(h_d.T_TABLE)
 
@@ -600,7 +590,6 @@ class WebGenerator:
         return link
 
     def __gen_common_columns(self, file, repo, commit, item, type_class_id):
-
         column_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
                                           + " " + c_d.CL_TEXT_LEFT
                                           + " " + c_d.CL_BORDER)
@@ -666,18 +655,19 @@ class WebGenerator:
         elif metric.exp:
             color = c_d.CLR_BLUE
             p_title = c_d.CLR_BLUE_TXT
-        elif metric.exp_canceled:
-            is_circle = False
-            color = c_d.CLR_BLUE
-            p_title = c_d.CLR_BLUE_BAGEL_TXT
-        elif metric.prom_to_cur:
-            is_circle = False
-            color = self.__get_red_tone(metric)
-            background_clr = c_d.CLR_GREEN
-            p_title = c_d.CLR_GREEN_BAGEL_TXT
         elif metric.old:
             color = self.__get_red_tone(metric)
             p_title = c_d.CLR_RED_TXT
+
+        days_text = ""
+
+        if metric.old or metric.forced:
+            days_text = "-"
+        elif metric.exp:
+            days_text = "+"
+
+        days_text = "{0:s}{1:4d} д.".format(days_text,
+                                            metric.diff_d.days)
 
         if is_circle:
             background_clr = color
@@ -687,7 +677,7 @@ class WebGenerator:
         gen.w_o_tag(h_d.T_TD, cl)
 
         gen.w_tag(h_d.T_P,
-                  "{0:4d} д.".format(metric.diff_d.days),
+                  days_text,
                   h_d.A_CLASS.format(c_d.CL_TEXT_LEFT
                                      + " " + c_d.CL_NO_WRAP)
                   + h_d.A_TITLE.format("{0:4d} пр.".format(metric.jumps)))

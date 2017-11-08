@@ -602,18 +602,14 @@ class GitMan:
                             if it_ind in last_indexes_dict.keys():
                                 if base_exist:
                                     if max_item_cm_d < dep_obj.commits[item.cm_i].date_obj:
-                                        if max_base_item.tag_date_obj <= item.tag_date_obj:
-                                            dep_obj.items[it_ind].metric.exp = True
-                                        else:
-                                            dep_obj.items[it_ind].metric.exp_canceled = True
+                                        dep_obj.items[it_ind].metric.exp = True
                                     elif max_item_cm_d == dep_obj.commits[item.cm_i].date_obj:
                                         dep_obj.items[it_ind].metric.last = True
                                     else:
                                         if max_base_item.tag_date_obj < item.tag_date_obj:
                                             dep_obj.items[it_ind].metric.forced = True
                                         else:
-                                            dep_obj.items[it_ind].metric.prom_to_cur = True
-                                            do_mult = True
+                                            old_item = True
                                 else:
                                     old_item = True
                             else:

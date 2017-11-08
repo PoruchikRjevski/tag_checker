@@ -9,6 +9,9 @@ CR                  = "\n\r"
 WS                  = "&nbsp;"
 SHARP               = "#"
 
+ARR_UP              = "&uarr;"
+ARR_DOWN            = "&darr;"
+
 # tags
 T_HTML              = "html"
 T_HEAD              = "head"
