@@ -17,9 +17,13 @@ class HtmlGen:
             dir_p = path
 
         file_path = os.path.join(dir_p, name)
-        if g_v.DEBUG: out_log("create file: " + file_path)
+
+        if not os.path.exists(dir_p):
+            os.mkdir(dir_p)
 
         self.file = open(file_path, 'w')
+
+        if g_v.DEBUG: out_log("create file: " + file_path)
 
     def w_o_tag(self, tag, attr="", cr=False):
         self.file.write(h_d.TAG.format("", tag, attr))

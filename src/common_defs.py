@@ -1,11 +1,12 @@
+import os
 import global_vars as g_v
 
 # WEB_GEN -----------------------------------------------------------
 DEVICE_DIR          = "devices/"
-DEVICE_PATH         = g_v.OUT_PATH + DEVICE_DIR
+DEVICE_PATH         = os.path.join(g_v.OUT_PATH, DEVICE_DIR)
 ORDERS_DIR          = "orders/"
-ORDERS_PATH         = DEVICE_PATH + ORDERS_DIR
-FILE_EXT            = ".html"
+ORDERS_PATH         = os.path.join(DEVICE_PATH, ORDERS_DIR)
+HTML_EXT            = ".html"
 
 LEVEL_UP            = "../"
 

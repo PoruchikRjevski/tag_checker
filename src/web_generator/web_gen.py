@@ -446,9 +446,12 @@ class WebGenerator:
     def __gen_items_page(self, model, dep, dev_name, item_num, type, items):
         if g_v.DEBUG: out_log("start gen item page: " + str(item_num))
 
-        page = HtmlGen(c_d.ORDERS_PATH, self.__get_order_file_name(dev_name, item_num))
+        item_file_name = self.__get_item_file_name(dev_name, item_num)
+        item_dir_name = self.__get_item_dir_name(dev_name, item_num)
 
-        self.__gen_page_head(page, c_d.LEVEL_UP * 2)
+        page = HtmlGen(os.path.join(c_d.ORDERS_PATH, item_dir_name), item_file_name)
+
+        self.__gen_page_head(page, c_d.LEVEL_UP * 3)
         self.__gen_content_start(page)
         self.__gen_table_head(page)
 
@@ -544,7 +547,8 @@ class WebGenerator:
                         first_s_t = False
                         order_link_attrs = (self.__get_num_by_type(ld_item.item_type, ld_item.item_num),
                                             os.path.join(c_d.ORDERS_DIR,
-                                                         self.__get_order_file_name(dev_name, ld_item.item_num)),
+                                                         self.__get_item_dir_name(dev_name, ld_item.item_num),
+                                                         self.__get_item_file_name(dev_name, ld_item.item_num)),
                                             h_d.A_TITLE.format(c_d.CNT_TXT + str(len(nummed_items))))
 
                         self.__gen_order_num(file,
@@ -751,11 +755,14 @@ class WebGenerator:
         gen.w_c_tag(h_d.T_TH)
         gen.w_c_tag(h_d.T_TR)
 
-    def __get_order_file_name(self, name, num):
-        return name + "_" + str(num) + c_d.FILE_EXT
+    def __get_item_file_name(self, name, num):
+        return "{:s}_{:s}{:s}".format(name, str(num), c_d.HTML_EXT)
+
+    def __get_item_dir_name(self, name, num):
+        return "{:s}_{:s}".format(name, str(num))
 
     def __get_device_file_name(self, name):
-        return name + c_d.FILE_EXT
+        return "{:s}{:s}".format(name, c_d.HTML_EXT)
 
     def __get_title_for_commit(self, repo, author, commDate, commMsg):
         return c_d.REPO_TXT + repo + "\n" \
