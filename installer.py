@@ -563,7 +563,7 @@ def show_select_params_menu(pos):
         else:
             SCREEN.addstr(BODY_HEIGHT + id, CUR_WIDTH + 2, text, NORMAL)
 
-    SCREEN.addstr(BODY_HEIGHT + max + 2, CUR_WIDTH + 2, "SPACE - select, ENTER - accept, ESC - cancel", NORMAL)
+    SCREEN.addstr(BODY_HEIGHT + max + 3, CUR_WIDTH + 2, "SPACE - select, ENTER - accept, ESC - cancel", NORMAL)
 
 
 @screen_height_update
@@ -576,6 +576,8 @@ def show_main_menu(pos):
             SCREEN.addstr(BODY_HEIGHT + i, CUR_WIDTH + 2, MAIN_M[i], HIGHLIGHT)
         else:
             SCREEN.addstr(BODY_HEIGHT + i, CUR_WIDTH + 2, MAIN_M[i], NORMAL)
+
+    SCREEN.addstr(BODY_HEIGHT + MAIN_M_SZ + 2, CUR_WIDTH + 2, "ENTER - accept, ESC - exit", NORMAL)
 
 
 def true_exit(res, msg=""):
