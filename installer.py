@@ -7,19 +7,24 @@ import subprocess
 import datetime
 import curses
 
+# INSTALLER COMMON
+DOC_CODE                    = "utf-8"
+
+
 # INSTALLER DEFS
 SOLUTION_NAME               = "tag_checker"
 OUT_LOG_DIR                 = "/tmp/{:s}_log/".format(SOLUTION_NAME)
 SETUP_DIR                   = "/opt/{:s}/".format(SOLUTION_NAME)
 OUT_DIR                     = "/var/www/swver_hist/"
-OUT_DEV_DIR                 = "{:s}devices/".format(OUT_DIR)
-OUT_ORD_DIR                 = "{:s}orders/".format(OUT_DEV_DIR)
+OUT_DEV_DIR                 = os.path.join(OUT_DIR, "devices/")
+OUT_ORD_DIR                 = os.path.join(OUT_DEV_DIR, "orders/")
 BACKUP_DIR                  = "/tmp/{:s}_backups/".format(SOLUTION_NAME)
 CSS_DIR                     = "css/"
 JS_DIR                      = "js/"
-OUT_JS_DIR                  = "{:s}{:s}".format(OUT_DIR, JS_DIR)
-OUT_CSS_DIR                 = "{:s}{:s}".format(OUT_DIR, CSS_DIR)
+OUT_JS_DIR                  = os.path.join(OUT_DIR, JS_DIR)
+OUT_CSS_DIR                 = os.path.join(OUT_DIR, CSS_DIR)
 SRC_DIR                     = os.path.join(os.getcwd(), "src/")
+MISC_DIR                    = "misc/"
 CONFIG_NAME                 = "config"
 CONFIG_EXT                  = ".ini"
 CONFIG_DIR                  = "/etc/{:s}/".format(SOLUTION_NAME)
@@ -31,6 +36,8 @@ LINK_PATH                   = "/usr/local/bin/"
 MAIN_FILE                   = "main.py"
 
 EXEC_FILE                   = "run.sh"
+
+VERSION_FILE                = "version.py"
 
 UPDATE_ATTR                 = "--update"
 
@@ -203,8 +210,15 @@ def remove_dirs():
 
 def exec_cmd(cmd):
     proc = subprocess.Popen(['{:s}\n'.format(cmd)],
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
                             shell=True)
-    proc.communicate()
+
+    out, _ = proc.communicate()
+
+    out = out.decode(DOC_CODE).strip()
+
+    return out
 
 
 @check_existence_weak
@@ -241,6 +255,18 @@ def create_ln(src, dst):
 def copy_source():
     SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, COPYING_TXT, curses.A_BOLD)
     cp_dir(SRC_DIR, SETUP_DIR)
+    SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Copy: {:s} to {:s}".format(SRC_DIR, SETUP_DIR), NORMAL)
+
+
+@screen_refresh
+def copy_misc():
+    SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, COPYING_TXT, curses.A_BOLD)
+    css_full_path = os.path.join(SRC_DIR, MISC_DIR, CSS_DIR)
+    js_full_path = os.path.join(SRC_DIR, MISC_DIR, JS_DIR)
+
+    cp_dir(css_full_path, OUT_CSS_DIR)
+    cp_dir(js_full_path, OUT_JS_DIR)
+
     SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Copy: {:s} to {:s}".format(SRC_DIR, SETUP_DIR), NORMAL)
 
 
@@ -336,7 +362,7 @@ def add_to_crontab(attr):
 
     exec_cmd("crontab -l > temp")
     exec_cmd("echo \"0 * * * * {:s} {:s}\" >> temp".format(exec_file,
-                                                                    attr))
+                                                           attr))
     exec_cmd("crontab temp")
     exec_cmd("rm -f temp")
 
@@ -351,12 +377,41 @@ def remove_from_crontab():
     exec_cmd("rm -f temp")
 
 
+def set_version():
+    # get info from repo
+    branch = exec_cmd("git rev-parse --abbrev-ref HEAD")
+
+    if not branch:
+        return
+
+    commits = exec_cmd("git rev-list {:s} --count".format(str(branch)))
+    auth = exec_cmd("git log -1 --pretty=format:\"%an\"")
+    hash = exec_cmd("git log -1 --pretty=format:\"%h\"")
+
+    # replace in version.py file values
+    version_file_path = os.path.join(SETUP_DIR, VERSION_FILE)
+    text_f_file = ""
+
+    with open(version_file_path, 'r') as file:
+        text_f_file = file.read()
+
+    text_f_file = text_f_file.replace("current_commits", str(commits))
+    text_f_file = text_f_file.replace("beta", str(branch))
+    text_f_file = text_f_file.replace("last_commiter", str(auth))
+    text_f_file = text_f_file.replace("last_hash", str(hash))
+
+    with open(version_file_path, 'w') as file:
+        file.write(text_f_file)
+
+
 def install():
     create_dirs()
 
     copy_source()
 
-    # set version
+    copy_misc()
+
+    set_version()
 
     copy_config()
 
