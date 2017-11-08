@@ -758,7 +758,7 @@ def backups_menu_loop(backups_list):
     menu_sz = len(backups_list)
 
     key = get_key()
-    while key != KEY_ESC:
+    while key != KEY_ESC or menu_sz != 0:
         if key == curses.KEY_UP:
             if pos > 0:
                 pos = pos - 1
@@ -771,6 +771,8 @@ def backups_menu_loop(backups_list):
                 pos = 0
         elif key == KEY_DELETE:
             remove_backup(pos, backups_list)
+            menu_sz = len(backups_list)
+            pos = 0
         elif key == curses.KEY_ENTER or key == KEY_RETURN:
             return backups_menu_accept_actions(pos, backups_list)
 

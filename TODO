@@ -114,16 +114,13 @@
                         DRV| 2017-xx-xx-xxxx
 
 - separate project for true update repo:
-
-    db                  -> current model
-
     update.ini          -> notes about updated repos
-
-    git_hook            -> [when repo updated] -> add to update.ini note with repo_name
-
-    runner.py           -> [runs one time per minute] -> check [if main_app alerady in processes] -> do nothing -> [else] -> run main_app
-
+    git_hook            -> [when repo updated] -> add to /etc/tag_checker/update.ini note with updated repo_name
     main_app.py         -> check db:update -> [if not empty] -> update info for all repo notes in db -> after that generate pages
+                            --update                            - check update.ini and update info about repos in this file
+                            --update --fully                    - update info about all repos in config.ini
+                            --add --repo [dep] [level:repo]     - add repo with level to dep in /etc/tag_checker/config.ini and put misc/git-hooks/post-receive to /[fullpath]/repo.git/hooks/
+                            --rem ...                           - remove ... and remove hook
 
 - change table view:
     - change style to more simplicity

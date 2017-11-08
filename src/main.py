@@ -21,7 +21,13 @@ def set_options(parser):
                       action="store_true",
                       dest="update",
                       default=False,
-                      help="update all")
+                      help="update by /etc/tag_checker/update.ini")
+
+    parser.add_option("-f", "--fully",
+                      action="store_true",
+                      dest="fully",
+                      default=False,
+                      help="uses only with --update, means that script will be update info about all repos in /etc/tag_checker/config.ini")
 
     parser.add_option("-s", "--show",
                       action="store_true",
@@ -95,6 +101,7 @@ def setup_options(opts):
 
 def check_main_opts(opts):
     return ((opts.update or opts.show or opts.prefix)
+            or (opts.update and opts.fully)
             or ((opts.add or opts.remove) and (opts.translate or opts.repo or opts.dep)))
 
 
@@ -130,11 +137,15 @@ def is_update(opts):
     return opts.update
 
 
+def is_full_update(opts):
+    return opts.fully and opts.update
+
+
 def is_change_prefix(opts):
     return opts.prefix
 
 
-def update(cfg_loader, git_man, tag_model):
+def full_update(cfg_loader, git_man, tag_model):
     # load config
     cfg_loader.load_config(tag_model)
 
@@ -209,8 +220,11 @@ def main():
     # branch by options
     bad_args = False
 
-    if is_update(opts):
-        update(cfg_loader, git_man, tag_model)
+    if is_full_update(opts):
+        full_update(cfg_loader, git_man, tag_model)
+    elif is_update(opts):
+        # todo parted update
+        pass
     elif is_show(opts):
         if args:
             cfg_loader.show(args[0])

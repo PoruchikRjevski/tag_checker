@@ -1,16 +1,53 @@
-#!/usr/bin/env python
+#!/usr/bin/sudo python3
 #post-receive
 
 import sys
 import os
-import subprocess
+import configparser
+
+
+UPDATE_TABLE_PATH               = "/etc/tag_checker/update.ini"
+SECTION_UPD                     = "UPDATE"
+OPTION_UPD                      = "to_update"
+
 
 def get_current_repo_name():
-    cur_repo = os.path.basename(os.getcwd())
-    sys.stdout.write("Current repo({:s}) was added for tag_checker update list".format(cur_repo))
+    return os.path.basename(os.getcwd())
+
+
+def add_repo_to_update_table(repo_name):
+    cfg_parser = configparser.ConfigParser()
+
+    cfg_parser.read(UPDATE_TABLE_PATH)
+
+    repos = None
+
+    if not cfg_parser.has_section(SECTION_UPD):
+        cfg_parser[SECTION_UPD] = {}
+
+    if cfg_parser.has_option(SECTION_UPD, OPTION_UPD):
+        repos = cfg_parser[SECTION_UPD][OPTION_UPD]
+
+    if repos is None:
+        repos = repo_name
+    else:
+        repos_splitted = repos.split("\n")
+        repos_splitted.append(repo_name)
+
+        repos = "\n".join(repos_splitted)
+
+    cfg_parser[SECTION_UPD][OPTION_UPD] = repos
+
+    with open(UPDATE_TABLE_PATH, 'w') as file:
+        cfg_parser.write(file)
+
+        file.flush()
+        file.close()
+
+
+if __name__ == "__main__":
+    repo_name = get_current_repo_name()
+    add_repo_to_update_table(repo_name)
+
+    sys.stdout.write("Add repo {:s} to {:s}".format(repo_name, UPDATE_TABLE_PATH))
     sys.stdout.flush()
-
-# refs = sys.stdin.read().split()
-
-get_current_repo_name()
-

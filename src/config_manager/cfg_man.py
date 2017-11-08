@@ -5,6 +5,7 @@ import common_defs as c_d
 import global_vars as g_v
 from logger import *
 from tag_model import *
+from cmd_executor.cmd_executor import *
 
 __all__ = ['CfgLoader']
 
@@ -85,12 +86,17 @@ class CfgLoader:
         else:
             return ""
 
+    def __get_dep_prefix(self, dep):
+        if self.__cfg.has_option(dep, c_d.OPTION_PREFIX):
+            return self.__cfg.get(dep, c_d.OPTION_PREFIX)
+
+        return ""
+
     def __add_department(self, block, model):
         prefix = ""
-        if self.__cfg.has_option(block, c_d.SECT_PREFIX):
-            prefix = self.__cfg.get(block, c_d.SECT_PREFIX)
+        prefix = self.__get_dep_prefix(block)
 
-        repos_links = self.__cfg.get(block, c_d.SECT_REPOS).split("\n")
+        repos_links = self.__cfg.get(block, c_d.OPTION_REPOS).split("\n")
 
         if repos_links:
             dep = Department(block)
@@ -138,6 +144,21 @@ class CfgLoader:
         with open(self.__config_def_path, 'w') as config_file:
             self.__cfg.write(config_file)
 
+    @staticmethod
+    def __separate_repo_and_soft_type(repo):
+        splitted = repo.split(":")
+
+        soft_type = ""
+        repo_name = ""
+
+        if isinstance(splitted, list) and len(splitted) > 1:
+            soft_type = splitted[0]
+            repo_name = splitted[1]
+        else:
+            repo_name = repo
+
+        return soft_type, repo_name
+
     def open_cfg(self):
         if not os.path.exists(self.__config_def_path):
             out_err(c_d.E_CFNE_STR)
@@ -174,10 +195,10 @@ class CfgLoader:
                 elif block == c_d.BLOCK_CONFIG:
                     pass
                 else:
-                    if self.__cfg.has_option(block, c_d.SECT_PREFIX):
-                        print("Prefix: {:s}".format(self.__cfg.get(block, c_d.SECT_PREFIX)))
-                    if self.__cfg.has_option(block, c_d.SECT_REPOS):
-                        repos = self.__cfg.get(block, c_d.SECT_REPOS).split("\n")
+                    if self.__cfg.has_option(block, c_d.OPTION_PREFIX):
+                        print("Prefix: {:s}".format(self.__cfg.get(block, c_d.OPTION_PREFIX)))
+                    if self.__cfg.has_option(block, c_d.OPTION_REPOS):
+                        repos = self.__cfg.get(block, c_d.OPTION_REPOS).split("\n")
                         print("Repos:")
                         for repo in repos:
                             print(repo)
@@ -186,39 +207,76 @@ class CfgLoader:
             for sect in self.__cfg.sections():
                 print(sect)
 
+    def __get_repo_path(self, dep, repo):
+        path = ""
+
+        if self.__cfg.has_section(dep):
+            path = self.__get_dep_prefix(dep)
+
+        return os.path.join(path, repo)
+
+    def add_git_hooks(self, dep, repo):
+        _, repo = self.__separate_repo_and_soft_type(repo)
+
+        hooks_path = os.path.join(c_d.GIT_HOOKS_PATH, c_d.POST_RX_HOOK_NAME)
+
+        repo_path = self.__get_repo_path(dep, repo)
+        repo_hooks_dir_path = os.path.join(repo_path, c_d.HOOKS_PATH)
+
+        run_cmd("yes | cp -rf {:s} {:s}".format(hooks_path, repo_hooks_dir_path))
+
+    def rem_git_hooks(self, dep, repo):
+        _, repo = self.__separate_repo_and_soft_type(repo)
+
+        repo_path = self.__get_repo_path(dep, repo)
+        hook_path = os.path.join(repo_path, c_d.HOOKS_PATH, c_d.POST_RX_HOOK_NAME)
+
+        run_cmd("rm -f {:s}".format(hook_path))
+
     def add_repo(self, block, repos):
+        if not block or not repos:
+            return
+
         repos_b = ""
 
         if self.__cfg.has_section(block):
-            if self.__cfg.has_option(block, c_d.SECT_REPOS):
-                repos_b = self.__cfg[block][c_d.SECT_REPOS] + "\n"
+            if self.__cfg.has_option(block, c_d.OPTION_REPOS):
+                repos_b = self.__cfg[block][c_d.OPTION_REPOS] + "\n"
         else:
-            self.__cfg[block] = {c_d.SECT_PREFIX : "", c_d.SECT_REPOS : ""}
+            self.__cfg[block] = {c_d.OPTION_PREFIX : "", c_d.OPTION_REPOS : ""}
 
         if isinstance(repos, list):
             for repo in repos:
                 repos_b += "{:s}\n".format(repo)
+
+                self.add_git_hooks(block, repo)
         else:
             repos_b += "{:s}\n".format(repos)
+            self.add_git_hooks(block, repos)
 
-        self.__cfg[block][c_d.SECT_REPOS] = repos_b
+        self.__cfg[block][c_d.OPTION_REPOS] = repos_b
 
         self.__write_cfg()
 
     def rem_repo(self, block, repos):
+        if not block or not repos:
+            return
+
         repos_b = ""
 
         if self.__cfg.has_section(block):
-            if self.__cfg.has_option(block, c_d.SECT_REPOS):
-                repos_b = self.__cfg[block][c_d.SECT_REPOS]
+            if self.__cfg.has_option(block, c_d.OPTION_REPOS):
+                repos_b = self.__cfg[block][c_d.OPTION_REPOS]
 
                 if isinstance(repos, list):
                     for repo in repos:
                         repos_b = repos_b.replace(repo, "").rstrip().lstrip()
+                        self.rem_git_hooks(block, repo)
                 else:
                     repos_b = repos_b.replace(repos, "").rstrip().lstrip()
+                    self.rem_git_hooks(block, repos)
 
-                self.__cfg[block][c_d.SECT_REPOS] = repos_b
+                self.__cfg[block][c_d.OPTION_REPOS] = repos_b
 
                 self.__write_cfg()
 
@@ -286,6 +344,6 @@ class CfgLoader:
 
     def change_prefix(self, department, prefix):
         if self.__cfg.has_section(department):
-            self.__cfg[department][c_d.SECT_PREFIX] = prefix
+            self.__cfg[department][c_d.OPTION_PREFIX] = prefix
 
             self.__write_cfg()

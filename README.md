@@ -14,7 +14,7 @@ Installing:
 - git clone git@srv-swdev:/opensource/device_tag_visualiser.git
 - cd device_tag_visualiser/
 - git checkout develop
-- sudo ./installer.py
+- sudo ./installer.py [install.sh - IS DEPRECATED FULLY]
 - Installer points:
     - Install - full script installation(create dirs, copy sources, creating symlinks and adding task to crontab)
     - Uninstall - full uninstall(remove all with backup configs in /tmp/solution_backups/
