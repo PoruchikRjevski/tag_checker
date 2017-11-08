@@ -103,6 +103,7 @@ PROGRESS_BAR = None
 KEY_RETURN                  = 10
 KEY_SPACE                   = 32
 KEY_DELETE                  = 330
+KEY_ESC                     = 27
 
 HEAD_TXT_SZ = len(HEAD_TXT) // 2
 
@@ -113,6 +114,7 @@ SCROLLBAR_HEIGHT            = 10
 CUR_WIDTH                   = 0
 
 BACKUPS_MENU_NAME_TXT       = "Select backup"
+CONFIDENCE_MENU_NAME_TXT    = "Are you sure?"
 
 
 def screen_height_update(func):
@@ -152,9 +154,30 @@ def screen_refresh(func):
 
         func(*args, **kwargs)
 
-        time.sleep(0.05)
+        time.sleep(0.01)
 
         SCREEN.refresh()
+    return wrapped
+
+
+@screen_height_update
+@screen_refresh
+def show_confidence_menu():
+    SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, CONFIDENCE_MENU_NAME_TXT, curses.A_BOLD)
+
+    SCREEN.addstr(BODY_HEIGHT + 2, CUR_WIDTH + 2,
+                  "ENTER - OK, ESC - Cancel", NORMAL)
+
+
+def check_confidence(func):
+    def wrapped(*args, **kwargs):
+        show_confidence_menu()
+
+        key = get_key()
+
+        if key == curses.KEY_ENTER or key == KEY_RETURN:
+            return func(*args, **kwargs)
+
     return wrapped
 
 
@@ -230,9 +253,9 @@ def exec_cmd(cmd):
     return out
 
 
-@check_existence_weak
+@check_existence_strong
 def cp_dir(src, dst):
-    exec_cmd("yes | cp -rf {:s}* {:s}".format(src, dst))
+    exec_cmd("yes | cp -rf {:s}. {:s}".format(src, dst))
 
 
 @check_existence_weak
@@ -283,17 +306,20 @@ def copy_misc():
 def backup_config():
     SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, COPYING_TXT, curses.A_BOLD)
     backup_dir = os.path.join(BACKUP_DIR,
-                              "{:s}_{:s}".format(SOLUTION_NAME,
+                              "{:s}_{:s}/".format(SOLUTION_NAME,
                                                  datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")))
 
     last_backup = get_last_backup()
 
-    diff = None
+    do_backup = False
 
     if last_backup:
-        diff = dircmp(os.path.join(BACKUP_DIR, "{:s}/".format(last_backup)), CONFIG_DIR)
+        if dircmp(os.path.join(BACKUP_DIR, "{:s}/".format(last_backup)), CONFIG_DIR).diff_files:
+            do_backup = True
+    else:
+        do_backup = True
 
-    if not last_backup or ((not diff is None) and diff.diff_files):
+    if do_backup:
         cp_dir(CONFIG_DIR, backup_dir)
 
     SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Backup config: {:s}".format(CONFIG_FILE), NORMAL)
@@ -413,6 +439,7 @@ def remove_from_crontab():
     SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Task was removed from crontab.", NORMAL)
 
 
+@check_confidence
 @screen_refresh
 def remove_backup(pos, backups):
     SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, REMOVE_BACKUP_TXT, curses.A_BOLD)
@@ -453,8 +480,6 @@ def set_version():
 
 
 def install():
-    backup_config()
-
     create_dirs()
 
     copy_source()
@@ -489,7 +514,8 @@ def update_files():
 
 
 def get_last_backup():
-    return max(get_list_of_backups())
+    backups = get_list_of_backups()
+    return max(backups) if backups else ""
 
 
 def get_list_of_backups():
@@ -576,7 +602,7 @@ def show_backups_menu(pos, backups_list):
         else:
             SCREEN.addstr(BODY_HEIGHT + id, CUR_WIDTH + 2, backup, NORMAL)
 
-    SCREEN.addstr(BODY_HEIGHT + len(backups_list) + 2, CUR_WIDTH + 2, "ENTER - accept, DEL - remove backup, ESC - cancel", NORMAL)
+    SCREEN.addstr(BODY_HEIGHT + len(backups_list) + 2, CUR_WIDTH + 2, "ENTER - restore, DEL - remove, ESC - cancel", NORMAL)
 
 
 @screen_height_update
@@ -677,13 +703,17 @@ def main_menu_loop():
 
     key = get_key()
 
-    while key != 27:
+    while key != KEY_ESC:
         if key == curses.KEY_UP:
             if pos > 0:
                 pos = pos - 1
+            else:
+                pos = MAIN_M_SZ - 1
         elif key == curses.KEY_DOWN:
             if pos < MAIN_M_SZ - 1:
                 pos = pos + 1
+            else:
+                pos = 0
         elif key == curses.KEY_ENTER or key == KEY_RETURN:
             main_menu_accept_action(pos)
 
@@ -697,13 +727,17 @@ def params_menu_loop():
     show_select_params_menu(pos)
 
     key = get_key()
-    while key != 27:
+    while key != KEY_ESC:
         if key == curses.KEY_UP:
             if pos > 0:
                 pos = pos - 1
+            else:
+                pos = PARAMS_MENU_SZ - 1
         elif key == curses.KEY_DOWN:
             if pos < PARAMS_MENU_SZ - 1:
                 pos = pos + 1
+            else:
+                pos = 0
         elif key == curses.KEY_ENTER or key == KEY_RETURN:
             return True
         elif key == KEY_SPACE:
@@ -724,13 +758,17 @@ def backups_menu_loop(backups_list):
     menu_sz = len(backups_list)
 
     key = get_key()
-    while key != 27:
+    while key != KEY_ESC:
         if key == curses.KEY_UP:
             if pos > 0:
                 pos = pos - 1
+            else:
+                pos = menu_sz - 1
         elif key == curses.KEY_DOWN:
             if pos < menu_sz - 1:
                 pos = pos + 1
+            else:
+                pos = 0
         elif key == KEY_DELETE:
             remove_backup(pos, backups_list)
         elif key == curses.KEY_ENTER or key == KEY_RETURN:
