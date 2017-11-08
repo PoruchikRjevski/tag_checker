@@ -217,14 +217,14 @@ class GitMan:
     def __get_last_commit_on_branch(self, branch):
         cmd = g_d.GIT_CMD.format(g_d.A_LOG
                                  + g_d.A_NN.format(str(c_d.GIT_AUTHOR_DEEP))
-                                 + g_d.A_FORMAT.format(g_d.AA_SHASH)
+                                 + g_d.A_FORMAT.format(g_d.AA_FHASH)
                                  + " " + branch)
 
         return run_cmd(cmd)
 
     def __get_parent_commit_hash(self, note_hash, last_commit_hash):
-        cmd = g_d.GIT_CMD.format(g_d.A_REV_LIST
-                                 + g_d.A_ABBREV.format(g_d.A_AB_COMMIT)
+        cmd = g_d.GIT_CMD.format(g_d.A_LOG
+                                 + g_d.A_FORMAT.format(g_d.AA_FHASH)
                                  + " " + note_hash + "..." + last_commit_hash
                                  + g_d.A_TAIL.format(str(c_d.GIT_PAR_SH_NEST)))
 
@@ -482,6 +482,8 @@ class GitMan:
             commit.p_hash = self.__get_parents_short_hash(commit.hash, commit.date)
             if commit.p_hash == -1:
                 commit.p_hash = commit.hash
+            else:
+                commit.p_hash = self.__strict_f_hash(commit.p_hash)
             if g_v.DEBUG: out_log("item pHash: {:s}".format(str(commit.p_hash)))
 
             commit.valid = True
