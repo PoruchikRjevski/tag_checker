@@ -52,9 +52,10 @@ M_INSTALL                   = "Install"
 M_UNINSTALL                 = "Uninstall"
 M_UPDATE_FILES              = "Update Files"
 M_CHANGE_PARAMS             = "Change run parameters"
+M_RESTORE_CFG               = "Restore config"
 M_EXIT                      = "Exit"
 
-MAIN_M = [M_INSTALL, M_UNINSTALL, M_UPDATE_FILES, M_CHANGE_PARAMS, M_EXIT]
+MAIN_M = [M_INSTALL, M_UNINSTALL, M_UPDATE_FILES, M_CHANGE_PARAMS, M_RESTORE_CFG, M_EXIT]
 MAIN_M_SZ = len(MAIN_M)
 
 HEAD_TXT                    = "Tag checker installer"
@@ -66,6 +67,7 @@ REMOVING_TXT                = "Removing"
 CREATE_EXEC_TXT             = "Create executable"
 CREATE_LN_TXT               = "Create symlink"
 REMOVE_LN_TXT               = "Remove symlink"
+RESTORE_BACKUP_TXT          = "Restore backup"
 
 
 # CURSES PARAMS MENU
@@ -88,6 +90,8 @@ PARAMS_MENU_STATE = {M_P_DEBUG:     [0, False, M_P_D],
                      M_P_TIMINGS:   [3, False, M_P_T],
                      M_P_VERBOSE:   [4, False, M_P_V]}
 
+PARAMS_MENU_SZ = len(PARAMS_MENU_STATE)
+
 
 # CURSES OTHER
 PROGRESS_BAR = None
@@ -102,6 +106,8 @@ NAME_HEIGHT = 4
 BODY_HEIGHT = 6
 SCROLLBAR_HEIGHT = 10
 CUR_WIDTH = 0
+
+BACKUPS_MENU_NAME_TXT            = "Select backup"
 
 
 def screen_height_update(func):
@@ -327,6 +333,16 @@ def create_executable():
 
 
 @screen_refresh
+def restore_cfg(backup_name):
+    SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, RESTORE_BACKUP_TXT, curses.A_BOLD)
+    backup_path = os.path.join(BACKUP_DIR, "{:s}/".format(backup_name))
+
+    cp_dir(backup_path, CONFIG_DIR)
+
+    SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Restored backup: {:s}".format(backup_name), NORMAL)
+
+
+@screen_refresh
 def create_symlink():
     SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, CREATE_LN_TXT, curses.A_BOLD)
 
@@ -403,6 +419,8 @@ def set_version():
 
 
 def install():
+    backup_config()
+
     create_dirs()
 
     copy_source()
@@ -413,7 +431,7 @@ def install():
 
     copy_config()
 
-    change_params()
+    change_params_context()
 
     add_to_crontab(UPDATE_ATTR)
 
@@ -436,7 +454,32 @@ def update_files():
     set_version()
 
 
-def change_params():
+def get_list_of_backups():
+    backups_list = []
+
+    temp_list = os.listdir(BACKUP_DIR)
+
+    for item in temp_list:
+        item_path = os.path.join(BACKUP_DIR, item)
+        if os.path.isdir(item_path):
+            backups_list.append(item)
+        else:
+            rm_file(item_path)
+
+    return backups_list
+
+
+def restore_cfg_context():
+    backups = sorted(get_list_of_backups())
+
+    if backups:
+        selected = restore_cfg_menu_loop(backups)
+
+        if selected != "":
+            restore_cfg(selected)
+
+
+def change_params_context():
     set_default_selecting()
 
     if params_menu_loop():
@@ -480,6 +523,22 @@ def get_params_str():
     params_str = " ".join([PARAMS_MENU_STATE[key][2] for key in PARAMS_MENU_STATE.keys() if PARAMS_MENU_STATE[key][1]])
 
     return params_str
+
+
+@screen_height_update
+@screen_refresh
+def show_backups_menu(pos, backups_list):
+    SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, BACKUPS_MENU_NAME_TXT, curses.A_BOLD)
+
+    for backup in backups_list:
+        id = backups_list.index(backup)
+
+        if id == pos:
+            SCREEN.addstr(BODY_HEIGHT + id, CUR_WIDTH + 2, backup, HIGHLIGHT)
+        else:
+            SCREEN.addstr(BODY_HEIGHT + id, CUR_WIDTH + 2, backup, NORMAL)
+
+    SCREEN.addstr(BODY_HEIGHT + len(backups_list) + 2, CUR_WIDTH + 2, "ENTER - accept, ESC - cancel", NORMAL)
 
 
 @screen_height_update
@@ -537,6 +596,10 @@ def get_key():
     return key
 
 
+def backups_menu_accept_actions(pos, backups_list):
+    return backups_list[pos] if pos < len(backups_list) else ""
+
+
 def param_menu_accept_actions(pos):
     for key in PARAMS_MENU_STATE.keys():
         if pos == PARAMS_MENU_STATE[key][0]:
@@ -560,7 +623,9 @@ def main_menu_accept_action(pos):
     elif pos_text == M_UPDATE_FILES:
         update_files()
     elif pos_text == M_CHANGE_PARAMS:
-        change_params()
+        change_params_context()
+    elif pos_text == M_RESTORE_CFG:
+        restore_cfg_context()
     elif pos_text == M_EXIT:
         true_exit(0)
 
@@ -597,7 +662,7 @@ def params_menu_loop():
             if pos > 0:
                 pos = pos - 1
         elif key == curses.KEY_DOWN:
-            if pos < MAIN_M_SZ - 1:
+            if pos < PARAMS_MENU_SZ - 1:
                 pos = pos + 1
         elif key == curses.KEY_ENTER or key == KEY_RETURN:
             return True
@@ -608,6 +673,31 @@ def params_menu_loop():
         key = get_key()
 
     return False
+
+
+def restore_cfg_menu_loop(backups_list):
+    pos = 0
+
+    res = ""
+
+    show_backups_menu(pos, backups_list)
+    menu_sz = len(backups_list)
+
+    key = get_key()
+    while key != 27:
+        if key == curses.KEY_UP:
+            if pos > 0:
+                pos = pos - 1
+        elif key == curses.KEY_DOWN:
+            if pos < menu_sz - 1:
+                pos = pos + 1
+        elif key == curses.KEY_ENTER or key == KEY_RETURN:
+            return backups_menu_accept_actions(pos, backups_list)
+
+        show_backups_menu(pos, backups_list)
+        key = get_key()
+
+    return ""
 
 
 def init_curses(screen):
