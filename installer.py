@@ -43,7 +43,7 @@ UPDATE_ATTR                 = "--update"
 
 
 # CURSES MAIN MENU
-HIGHLIGHT                   = None
+HIGHLIGHT = None
 NORMAL = None
 
 SCREEN = None
@@ -96,18 +96,18 @@ PARAMS_MENU_SZ = len(PARAMS_MENU_STATE)
 # CURSES OTHER
 PROGRESS_BAR = None
 
-KEY_RETURN = 10
-KEY_SPACE = 32
+KEY_RETURN                  = 10
+KEY_SPACE                   = 32
 
 HEAD_TXT_SZ = len(HEAD_TXT) // 2
 
-HEAD_HEIGHT = 2
-NAME_HEIGHT = 4
-BODY_HEIGHT = 6
-SCROLLBAR_HEIGHT = 10
-CUR_WIDTH = 0
+HEAD_HEIGHT                 = 2
+NAME_HEIGHT                 = 4
+BODY_HEIGHT                 = 6
+SCROLLBAR_HEIGHT            = 10
+CUR_WIDTH                   = 0
 
-BACKUPS_MENU_NAME_TXT            = "Select backup"
+BACKUPS_MENU_NAME_TXT       = "Select backup"
 
 
 def screen_height_update(func):
