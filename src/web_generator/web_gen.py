@@ -687,10 +687,10 @@ class WebGenerator:
         gen.w_o_tag(h_d.T_TD, cl)
 
         gen.w_tag(h_d.T_P,
-                  "{0:4d} д. / {1:4d} пр.".format(metric.diff_d.days,
-                                                  metric.jumps).replace(" ", h_d.WS),
+                  "{0:4d} д.".format(metric.diff_d.days),
                   h_d.A_CLASS.format(c_d.CL_TEXT_LEFT
-                                     + " " + c_d.CL_NO_WRAP))
+                                     + " " + c_d.CL_NO_WRAP)
+                  + h_d.A_TITLE.format("{0:4d} пр.".format(metric.jumps)))
 
         gen.w_tag(h_d.T_P,
                   2 * h_d.WS,
