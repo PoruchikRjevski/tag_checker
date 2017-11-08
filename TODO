@@ -122,6 +122,8 @@
                             --add --repo [dep] [level:repo]     - add repo with level to dep in /etc/tag_checker/config.ini and put misc/git-hooks/post-receive to /[fullpath]/repo.git/hooks/
                             --rem ...                           - remove ... and remove hook
 
+                        check is script already runned by using: ps -eo pid,cmd | grep '[t]ag_checker/main.py'
+
 - change table view:
     - change style to more simplicity
 
