@@ -13,6 +13,7 @@ HASH            = "last_hash"
 # - separate updater
 # - when add repo - add post.receive git hook to .git/hook
 # - update one time per minute for checking changes
+# - new installer
 
 
 # 1.4.xx - 192 to 286
