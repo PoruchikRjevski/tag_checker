@@ -6,11 +6,21 @@ Issues:
 - create web-pages with tables of info about tag's commits, dates etc
 
 
+Dependency's:
+- Python 3.4 or higher
+- Git 2.14.1 or higher
+
 Installing:
 - git clone git@srv-swdev:/opensource/device_tag_visualiser.git
 - cd device_tag_visualiser/
 - git checkout develop
-- sudo ./install.sh
+- sudo ./installer.py
+- Installer points:
+    - Install - full script installation(create dirs, copy sources, creating symlinks and adding task to crontab)
+    - Uninstall - full uninstall(remove all with backup configs in /tmp/solution_backups/
+    - Update files - copy source, misc and reset version
+    - Change run parameters - selecting script run params and recreate executables with symlinks
+    - Restore config - selecting saved backups and restore it to /etc/solution/
 - two ways to edit config:
     - edit tag_checker.ini manually(example in config.example/)
     - edit by script controls(for help exec tag_checker -h)
