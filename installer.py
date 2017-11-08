@@ -6,6 +6,7 @@ import time
 import subprocess
 import datetime
 import curses
+from filecmp import dircmp
 
 # INSTALLER COMMON
 DOC_CODE                    = "utf-8"
@@ -52,7 +53,7 @@ M_INSTALL                   = "Install"
 M_UNINSTALL                 = "Uninstall"
 M_UPDATE_FILES              = "Update Files"
 M_CHANGE_PARAMS             = "Change run parameters"
-M_RESTORE_CFG               = "Restore config"
+M_RESTORE_CFG               = "Backups"
 M_EXIT                      = "Exit"
 
 MAIN_M = [M_INSTALL, M_UNINSTALL, M_UPDATE_FILES, M_CHANGE_PARAMS, M_RESTORE_CFG, M_EXIT]
@@ -67,7 +68,10 @@ REMOVING_TXT                = "Removing"
 CREATE_EXEC_TXT             = "Create executable"
 CREATE_LN_TXT               = "Create symlink"
 REMOVE_LN_TXT               = "Remove symlink"
-RESTORE_BACKUP_TXT          = "Restore backup"
+RESTORE_BACKUP_TXT          = "Backups"
+REMOVE_BACKUP_TXT           = "Remove backup"
+ADD_CRONTAB_TXT             = "Add task to crontab"
+REM_CRONTAB_TXT             = "Remove task from crontab"
 
 
 # CURSES PARAMS MENU
@@ -98,6 +102,7 @@ PROGRESS_BAR = None
 
 KEY_RETURN                  = 10
 KEY_SPACE                   = 32
+KEY_DELETE                  = 330
 
 HEAD_TXT_SZ = len(HEAD_TXT) // 2
 
@@ -281,7 +286,16 @@ def backup_config():
                               "{:s}_{:s}".format(SOLUTION_NAME,
                                                  datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")))
 
-    cp_dir(CONFIG_DIR, backup_dir)
+    last_backup = get_last_backup()
+
+    diff = None
+
+    if last_backup:
+        diff = dircmp(os.path.join(BACKUP_DIR, "{:s}/".format(last_backup)), CONFIG_DIR)
+
+    if not last_backup or ((not diff is None) and diff.diff_files):
+        cp_dir(CONFIG_DIR, backup_dir)
+
     SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Backup config: {:s}".format(CONFIG_FILE), NORMAL)
 
 
@@ -371,6 +385,8 @@ def remove_symlink():
 
 @screen_refresh
 def add_to_crontab(attr):
+    SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, ADD_CRONTAB_TXT, curses.A_BOLD)
+
     exec_file = os.path.join(SETUP_DIR,
                              EXEC_FILE)
 
@@ -380,15 +396,33 @@ def add_to_crontab(attr):
     exec_cmd("crontab temp")
     exec_cmd("rm -f temp")
 
+    SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Task was added to crontab.", NORMAL)
+
 
 @screen_refresh
 def remove_from_crontab():
+    SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, REM_CRONTAB_TXT, curses.A_BOLD)
+
     exec_file = os.path.join(SETUP_DIR,
                              EXEC_FILE)
 
     exec_cmd("crontab -l | grep -q !\"{:s}\" > temp".format(exec_file))
     exec_cmd("crontab temp")
     exec_cmd("rm -f temp")
+
+    SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Task was removed from crontab.", NORMAL)
+
+
+@screen_refresh
+def remove_backup(pos, backups):
+    SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, REMOVE_BACKUP_TXT, curses.A_BOLD)
+
+    backup = backups[pos]
+
+    rm_dir(os.path.join(BACKUP_DIR, backup))
+    backups.remove(backup)
+
+    SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Remove backup: {:s}".format(backup), NORMAL)
 
 
 def set_version():
@@ -454,6 +488,10 @@ def update_files():
     set_version()
 
 
+def get_last_backup():
+    return max(get_list_of_backups())
+
+
 def get_list_of_backups():
     backups_list = []
 
@@ -469,11 +507,11 @@ def get_list_of_backups():
     return backups_list
 
 
-def restore_cfg_context():
+def backups_context():
     backups = sorted(get_list_of_backups())
 
     if backups:
-        selected = restore_cfg_menu_loop(backups)
+        selected = backups_menu_loop(backups)
 
         if selected != "":
             restore_cfg(selected)
@@ -538,7 +576,7 @@ def show_backups_menu(pos, backups_list):
         else:
             SCREEN.addstr(BODY_HEIGHT + id, CUR_WIDTH + 2, backup, NORMAL)
 
-    SCREEN.addstr(BODY_HEIGHT + len(backups_list) + 2, CUR_WIDTH + 2, "ENTER - accept, ESC - cancel", NORMAL)
+    SCREEN.addstr(BODY_HEIGHT + len(backups_list) + 2, CUR_WIDTH + 2, "ENTER - accept, DEL - remove backup, ESC - cancel", NORMAL)
 
 
 @screen_height_update
@@ -627,7 +665,7 @@ def main_menu_accept_action(pos):
     elif pos_text == M_CHANGE_PARAMS:
         change_params_context()
     elif pos_text == M_RESTORE_CFG:
-        restore_cfg_context()
+        backups_context()
     elif pos_text == M_EXIT:
         true_exit(0)
 
@@ -677,7 +715,7 @@ def params_menu_loop():
     return False
 
 
-def restore_cfg_menu_loop(backups_list):
+def backups_menu_loop(backups_list):
     pos = 0
 
     res = ""
@@ -693,6 +731,8 @@ def restore_cfg_menu_loop(backups_list):
         elif key == curses.KEY_DOWN:
             if pos < menu_sz - 1:
                 pos = pos + 1
+        elif key == KEY_DELETE:
+            remove_backup(pos, backups_list)
         elif key == curses.KEY_ENTER or key == KEY_RETURN:
             return backups_menu_accept_actions(pos, backups_list)
 
