@@ -658,7 +658,7 @@ class GitMan:
 
                         # red color intensity with respect to diff days
                         if do_mult:
-                            dep_obj.items[it_ind].metric.jmp_clr_mult = round(((item_cm_d.toordinal() - min_item_cm_d) / max_day_step) + 0.5)
+                            dep_obj.items[it_ind].metric.jmp_clr_mult = int(c_d.CLR_RED_STEPS) - round(((item_cm_d.toordinal() - min_item_cm_d) / max_day_step) + 0.5)
 
                             out_log("ITEM DATE ORD: {:s}".format(str(item_cm_d.toordinal())))
                             out_log("MULT: {:s}".format(str(dep_obj.items[it_ind].metric.jmp_clr_mult)))
