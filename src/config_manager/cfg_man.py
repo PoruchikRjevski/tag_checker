@@ -13,13 +13,23 @@ __all__ = ['CfgLoader']
 # TODO: maybe json will be simpler?
 
 class CfgLoader:
-
     def __init__(self):
         if g_v.DEBUG: out_log("init")  # TODO: used logger?
+
+        self.__partly_update = False
+        self.__update_list = []
 
         self.__cfg = None
         self.__gen_paths()
         CfgLoader.__set_default_out_path()
+
+    @property
+    def partly_update(self):
+        return self.__partly_update
+
+    @partly_update.setter
+    def partly_update(self, flag):
+        self.__partly_update = flag
 
     def __gen_paths(self):
         self.__config_def_path = ""
@@ -53,8 +63,6 @@ class CfgLoader:
             tr_dict = dict(item.split(":") for item in pairs.split("|") if item)
 
             model.tr_dev_names.update(tr_dict)
-        # for name in self.__cfg[block]:
-        #     model.tr_dev_names[name] = self.__cfg.get(block, name)
 
     @staticmethod
     def get_sw_module_uid_from_repo_full_link(repo_full_link):
@@ -93,7 +101,6 @@ class CfgLoader:
         return ""
 
     def __add_department(self, block, model):
-        prefix = ""
         prefix = self.__get_dep_prefix(block)
 
         repos_links = self.__cfg.get(block, c_d.OPTION_REPOS).split("\n")
@@ -101,19 +108,28 @@ class CfgLoader:
         if repos_links:
             dep = Department(block)
 
+            split = []
+            pre_link = ""
+
             for repo_name in repos_links:
-                repo = Repo()
+                if not repo_name:
+                    continue
+
+                repo_obj = Repo()
 
                 split = repo_name.split(":")
                 item_count = len(split)
                 sw_archive_module_id = ""
                 sw_archive_module_group_id = ""
-                if isinstance(split, list) and item_count > 1:
-                    repo.soft_type = split[0]
 
-                    if repo.soft_type not in dep.soft_types:
-                        dep.soft_types.append(repo.soft_type)
+                if isinstance(split, list) and item_count > 1:
+                    repo_obj.soft_type = split[0]
+
+                    if repo_obj.soft_type not in dep.soft_types:
+                        dep.soft_types.append(repo_obj.soft_type)
+
                     pre_link = split[1]
+
                     if item_count > 2:
                         sw_archive_module_group_id = split[2]
                     if item_count > 3:
@@ -121,22 +137,29 @@ class CfgLoader:
                 else:
                     pre_link = repo_name
 
-                repo.link = prefix + pre_link
-                repo.name = pre_link
+                repo_obj.link = prefix + pre_link
+                repo_obj.name = pre_link
                 
                 if not sw_archive_module_id:
-                    repo.sw_archive_module_id = CfgLoader.get_sw_module_id_from_repo_full_link(repo.link)
+                    repo_obj.sw_archive_module_id = CfgLoader.get_sw_module_id_from_repo_full_link(repo_obj.link)
                 else:
-                    repo.sw_archive_module_id = sw_archive_module_id
+                    repo_obj.sw_archive_module_id = sw_archive_module_id
 
                 if not sw_archive_module_group_id:
-                    sw_archive_module_group_id = CfgLoader.get_sw_module_group_id_from_repo_full_link(repo.link)
+                    sw_archive_module_group_id = CfgLoader.get_sw_module_group_id_from_repo_full_link(repo_obj.link)
 
                 if len(sw_archive_module_group_id) > 0:
                     sw_archive_module_group_id = sw_archive_module_group_id + "/"
                 
-                repo.sw_archive_module_group_id = sw_archive_module_group_id
-                dep.repos.append(repo)
+                repo_obj.sw_archive_module_group_id = sw_archive_module_group_id
+
+                update_repo_flag = True
+
+                if self.__partly_update:
+                    if pre_link not in self.__update_list:
+                        update_repo_flag = False
+
+                dep.repos.append({UPDATE_FLAG: update_repo_flag, REPO_OBJECT: repo_obj})
 
             model.departments[block] = dep
 
@@ -169,10 +192,98 @@ class CfgLoader:
 
         return None
 
+    @staticmethod
+    def __rewrite_update_file(cfg_parser, repos):
+        cfg_parser[c_d.SECTION_UPD][c_d.OPTION_UPD] = repos
+
+        with open(c_d.UPDATE_TABLE_PATH, 'w') as file:
+            cfg_parser.write(file)
+
+            file.flush()
+            file.close()
+
+    @staticmethod
+    def __get_list_of_updates():
+        cfg_parser = configparser.ConfigParser()
+
+        cfg_parser.read(c_d.UPDATE_TABLE_PATH)
+
+        repos = None
+
+        if not cfg_parser.has_section(c_d.SECTION_UPD):
+            cfg_parser[c_d.SECTION_UPD] = {}
+
+        if cfg_parser.has_option(c_d.SECTION_UPD, c_d.OPTION_UPD):
+            repos = cfg_parser[c_d.SECTION_UPD][c_d.OPTION_UPD]
+
+        if not repos is None:
+            res = repos.split("\n")
+            CfgLoader.__rewrite_update_file(cfg_parser, "")
+
+            return res
+
+        return []
+
+    @staticmethod
+    def add_repo_to_updates(repo_name):
+        cfg_parser = configparser.ConfigParser()
+
+        cfg_parser.read(c_d.UPDATE_TABLE_PATH)
+
+        repos = None
+
+        if not cfg_parser.has_section(c_d.SECTION_UPD):
+            cfg_parser[c_d.SECTION_UPD] = {}
+
+        if cfg_parser.has_option(c_d.SECTION_UPD, c_d.OPTION_UPD):
+            repos = cfg_parser[c_d.SECTION_UPD][c_d.OPTION_UPD]
+
+        if repos is None:
+            repos = repo_name
+        else:
+            repos_splitted = repos.split("\n")
+            if repo_name not in repos_splitted:
+                repos_splitted.append(repo_name)
+
+                repos = "\n".join(repos_splitted)
+
+        CfgLoader.__rewrite_update_file(cfg_parser, repos)
+
+    @staticmethod
+    def __rem_repo_from_updates(repo_name):
+        cfg_parser = configparser.ConfigParser()
+
+        cfg_parser.read(c_d.UPDATE_TABLE_PATH)
+
+        repos = None
+
+        if not cfg_parser.has_section(c_d.SECTION_UPD):
+            cfg_parser[c_d.SECTION_UPD] = {}
+
+        if cfg_parser.has_option(c_d.SECTION_UPD, c_d.OPTION_UPD):
+            repos = cfg_parser[c_d.SECTION_UPD][c_d.OPTION_UPD]
+
+        if not repos is None:
+            repos_splitted = repos.split("\n")
+
+            if repo_name in repos_splitted:
+                repos_splitted.remove(repo_name)
+
+            repos = "\n".join(repos_splitted)
+
+            CfgLoader.__rewrite_update_file(cfg_parser, repos)
+
     def load_config(self, model):
         if g_v.DEBUG: out_log("start load config")
 
         blocks = self.__cfg.sections()
+
+        if self.__partly_update:
+            self.__update_list = self.__get_list_of_updates()
+            out_log(" ".join(self.__update_list))
+
+            if not self.__update_list:
+                return False
 
         for block in blocks:
             if block == c_d.BLOCK_CONFIG:
@@ -183,6 +294,8 @@ class CfgLoader:
                 self.__add_department(block, model)
 
         if g_v.DEBUG: out_log("config was loaded")
+
+        return True
 
     def show(self, block=""):
         if block:
@@ -215,7 +328,7 @@ class CfgLoader:
 
         return os.path.join(path, repo)
 
-    def add_git_hooks(self, dep, repo):
+    def __add_git_hooks(self, dep, repo):
         _, repo = self.__separate_repo_and_soft_type(repo)
 
         hooks_path = os.path.join(c_d.GIT_HOOKS_PATH, c_d.POST_RX_HOOK_NAME)
@@ -225,7 +338,7 @@ class CfgLoader:
 
         run_cmd("yes | cp -rf {:s} {:s}".format(hooks_path, repo_hooks_dir_path))
 
-    def rem_git_hooks(self, dep, repo):
+    def __rem_git_hooks(self, dep, repo):
         _, repo = self.__separate_repo_and_soft_type(repo)
 
         repo_path = self.__get_repo_path(dep, repo)
@@ -249,10 +362,12 @@ class CfgLoader:
             for repo in repos:
                 repos_b += "{:s}\n".format(repo)
 
-                self.add_git_hooks(block, repo)
+                self.__add_git_hooks(block, repo)
+                self.add_repo_to_updates(repo)
         else:
             repos_b += "{:s}\n".format(repos)
-            self.add_git_hooks(block, repos)
+            self.__add_git_hooks(block, repos)
+            self.add_repo_to_updates(repos)
 
         self.__cfg[block][c_d.OPTION_REPOS] = repos_b
 
@@ -271,10 +386,12 @@ class CfgLoader:
                 if isinstance(repos, list):
                     for repo in repos:
                         repos_b = repos_b.replace(repo, "").rstrip().lstrip()
-                        self.rem_git_hooks(block, repo)
+                        self.__rem_git_hooks(block, repo)
+                        self.__rem_repo_from_updates(repo)
                 else:
                     repos_b = repos_b.replace(repos, "").rstrip().lstrip()
-                    self.rem_git_hooks(block, repos)
+                    self.__rem_git_hooks(block, repos)
+                    self.__rem_repo_from_updates(repos)
 
                 self.__cfg[block][c_d.OPTION_REPOS] = repos_b
 

@@ -25,6 +25,7 @@ T_H                 = "h{:s}" # size
 T_A                 = "a"
 T_P                 = "p"
 T_META              = "meta"
+T_TITLE             = "title"
 T_IFRAME            = "iframe"
 T_SCRIPT            = "script"
 T_LINK              = "link"

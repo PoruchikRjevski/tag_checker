@@ -8,12 +8,15 @@ import common_defs as c_d
 import global_vars as g_v
 import version as v
 from logger import *
+from tag_model import *
 from web_generator import html_defs as h_d
 
 
 class WebGenerator:
     def __init__(self):
         if g_v.DEBUG: out_log("init")
+
+        self.__cur_timestamp = None
 
     def __clear_out_dir(self, dir):
         for item in os.listdir(dir):
@@ -31,7 +34,7 @@ class WebGenerator:
         if g_v.DEBUG: out_log("start gen index")
         index = HtmlGen(g_v.OUT_PATH, c_d.INDEX_F_NAME)
 
-        self.__gen_page_head(index, "", h_d.A_CLASS.format(c_d.CL_BACK_CIRLE))
+        self.__gen_page_head(index, c_d.M_HEAD_TXT, "", h_d.A_CLASS.format(c_d.CL_BACK_CIRLE))
 
         self.__gen_content_start(index)
         self.__gen_iframe(index)
@@ -48,7 +51,7 @@ class WebGenerator:
         if g_v.DEBUG: out_log("start gen read metrics help page")
         help = HtmlGen(g_v.OUT_PATH, c_d.HELP_METR_F_NAME)
 
-        self.__gen_page_head(help, "", h_d.A_CLASS.format(c_d.CL_BACK_CIRLE))
+        self.__gen_page_head(help, c_d.READ_METR_TXT, "", h_d.A_CLASS.format(c_d.CL_BACK_CIRLE))
 
         self.__gen_content_start(help)
 
@@ -130,7 +133,7 @@ class WebGenerator:
         if g_v.DEBUG: out_log("start gen main")
         main = HtmlGen(g_v.OUT_PATH, c_d.MAIN_F_NAME)
 
-        self.__gen_page_head(main, "")
+        self.__gen_page_head(main, c_d.M_HEAD_TXT, "")
 
         self.__gen_content_start(main)
         self.__gen_table_head(main)
@@ -145,7 +148,7 @@ class WebGenerator:
         main.close()
         if g_v.DEBUG: out_log("finish gen main")
 
-    def __gen_page_head(self, gen, level, body_attr=""):
+    def __gen_page_head(self, gen, title, level, body_attr=""):
         gen.w_o_tag(h_d.T_HTML, "", True)
         gen.w_o_tag(h_d.T_HEAD, "", True)
         gen.w_o_tag(h_d.T_META, h_d.A_CHARSET.format(c_d.DOC_CODE), True)
@@ -163,6 +166,8 @@ class WebGenerator:
         gen.w_o_tag(h_d.T_LINK,
                     h_d.A_REL.format(h_d.A_REL_SS)
                     + h_d.A_HREF.format(os.path.join(level, c_d.CSS_DIR, c_d.STYLE_F_NAME)), True)
+
+        gen.w_tag(h_d.T_TITLE, title, "", True)
 
         self.__gen_script(gen, os.path.join(level, c_d.JS_DIR, c_d.JS_METRICS_F_NAME))
 
@@ -218,7 +223,7 @@ class WebGenerator:
                                   + " -{:s}".format(str(c_d.F_TIMINGS_TXT)) if g_v.TIMEOUTS else "")
 
         gen.w_tag(h_d.T_P,
-                  c_d.LAST_UPD_TXT + datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+                  c_d.LAST_UPD_TXT + self.__cur_timestamp,
                   h_d.A_CLASS.format(c_d.CL_FOOT_INFO)
                   + h_d.A_TITLE.format(c_d.REPOS_NUM_TXT.format(str(g_v.REPOS_NUM)) + "\n"
                                        + c_d.TAGS_NUM_TXT.format(str(g_v.TAGS_NUM)) + "\n"
@@ -321,6 +326,27 @@ class WebGenerator:
                   h_d.A_ROWSPAN.format(c_d.BTM_ROWS) + h_d.A_CLASS.format(c_d.CL_BORDER))
         gen.w_c_tag(h_d.T_TR)
 
+    def __is_need_update_device_page(self, model, dev_name, dep_name):
+        dep = model.departments[dep_name]
+        dev_item = None
+
+        for item in dep.items:
+            if item.dev_name == dev_name:
+                dev_item = item
+
+                break
+
+        if not dev_item is None:
+            repo = dep.repos[dev_item.repo_i]
+
+            if UPDATE_FLAG in repo.keys():
+                flag = repo[UPDATE_FLAG]
+
+                if not flag is None:
+                    return flag
+
+        return False
+
     def __gen_main_content(self, model, file):
         if g_v.DEBUG: out_log("start gen main content")
 
@@ -345,8 +371,8 @@ class WebGenerator:
 
                 file.w_c_tag(h_d.T_TR)
 
-                # gen device page
-                self.__gen_device_page(model, dep_name, dev_name)
+                if self.__is_need_update_device_page(model, dev_name, dep_name):
+                    self.__gen_device_page(model, dep_name, dev_name)
 
         if g_v.DEBUG: out_log("finish gen main content")
 
@@ -413,13 +439,21 @@ class WebGenerator:
         if g_v.DEBUG: out_log("start gen pages for device: " + dev_name)
         page = HtmlGen(c_d.DEVICE_PATH, self.__get_device_file_name(dev_name))
 
-        self.__gen_page_head(page, c_d.LEVEL_UP)
+        dev_str = "{:s} \"{:s}\" [{:s}]".format(c_d.HISTORY_TXT,
+                                                   model.get_tr_dev(dev_name),
+                                                   self.__cur_timestamp)
+        dep_str = "{:s} {:s}".format(c_d.DEPART_TXT,
+                                     str(dep_name))
+
+        dev_tooltip = self.__gen_device_head_tooltip()
+
+        self.__gen_page_head(page, dev_str, c_d.LEVEL_UP)
         self.__gen_content_start(page)
         self.__gen_table_head(page)
 
         self.__gen_device_table_head(page,
-                                     [c_d.HISTORY_TXT + " \"" + model.get_tr_dev(dev_name) + "\"",
-                                      c_d.DEPART_TXT + str(dep_name)])
+                                     [dev_str, dep_str],
+                                     dev_tooltip)
 
         self.__gen_device_content(page, model, dep_name, dev_name)
 
@@ -433,22 +467,27 @@ class WebGenerator:
 
         if g_v.DEBUG: out_log("finish gen pages for device: " + dev_name)
 
-    def __gen_items_page(self, model, dep, dev_name, item_num, type, items):
+    def __gen_history_page(self, model, dep, dev_name, item_num, type, items):
         if g_v.DEBUG: out_log("start gen item page: " + str(item_num))
 
         item_file_name = self.__get_item_file_name(dev_name, item_num)
         item_dir_name = self.__get_item_dir_name(dev_name, item_num)
 
+        dev_str = "{:s} \"{:s}\" - \"{:s}\" [{:s}]".format(c_d.HISTORY_TXT,
+                                                              model.get_tr_dev(dev_name),
+                                                              self.__get_num_by_type(type, item_num),
+                                                              self.__cur_timestamp)
+        dep_str = "{:s} {:s}".format(c_d.DEPART_TXT,
+                                     str(dep.name))
+
         page = HtmlGen(os.path.join(c_d.ORDERS_PATH, item_dir_name), item_file_name)
 
-        self.__gen_page_head(page, c_d.LEVEL_UP * 3)
+        self.__gen_page_head(page, dev_str, c_d.LEVEL_UP * 3)
         self.__gen_content_start(page)
         self.__gen_table_head(page)
 
         self.__gen_items_table_head(page,
-                                    [c_d.HISTORY_TXT + " \"" + model.get_tr_dev(dev_name) + "\"" + " - "
-                                     + " \"" + self.__get_num_by_type(type, item_num) + "\"",
-                                     c_d.DEPART_TXT + str(dep.name)])
+                                    [dev_str, dep_str])
 
         self.__gen_items_content(page, dep, items)
 
@@ -485,13 +524,14 @@ class WebGenerator:
             soft_type_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
                                                  + " " + c_d.CL_TEXT_CENTER
                                                  + " " + c_d.CL_BORDER)
+            repo_obj = dep.repos[item.repo_i][REPO_OBJECT]
             self.__gen_item_soft_type(page,
-                                      dep.repos[item.repo_i].soft_type,
+                                      repo_obj.soft_type,
                                       soft_type_class)
 
             # tag date and commit hash
             self.__gen_common_columns(page,
-                                      dep.repos[item.repo_i],
+                                      repo_obj,
                                       dep.commits[item.cm_i],
                                       item,
                                       type_class_id)
@@ -515,12 +555,12 @@ class WebGenerator:
 
                 soft_type_by_num = []
                 for n_item in nummed_items:
-                    s_type = dep.repos[n_item.repo_i].soft_type
+                    s_type = dep.repos[n_item.repo_i][REPO_OBJECT].soft_type
                     if s_type not in soft_type_by_num:
                         soft_type_by_num.append(s_type)
 
                 for soft_t in dep.soft_types:
-                    s_typed_items = [item for item in nummed_items if dep.repos[item.repo_i].soft_type == soft_t]
+                    s_typed_items = [item for item in nummed_items if dep.repos[item.repo_i][REPO_OBJECT].soft_type == soft_t]
 
                     if not s_typed_items:
                         continue
@@ -557,8 +597,8 @@ class WebGenerator:
                                               soft_type_class)
 
                     # tag date and commit hash
-                    repo = model.departments[dep_name].repos[ld_item.repo_i]
-                    commit = model.departments[dep_name].commits[ld_item.cm_i]
+                    repo = dep.repos[ld_item.repo_i][REPO_OBJECT]
+                    commit = dep.commits[ld_item.cm_i]
                     self.__gen_common_columns(file,
                                               repo,
                                               commit,
@@ -567,12 +607,12 @@ class WebGenerator:
                     file.w_c_tag(h_d.T_TR)
 
                 # generate page for item
-                self.__gen_items_page(model,
-                                      dep,
-                                      dev_name,
-                                      num,
-                                      type,
-                                      nummed_items)
+                self.__gen_history_page(model,
+                                        dep,
+                                        dev_name,
+                                        num,
+                                        type,
+                                        nummed_items)
 
             type_class_id += 1
 
@@ -708,9 +748,13 @@ class WebGenerator:
                   h_d.BLK_ONCLICK_BACK)
         gen.w_c_tag(h_d.T_P)
 
+    def __gen_device_head_tooltip(self):
+        tooltip = ""
 
-    def __gen_device_table_head(self, gen, text_list):
-        self.__gen_top_dev_order_table_head(gen, text_list, c_d.D_TABLE_COLSPAN)
+        return tooltip
+
+    def __gen_device_table_head(self, gen, text_list, tooltip):
+        self.__gen_top_dev_order_table_head(gen, text_list, tooltip, c_d.D_TABLE_COLSPAN)
         self.__gen_mid_table_head(gen)
         self.__gen_mid_table_mid(gen)
         self.__gen_mid_common_table_body(gen)
@@ -718,16 +762,17 @@ class WebGenerator:
         self.__gen_bottom_table_head(gen)
 
     def __gen_items_table_head(self, gen, text_list):
-        self.__gen_top_dev_order_table_head(gen, text_list, c_d.M_TABLE_CS_ITEM)
+        self.__gen_top_dev_order_table_head(gen, text_list, "", c_d.M_TABLE_CS_ITEM)
         self.__gen_mid_table_head(gen)
         # self.__gen_mid_table_mid(gen)
         self.__gen_mid_common_table_body(gen)
         self.__gen_mid_table_foot(gen)
         self.__gen_bottom_table_head(gen)
 
-    def __gen_top_dev_order_table_head(self, gen, text_list, span):
+    def __gen_top_dev_order_table_head(self, gen, text_list, title, span):
         gen.w_o_tag(h_d.T_TR,
-                    h_d.A_CLASS.format(c_d.CL_MT_H),
+                    h_d.A_CLASS.format(c_d.CL_MT_H)
+                    + h_d.A_TITLE.format(title),
                     True)
         gen.w_o_tag(h_d.T_TH,
                     h_d.A_COLSPAN.format(span) + h_d.A_CLASS.format(c_d.CL_BORDER),
@@ -749,7 +794,7 @@ class WebGenerator:
         return "{:s}_{:s}{:s}".format(name, str(num), c_d.HTML_EXT)
 
     def __get_item_dir_name(self, name, num):
-        return "{:s}_{:s}".format(name, str(num))
+        return "{:s}_{:s}/".format(name, str(num))
 
     def __get_device_file_name(self, name):
         return "{:s}{:s}".format(name, c_d.HTML_EXT)
@@ -760,13 +805,20 @@ class WebGenerator:
                + c_d.COMM_DATE_TXT + commDate + "\n" \
                + c_d.COMM_MSG_SH_TXT.format(commMsg)
 
-    def generate_web(self, model):
+    def __set_current_timestamp(self):
+        self.__cur_timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    def generate_web(self, model, partly_update):
         if g_v.DEBUG: out_log("start gen web")
 
-        self.__clear_out_dir(g_v.OUT_PATH)
+        self.__set_current_timestamp()
 
-        self.__gen_index(model)
-        self.__gen_read_metrics_help_page()
+        if not partly_update:
+            self.__clear_out_dir(g_v.OUT_PATH)
+
+            self.__gen_index(model)
+            self.__gen_read_metrics_help_page()
+
         self.__gen_pages(model)
 
         if g_v.DEBUG: out_log("finish gen web")

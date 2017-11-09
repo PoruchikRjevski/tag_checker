@@ -116,6 +116,7 @@
 - separate project for true update repo:
     update.ini          -> notes about updated repos
     git_hook            -> [when repo updated] -> add to /etc/tag_checker/update.ini note with updated repo_name
+    run_helper.py       -> check if main.py alredy not run then run it
     main_app.py         -> check db:update -> [if not empty] -> update info for all repo notes in db -> after that generate pages
                             --update                            - check update.ini and update info about repos in this file
                             --update --fully                    - update info about all repos in config.ini
@@ -123,6 +124,9 @@
                             --rem ...                           - remove ... and remove hook
 
                         check is script already runned by using: ps -eo pid,cmd | grep '[t]ag_checker/main.py'
+
+                        one time per minute -> run_helper.py --update
+                        one time per day -> run_helper.py --update --fully
 
 - change table view:
     - change style to more simplicity

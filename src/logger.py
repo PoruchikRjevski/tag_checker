@@ -44,7 +44,6 @@ def start_thread_logging():
 
 def finish_thread_logging():
     pid = str(threading.get_ident())
-    # threads_list.remove(pid)
     threads_list_f.append(pid)
 
 
@@ -82,10 +81,6 @@ def out_log(msg):
         threads_logs[pid].append(out)
     else:
         out_msg(out, c_d.LOG_T)
-    # if pid in threads_list and g_v.MULTITH:
-    #     threads_logs[pid].append(out)
-    # else:
-
 
 
 def out_msg(out, place):

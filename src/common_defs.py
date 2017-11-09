@@ -109,7 +109,7 @@ GW_SHORTLOG         = "shortlog"
 GW_COMMIT           = "commit"
 
 # footer
-LAST_UPD_TXT        = "Последнее обновление: "
+LAST_UPD_TXT        = "Последнее полное обновление: "
 CR_TXT              = "&copy; 2017 - 140 отдел. Буревестник."
 M_HEAD_TXT          = "Актуальные прошивки"
 DEP_TXT             = "Отдел"
@@ -164,10 +164,12 @@ EXIT_GNT            = 1                                         # git not instal
 EXIT_WA             = 2                                         # wron arguments
 EXIT_WO             = 3                                         # wrong options
 EXIT_CFNE           = 4                                         # config file does not exist
+EXIT_AR             = 5                                         # already run
 
 E_GNT_STR           = "Git not installed"
 E_CFNE_STR          = "Config file does not exist"
 E_BAD_ARGS          = "Bad arguments"
+E_ALREADY_RUNS      = "Already run's"
 
 # CFG LOADER --------------------------------------------------------
 BLOCK_CONFIG        = "CONFIG"
@@ -219,6 +221,8 @@ DOMENS_L            = [D_LINUX, D_WIN, D_DOS]
 WINDOWS_P           = "windows"
 LINUX_P             = "linux"
 
+LIN_MAIN_PATH_DEF   = "/opt/tag_checker/"
+
 LIN_OUT_P_DEF       = "/var/www/swver_hist/"
 WIN_OUT_P_DEF       = "../out/"
 
@@ -235,5 +239,10 @@ SUDO_CMD            = "sudo "
 REPO_SUFFIX         = ".git"
 DOC_CODE            = "utf-8"
 POST_RX_HOOK_NAME   = "post-receive"
-GIT_HOOKS_PATH      = "/opt/tag_checker/misc/git-hooks/"
 HOOKS_PATH          = "hooks/"
+
+GIT_HOOKS_PATH      = "/opt/tag_checker/misc/git-hooks/"
+UPDATE_TABLE_PATH   = "/etc/tag_checker/update.ini"
+
+SECTION_UPD         = "UPDATE"
+OPTION_UPD          = "to_update"

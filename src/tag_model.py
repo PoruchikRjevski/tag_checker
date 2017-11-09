@@ -5,7 +5,11 @@ import common_defs as c_d
 import global_vars as g_v
 from logger import *
 
-__all__ = ['TagModel', 'Department', 'Repo', 'Device', 'Item', 'CommitInfo']
+__all__ = ['TagModel', 'Department', 'Repo', 'Device', 'Item', 'CommitInfo', 'UPDATE_FLAG', 'REPO_OBJECT']
+
+
+UPDATE_FLAG = 'update_flag'
+REPO_OBJECT = 'repo_object'
 
 
 class TagModel:
@@ -45,10 +49,10 @@ class TagModel:
 class Department:
     """
     __name                      is name of department from config
-    __repos                     is [Repo...]
+    __repos                     is {repo: flag}
     __commits                   is [CommitInfo object]
     __items                     is [Item...]
-    __devices                   is [dev_1...dev_n]
+    __devices                   is [dev...]
     __soft_types                is [type...]
     """
     def __init__(self, name=""):

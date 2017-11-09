@@ -35,12 +35,14 @@ CONFIG_EXMPL_DIR            = "config.example/"
 LINK_PATH                   = "/usr/local/bin/"
 
 MAIN_FILE                   = "main.py"
+RUN_HELPER_FILE             = "run_helper.py"
 
 EXEC_FILE                   = "run.sh"
 
 VERSION_FILE                = "version.py"
 
-UPDATE_ATTR                 = "--update"
+UPDATE_ATTR                 = {"--update": "* * * * *"}
+UPDATE_FULLY_ATTR           = {"--update --fully": "0 0 * * *"}
 
 
 # CURSES MAIN MENU
@@ -255,7 +257,7 @@ def exec_cmd(cmd):
 
 @check_existence_strong
 def cp_dir(src, dst):
-    exec_cmd("yes | cp -rf {:s}. {:s}".format(src, dst))
+    exec_cmd("yes | cp -rf {:s}* {:s}".format(src, dst))
 
 
 @check_existence_weak
@@ -362,10 +364,10 @@ def create_executable():
 
     exec_file = os.path.join(SETUP_DIR,
                              EXEC_FILE)
-    main_file = os.path.join(SETUP_DIR,
-                             MAIN_FILE)
+    run_helper_file = os.path.join(SETUP_DIR,
+                                   RUN_HELPER_FILE)
 
-    create_exec_file(exec_file, main_file)
+    create_exec_file(exec_file, run_helper_file)
 
     add_runnable_rights(exec_file)
 
@@ -410,15 +412,17 @@ def remove_symlink():
 
 
 @screen_refresh
-def add_to_crontab(attr):
+def add_to_crontab(attr_dict):
     SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, ADD_CRONTAB_TXT, curses.A_BOLD)
 
     exec_file = os.path.join(SETUP_DIR,
                              EXEC_FILE)
 
     exec_cmd("crontab -l > temp")
-    exec_cmd("echo \"0 * * * * {:s} {:s}\" >> temp".format(exec_file,
-                                                           attr))
+    for key, val in attr_dict.items():
+        exec_cmd("echo \"{:s} {:s} {:s}\" >> temp".format(val,
+                                                          exec_file,
+                                                          key))
     exec_cmd("crontab temp")
     exec_cmd("rm -f temp")
 
@@ -493,6 +497,7 @@ def install():
     change_params_context()
 
     add_to_crontab(UPDATE_ATTR)
+    add_to_crontab(UPDATE_FULLY_ATTR)
 
 
 def uninstall():
@@ -758,7 +763,7 @@ def backups_menu_loop(backups_list):
     menu_sz = len(backups_list)
 
     key = get_key()
-    while key != KEY_ESC or menu_sz != 0:
+    while key != KEY_ESC:
         if key == curses.KEY_UP:
             if pos > 0:
                 pos = pos - 1
@@ -775,6 +780,9 @@ def backups_menu_loop(backups_list):
             pos = 0
         elif key == curses.KEY_ENTER or key == KEY_RETURN:
             return backups_menu_accept_actions(pos, backups_list)
+
+        if menu_sz <= 0:
+            break
 
         show_backups_menu(pos, backups_list)
         key = get_key()

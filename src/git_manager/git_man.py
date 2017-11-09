@@ -492,7 +492,7 @@ class GitMan:
 
         return commits_out
 
-    def __do_main_work(self, tags_list, commits, repo_i):
+    def __do_main_work(self, tags_list, commits, repo_i, full_update):
         self.__get_cpus()
 
         items_out = []
@@ -509,21 +509,22 @@ class GitMan:
         for item in items_out:
             item.cm_hash = self.__strict_f_hash(item.f_hash)
 
-        # create helper lists
-        work_t = start()
-        unic_hashes = list(set([item.f_hash for item in items_out]))
-        stop(work_t)
-        if g_v.TIMEOUTS: out_log("Create helpers lists: {:s}".format(get_pass_time(work_t)))
+        if full_update:
+            # create helper lists
+            work_t = start()
+            unic_hashes = list(set([item.f_hash for item in items_out]))
+            stop(work_t)
+            if g_v.TIMEOUTS: out_log("Create helpers lists: {:s}".format(get_pass_time(work_t)))
 
-        # get commits info
-        work_t = start()
-        commits_out = self.__get_commits_info(unic_hashes, repo_i)
+            # get commits info
+            work_t = start()
+            commits_out = self.__get_commits_info(unic_hashes, repo_i)
 
-        for commit in commits_out:
-            commits.append(commit)
+            for commit in commits_out:
+                commits.append(commit)
 
-        stop(work_t)
-        if g_v.TIMEOUTS: out_log("Get commits info: {:s}".format(get_pass_time(work_t)))
+            stop(work_t)
+            if g_v.TIMEOUTS: out_log("Get commits info: {:s}".format(get_pass_time(work_t)))
 
         return items_out
 
@@ -531,7 +532,7 @@ class GitMan:
         for dev_name in dep_obj.devices:
             for soft_t in dep_obj.soft_types:
                 dev_s_items = [item for item in items if (item.dev_name == dev_name
-                                                          and dep_obj.repos[item.repo_i].soft_type == soft_t
+                                                          and dep_obj.repos[item.repo_i][REPO_OBJECT].soft_type == soft_t
                                                           and item.cm_i < len(dep_obj.commits))]
 
                 if not dev_s_items:
@@ -638,13 +639,16 @@ class GitMan:
             g_v.REPOS_NUM = g_v.REPOS_NUM + len(dep_obj.repos)
 
             for repo in dep_obj.repos:
-                if g_v.DEBUG:
-                    out_log("repo: \"{:s}\"".format(repo.name))
-                    out_log("repo-link: \"{:s}\"".format(repo.link))
-                    out_log("repo-soft-type: \"{:s}\"".format(repo.soft_type))
+                repo_obj = repo[REPO_OBJECT]
+                repo_update_flag = repo[UPDATE_FLAG]
 
-                if self.__is_dir_exist(repo.link):
-                    self.__go_to_dir(repo.link)
+                if g_v.DEBUG:
+                    out_log("repo: \"{:s}\"".format(repo_obj.name))
+                    out_log("repo-link: \"{:s}\"".format(repo_obj.link))
+                    out_log("repo-soft-type: \"{:s}\"".format(repo_obj.soft_type))
+
+                if self.__is_dir_exist(repo_obj.link):
+                    self.__go_to_dir(repo_obj.link)
 
                 tags = self.__get_tags_with_fhash()
 
@@ -656,7 +660,10 @@ class GitMan:
                     if g_v.DEBUG:
                         out_log("Tags number: {:s}".format(str(len(tags_list))))
 
-                    items_list = self.__do_main_work(tags_list, dep_obj.commits, dep_obj.repos.index(repo))
+                    items_list = self.__do_main_work(tags_list,
+                                                     dep_obj.commits,
+                                                     dep_obj.repos.index(repo),
+                                                     repo_update_flag)
 
                     g_v.PROC_TAGS_NUM += len(items_list)
 
@@ -670,11 +677,12 @@ class GitMan:
                         if item.dev_name not in dep_obj.devices:
                             dep_obj.devices.append(item.dev_name)
 
-                    # todo do get metrics
-                    metr_t = start()
-                    self.__do_get_metrics(items_list, dep_obj)
-                    stop(metr_t)
-                    if g_v.TIMEOUTS: out_log("Metrics time: {:s}".format(get_pass_time(metr_t)))
+                    # do get metrics
+                    if repo_update_flag:
+                        metr_t = start()
+                        self.__do_get_metrics(items_list, dep_obj)
+                        stop(metr_t)
+                        if g_v.TIMEOUTS: out_log("Metrics time: {:s}".format(get_pass_time(metr_t)))
 
         if g_v.DEBUG: out_log("stop scanning")
 
