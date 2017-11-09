@@ -255,9 +255,14 @@ def exec_cmd(cmd):
     return out
 
 
-@check_existence_strong
-def cp_dir(src, dst):
+@check_existence_weak
+def cp_dir_star(src, dst):
     exec_cmd("yes | cp -rf {:s}* {:s}".format(src, dst))
+
+
+@check_existence_weak
+def cp_dir_dot(src, dst):
+    exec_cmd("yes | cp -rf {:s}. {:s}".format(src, dst))
 
 
 @check_existence_weak
@@ -288,7 +293,7 @@ def create_ln(src, dst):
 @screen_refresh
 def copy_source():
     SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, COPYING_TXT, curses.A_BOLD)
-    cp_dir(SRC_DIR, SETUP_DIR)
+    cp_dir_star(SRC_DIR, SETUP_DIR)
     SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Copy: {:s} to {:s}".format(SRC_DIR, SETUP_DIR), NORMAL)
 
 
@@ -298,8 +303,8 @@ def copy_misc():
     css_full_path = os.path.join(SRC_DIR, MISC_DIR, CSS_DIR)
     js_full_path = os.path.join(SRC_DIR, MISC_DIR, JS_DIR)
 
-    cp_dir(css_full_path, OUT_CSS_DIR)
-    cp_dir(js_full_path, OUT_JS_DIR)
+    cp_dir_star(css_full_path, OUT_CSS_DIR)
+    cp_dir_star(js_full_path, OUT_JS_DIR)
 
     SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Copy: {:s} to {:s}".format(SRC_DIR, SETUP_DIR), NORMAL)
 
@@ -307,9 +312,12 @@ def copy_misc():
 @screen_refresh
 def backup_config():
     SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, COPYING_TXT, curses.A_BOLD)
+
+    create_dir(BACKUP_DIR)
+
     backup_dir = os.path.join(BACKUP_DIR,
                               "{:s}_{:s}/".format(SOLUTION_NAME,
-                                                 datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")))
+                                                  datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")))
 
     last_backup = get_last_backup()
 
@@ -322,7 +330,7 @@ def backup_config():
         do_backup = True
 
     if do_backup:
-        cp_dir(CONFIG_DIR, backup_dir)
+        cp_dir_dot(CONFIG_DIR, backup_dir)
 
     SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Backup config: {:s}".format(CONFIG_FILE), NORMAL)
 
@@ -333,7 +341,7 @@ def copy_config():
     src_conf_dir = os.path.join(os.getcwd(),
                                 CONFIG_EXMPL_DIR)
 
-    cp_dir(src_conf_dir, CONFIG_DIR)
+    cp_dir_star(src_conf_dir, CONFIG_DIR)
     SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Copied: {:s} to {:s}".format(SRC_DIR, SETUP_DIR), NORMAL)
 
 
@@ -379,7 +387,7 @@ def restore_cfg(backup_name):
     SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, RESTORE_BACKUP_TXT, curses.A_BOLD)
     backup_path = os.path.join(BACKUP_DIR, "{:s}/".format(backup_name))
 
-    cp_dir(backup_path, CONFIG_DIR)
+    cp_dir_star(backup_path, CONFIG_DIR)
 
     SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Restored backup: {:s}".format(backup_name), NORMAL)
 
