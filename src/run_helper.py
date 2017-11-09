@@ -29,7 +29,6 @@ def main():
         print(c_d.E_ALREADY_RUNS)
         sys.exit(c_d.EXIT_AR)
     else:
-        print(sys.argv[1:])
         run_tag_checker()
 
     sys.exit(c_d.EXIT_NORMAL)

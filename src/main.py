@@ -191,7 +191,6 @@ def main():
     if check_main_opts(opts):
         setup_options(opts)
     else:
-        print(sys.argv)
         optParser.print_help()
         sys.exit(c_d.EXIT_WO)
 

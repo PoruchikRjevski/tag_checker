@@ -17,10 +17,10 @@ Installing:
 - sudo ./installer.py [install.sh - IS DEPRECATED FULLY]
 - Installer points:
     - Install - full script installation(create dirs, copy sources, creating symlinks and adding task to crontab)
-    - Uninstall - full uninstall(remove all with backup configs in /tmp/solution_backups/
+    - Uninstall - full uninstall(remove all with backup configs in /tmp/tag_checker_backups/
     - Update files - copy source, misc and reset version
     - Change run parameters - selecting script run params and recreate executables with symlinks
-    - Restore config - selecting saved backups and restore it to /etc/solution/
+    - Backups - Control of config's backups
 - two ways to edit config:
     - edit tag_checker.ini manually(example in config.example/)
     - edit by script controls(for help exec tag_checker -h)
