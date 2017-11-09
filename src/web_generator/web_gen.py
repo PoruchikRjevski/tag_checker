@@ -702,12 +702,12 @@ class WebGenerator:
         days_text = ""
 
         if metric.old or metric.forced:
-            days_text = "-"
+            days_text = "{0:4d} д.".format((-metric.diff_d.days) if metric.diff_d.days > 0 else metric.diff_d.days)
         elif metric.exp:
-            days_text = "+"
+            days_text = "{0:4d} д.".format(+metric.diff_d.days)
 
-        days_text = "{0:s}{1:4d} д.".format(days_text,
-                                            metric.diff_d.days)
+        # days_text = "{0:s}{1:4d} д.".format(days_text,
+        #                                     metric.diff_d.days)
 
         if is_circle:
             background_clr = color

@@ -541,11 +541,13 @@ class GitMan:
                 # max_item = max(dev_s_items, key=lambda item: item.tag_date) OR  dep_obj.commits[item.cm_i].date ???
                 base_exist = True
                 max_base_item = None
+                min_base_item = None
                 base_list = [item for item in dev_s_items if item.item_type == c_d.TYPE_ALL]
                 last_indexes_dict = {}
 
                 if base_list:
                     max_base_item = max(base_list, key=lambda item: item.tag_date)
+                    min_base_item = min(base_list, key=lambda item: item.tag_date)
 
                     # todo find lasts for other nums
                     unic_nums = sorted([key for key in dict.fromkeys([item.item_num for item in dev_s_items if item.item_type != c_d.TYPE_ALL]).keys()],
@@ -559,6 +561,7 @@ class GitMan:
                             last_indexes_dict[num_it_ind] = max_by_num.item_num
                 else:
                     max_base_item = max(dev_s_items, key=lambda item: item.tag_date)
+                    min_base_item = min(dev_s_items, key=lambda item: item.tag_date)
                     base_exist = False
 
                 if max_base_item is None:
@@ -567,6 +570,20 @@ class GitMan:
                 max_item_ind = dep_obj.items.index(max_base_item)
                 dep_obj.items[max_item_ind].metric.last = True
                 max_item_cm_d = dep_obj.commits[max_base_item.cm_i].date_obj
+                min_item_cm_d = None
+
+                if not min_base_item is None:
+                    min_item_ind = dep_obj.items.index(min_base_item)
+                    min_item_cm_d = dep_obj.commits[min_base_item.cm_i].date_obj
+
+                if min_item_cm_d is None:
+                    min_item_cm_d = 0
+                else:
+                    min_item_cm_d = min_item_cm_d.toordinal()
+
+                out_log("MIN DATE ORD {:s}".format(str(min_item_cm_d)))
+                out_log("MAX DATE ORD {:s}".format(str(max_item_cm_d.toordinal())))
+                out_log("RED STEPS {:s}".format(str(c_d.CLR_RED_STEPS)))
 
                 # find jumps
                 unic_hashes = list(set([item.cm_hash for item in dev_s_items]))
@@ -579,12 +596,20 @@ class GitMan:
                         unic_hashes_jumps[hash] = self.__get_jumps_between_commits(max_base_item.cm_hash, hash)
 
                 max_jump = max(unic_hashes_jumps.values())
-                max_jump_step = 0
 
-                if max_jump < c_d.CLR_RED_STEPS:
-                    max_jump_step = 1
+                max_diff = max_item_cm_d.toordinal() - min_item_cm_d
+
+                max_jump_step = 0
+                max_day_step = 0
+
+                if max_diff < c_d.CLR_RED_STEPS:
+                    # max_jump_step = 1
+                    max_day_step = 1
                 else:
-                    max_jump_step = round((max_jump / c_d.CLR_RED_STEPS) + 0.5)
+                    # max_jump_step = round((max_jump / c_d.CLR_RED_STEPS) + 0.5)
+                    max_day_step = round((max_diff / c_d.CLR_RED_STEPS) + 0.5)
+
+                out_log("MAX_DAY_STEP {:s}".format(str(max_day_step)))
 
                 # true fill
                 for type in c_d.TYPES_L:
@@ -620,8 +645,9 @@ class GitMan:
                             dep_obj.items[it_ind].metric.old = True
                             do_mult = True
 
-                        if do_mult:
-                            dep_obj.items[it_ind].metric.jmp_clr_mult = round((jmp_tmp / max_jump_step) + 0.5)
+                        # red color intensity with respect to jumps
+                        # if do_mult:
+                        #     dep_obj.items[it_ind].metric.jmp_clr_mult = round((jmp_tmp / max_jump_step) + 0.5)
 
                         dep_obj.items[it_ind].metric.jumps = jmp_tmp
                         item_cm_d = dep_obj.commits[item.cm_i].date_obj
@@ -629,6 +655,14 @@ class GitMan:
                             dep_obj.items[it_ind].metric.diff_d = max_item_cm_d - item_cm_d
                         else:
                             dep_obj.items[it_ind].metric.diff_d = item_cm_d - max_item_cm_d
+
+                        # red color intensity with respect to diff days
+                        if do_mult:
+                            dep_obj.items[it_ind].metric.jmp_clr_mult = int(c_d.CLR_RED_STEPS) - round(((item_cm_d.toordinal() - min_item_cm_d) / max_day_step) + 0.5)
+                            out_log("ITEM DATE ORD: {:s}".format(str(item_cm_d.toordinal())))
+                            out_log("MULT: {:s}".format(str(dep_obj.items[it_ind].metric.jmp_clr_mult)))
+
+
 
     def scanning(self, model):
         if g_v.DEBUG: out_log("start scanning")
