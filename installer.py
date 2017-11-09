@@ -280,12 +280,12 @@ def rm_file(dst):
     exec_cmd("rm -f {:s}".format(dst))
 
 
-@check_existence_strong
+@check_existence_weak
 def add_runnable_rights(dst):
     exec_cmd("chmod +x {:s}".format(dst))
 
 
-@check_existence_strong
+@check_existence_weak
 def create_ln(src, dst):
     exec_cmd("ln -s {:s} {:s}".format(src, dst))
 
@@ -374,6 +374,9 @@ def create_executable():
                              EXEC_FILE)
     run_helper_file = os.path.join(SETUP_DIR,
                                    RUN_HELPER_FILE)
+
+    if not os.path.exists(SETUP_DIR) or not os.path.exists(run_helper_file):
+        return
 
     create_exec_file(exec_file, run_helper_file)
 
@@ -465,6 +468,11 @@ def remove_backup(pos, backups):
 
 
 def set_version():
+    version_file_path = os.path.join(SETUP_DIR, VERSION_FILE)
+
+    if not os.path.exists(version_file_path):
+        return
+
     # get info from repo
     branch = exec_cmd("git rev-parse --abbrev-ref HEAD")
 
@@ -476,7 +484,6 @@ def set_version():
     hash = exec_cmd("git log -1 --pretty=format:\"%h\"")
 
     # replace in version.py file values
-    version_file_path = os.path.join(SETUP_DIR, VERSION_FILE)
     text_f_file = ""
 
     with open(version_file_path, 'r') as file:

@@ -328,6 +328,14 @@ class CfgLoader:
 
         return os.path.join(path, repo)
 
+    @staticmethod
+    def __do_add_hook(src, dst):
+        run_cmd("yes | cp -rf {:s} {:s}".format(src, dst))
+
+    @staticmethod
+    def __do_rem_hook(dst):
+        run_cmd("rm -f {:s}".format(dst))
+
     def __add_git_hooks(self, dep, repo):
         _, repo = self.__separate_repo_and_soft_type(repo)
 
@@ -336,7 +344,7 @@ class CfgLoader:
         repo_path = self.__get_repo_path(dep, repo)
         repo_hooks_dir_path = os.path.join(repo_path, c_d.HOOKS_PATH)
 
-        run_cmd("yes | cp -rf {:s} {:s}".format(hooks_path, repo_hooks_dir_path))
+        self.__do_add_hook(hooks_path, repo_hooks_dir_path)
 
     def __rem_git_hooks(self, dep, repo):
         _, repo = self.__separate_repo_and_soft_type(repo)
@@ -344,7 +352,19 @@ class CfgLoader:
         repo_path = self.__get_repo_path(dep, repo)
         hook_path = os.path.join(repo_path, c_d.HOOKS_PATH, c_d.POST_RX_HOOK_NAME)
 
-        run_cmd("rm -f {:s}".format(hook_path))
+        self.__do_rem_hook(hook_path)
+
+    def setup_hooks(self, tag_model):
+        hook_path = os.path.join(c_d.GIT_HOOKS_PATH, c_d.POST_RX_HOOK_NAME)
+
+        for dep_name, dep_obj in tag_model.departments.items():
+            for repo in dep_obj.repos:
+                repo_obj = repo[REPO_OBJECT]
+
+                if os.path.exists(repo_obj.link):
+                    dst = os.path.join(repo_obj.link, c_d.HOOKS_PATH)
+
+                    self.__do_add_hook(hook_path, dst)
 
     def add_repo(self, block, repos):
         if not block or not repos:

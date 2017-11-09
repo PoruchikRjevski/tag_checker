@@ -34,7 +34,13 @@ def set_options(parser):
                       action="store_true",
                       dest="related",
                       default=False,
-                      help="uses only with --update and --repo, add repo(if it exist in config) to /et/tag_checker/update.ini")
+                      help="uses only with --update and --repo, add repo(if it exist in config) to /etc/tag_checker/update.ini")
+
+    parser.add_option("--setuphooks",
+                      action="store_true",
+                      dest="setuphooks",
+                      default=False,
+                      help="uses alone for setup git hooks to all repos in /etc/tag_checker/config.ini")
 
     parser.add_option("-s", "--show",
                       action="store_true",
@@ -110,6 +116,7 @@ def check_main_opts(opts):
     return ((opts.update or opts.show or opts.prefix)
             or (opts.update and opts.fully)
             or (opts.update and opts.related and opts.repo)
+            or opts.setuphooks
             or ((opts.add or opts.remove) and (opts.translate or opts.repo or opts.dep)))
 
 
@@ -157,6 +164,10 @@ def is_change_prefix(opts):
     return opts.prefix
 
 
+def is_setup_hooks(opts):
+    return opts.setuphooks
+
+
 def update(cfg_loader, git_man, tag_model):
     # load config
     if cfg_loader.load_config(tag_model):
@@ -173,6 +184,12 @@ def update(cfg_loader, git_man, tag_model):
         web_gen.generate_web(tag_model, cfg_loader.partly_update)
         stop(web_gen_t)
         if g_v.TIMEOUTS: out_log("web gen time: {:s}".format(get_pass_time(web_gen_t)))
+
+
+def setup_hooks(cfg_loader, tag_model):
+    cfg_loader.load_config(tag_model)
+
+    cfg_loader.setup_hooks(tag_model)
 
 
 def main():
@@ -226,7 +243,9 @@ def main():
     # branch by options
     bad_args = False
 
-    if is_related_update(opts):
+    if is_setup_hooks(opts):
+        setup_hooks(cfg_loader, tag_model)
+    elif is_related_update(opts):
         if args and len(args) == 1:
             cfg_loader.add_repo_to_updates(args[0])
         else:
