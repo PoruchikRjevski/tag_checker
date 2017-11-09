@@ -113,7 +113,7 @@
         | ASW-1 | #14 | HL | 2017-xx-xx-xxxx
                         DRV| 2017-xx-xx-xxxx
 
-- separate project for true update repo:
++ separate project for true update repo:
     update.ini          -> notes about updated repos
     git_hook            -> [when repo updated] -> add to /etc/tag_checker/update.ini note with updated repo_name
     run_helper.py       -> check if main.py alredy not run then run it
@@ -127,6 +127,10 @@
 
                         one time per minute -> run_helper.py --update
                         one time per day -> run_helper.py --update --fully
+
+- fix red intensity for metrics visualise
+
+- fix logging
 
 - change table view:
     - change style to more simplicity
