@@ -547,7 +547,7 @@ class GitMan:
 
                 if base_list:
                     max_base_item = max(base_list, key=lambda item: item.tag_date)
-                    min_base_item = min(base_list, key=lambda item: item.tag_date)
+                    min_base_item = min(base_list, key=lambda item: dep_obj.commits[item.cm_i].date_obj)
 
                     # todo find lasts for other nums
                     unic_nums = sorted([key for key in dict.fromkeys([item.item_num for item in dev_s_items if item.item_type != c_d.TYPE_ALL]).keys()],
