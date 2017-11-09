@@ -561,7 +561,7 @@ class GitMan:
                             last_indexes_dict[num_it_ind] = max_by_num.item_num
                 else:
                     max_base_item = max(dev_s_items, key=lambda item: item.tag_date)
-                    min_base_item = min(dev_s_items, key=lambda item: item.tag_date)
+                    min_base_item = min(dev_s_items, key=lambda item: dep_obj.commits[item.cm_i].date_obj)
                     base_exist = False
 
                 if max_base_item is None:
@@ -659,8 +659,6 @@ class GitMan:
                         # red color intensity with respect to diff days
                         if do_mult:
                             dep_obj.items[it_ind].metric.jmp_clr_mult = round(((item_cm_d.toordinal() - min_item_cm_d) / max_day_step) + 0.5)
-                            if dep_obj.items[it_ind].metric.jmp_clr_mult >= c_d.CLR_RED_STEPS:
-                                dep_obj.items[it_ind].metric.jmp_clr_mult = c_d.CLR_RED_STEPS - 1
 
                             out_log("ITEM DATE ORD: {:s}".format(str(item_cm_d.toordinal())))
                             out_log("MULT: {:s}".format(str(dep_obj.items[it_ind].metric.jmp_clr_mult)))
