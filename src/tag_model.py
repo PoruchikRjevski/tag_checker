@@ -219,5 +219,5 @@ class MetricsInfo:
         self.exp = False # if item or order version newer than base version(if it exist)
         self.old = False
         self.jumps = 0 # number of commits between this and last if this is not last
-        self.jmp_clr_mult = 1 # multiplier for red color step+ for shows metric
+        self.color_intensity = 1 # multiplier for red color step+ for shows metric
         self.diff_d = None # number of days between this and last if this is not last

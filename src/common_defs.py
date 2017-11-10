@@ -58,12 +58,20 @@ CLR_BLUE_TXT        = "Экспериментальная версия"
 CLR_BLUE_BAGEL_TXT  = "Отмененная экспериментальная версия"
 
 CLR_BLUE            = 0x96b0ff#0x3f3fff
-CLR_GREEN           = 0xb2fca6#0x3fef3f
-CLR_RED_MAX         = 0xfff0f0
-CLR_RED_MIN         = 0xff0f0f
+
+CLR_BLUE_MAX        = 0xa5adff
+CLR_BLUE_MIN        = 0x4149ff
+CLR_BLUE_STEP       = 0x10100
+CLR_BLUE_STEPS      = (CLR_BLUE_MAX - CLR_BLUE_MIN) / CLR_BLUE_STEP #100 steps
+
+CLR_GREEN           = 0x1fe800#b2fca6#0x3fef3f
+
+CLR_RED_MAX         = 0xffc3c3#fff0f0
+CLR_RED_MIN         = 0xff0f0f#ff0f0f
 CLR_RED_STEP        = 0x000101
-CLR_RED_STEPS       = (CLR_RED_MAX - CLR_RED_MIN) / CLR_RED_STEP
-CLR_YEL             = 0xefef94
+CLR_RED_STEPS      = (CLR_RED_MAX - CLR_RED_MIN) / CLR_RED_STEP #100 steps 180 - b4b4
+
+CLR_YEL             = 0xede500
 
 DATE_ATR_ORDINAL    = "ordinal"
 

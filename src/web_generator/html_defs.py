@@ -67,6 +67,8 @@ A_ST_B_RAD          = "-radius: {:s};"
 
 A_ST_BAGEL          = " border-radius: 50%; border: 3px solid #{:x};"
 
+A_ST_COLORED        = " font-size: 24px; font-weight: bold; color: #{:x}; padding: -10px;"
+
 A_T_JS              = "text/javascript"
 
 A_TARGET_BLANK      = "_blank"
@@ -90,6 +92,8 @@ A_LINK              = "link=\"{0!s}\""
 A_ALINK             = "alink=\"{0!s}\""
 A_VLINK             = "vlink=\"{0!s}\""
 
+
+A_TEXT_CHECK_MARK   = "&#10004;"
 
 # finished blocks
 HISTORY_BACK = "history.back();"

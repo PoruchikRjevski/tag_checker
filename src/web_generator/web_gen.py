@@ -95,8 +95,7 @@ class WebGenerator:
                   2 * h_d.WS,
                   h_d.A_CLASS.format(c_d.CL_TEXT_CENTER
                                      + " " + c_d.CL_NO_WRAP)
-                  + (h_d.A_STYLE.format((h_d.A_ST_BCKGRND_COL.format(bg_color) if not bg_color is None else "")
-                                        + h_d.A_ST_BAGEL.format(color))))
+                  + (h_d.A_STYLE.format(h_d.A_ST_BAGEL.format(color))))
         gen.w_c_tag(h_d.T_TD)
 
         gen.w_tag(h_d.T_TD,
@@ -677,30 +676,32 @@ class WebGenerator:
                                         + " " + c_d.CL_BORDER)
         self.__gen_metrics_column(file, metr_class, item.metric)
 
-    def __get_red_tone(self, metric):
-        return c_d.CLR_RED_MAX - (metric.jmp_clr_mult * c_d.CLR_RED_STEP)
-
     def __gen_metrics_column(self, gen, cl, metric):
         color = 0x00
-        background_clr = None
         p_title = None
-        is_circle = True
+        days_text = ""
+        mark_text = "-"
 
+        # gen color
         if metric.last:
             color = c_d.CLR_GREEN
             p_title = c_d.CLR_GREEN_TXT
+            mark_text = h_d.A_TEXT_CHECK_MARK
         elif metric.forced:
             color = c_d.CLR_YEL
             p_title = c_d.CLR_YEL_TXT
         elif metric.exp:
-            color = c_d.CLR_BLUE
+            color = c_d.CLR_BLUE_MAX - (metric.color_intensity * c_d.CLR_BLUE_STEP)
             p_title = c_d.CLR_BLUE_TXT
+            mark_text = "+"
         elif metric.old:
-            color = self.__get_red_tone(metric)
+            color = c_d.CLR_RED_MAX - (metric.color_intensity * c_d.CLR_RED_STEP)
             p_title = c_d.CLR_RED_TXT
 
-        days_text = ""
+        colored_thing = h_d.A_ST_BAGEL.format(color)
+        # colored_thing = h_d.A_ST_COLORED.format(color)
 
+        # gen text
         if metric.old or metric.forced:
             days_text = "{0:4d} д.".format((-metric.diff_d.days) if metric.diff_d.days > 0 else metric.diff_d.days)
         elif metric.exp:
@@ -708,14 +709,7 @@ class WebGenerator:
         elif metric.last:
             days_text = "0 д."
 
-        # days_text = "{0:s}{1:4d} д.".format(days_text,
-        #                                     metric.diff_d.days)
-
-        if is_circle:
-            background_clr = color
-
-        colored_thing = h_d.A_ST_BAGEL.format(color)
-
+        # gen tags
         gen.w_o_tag(h_d.T_TD, cl)
 
         gen.w_tag(h_d.T_P,
@@ -725,11 +719,11 @@ class WebGenerator:
                   + h_d.A_TITLE.format("{0:4d} пр.".format(metric.jumps)))
 
         gen.w_tag(h_d.T_P,
+                  # mark_text,
                   2 * h_d.WS,
                   h_d.A_CLASS.format(c_d.CL_TEXT_RIGHT
                                      + " " + c_d.CL_NO_WRAP)
-                  + (h_d.A_STYLE.format( (h_d.A_ST_BCKGRND_COL.format(background_clr) if not background_clr is None else "")
-                                         + colored_thing))
+                  + h_d.A_STYLE.format(colored_thing)
                   + (h_d.A_TITLE.format(p_title) if not p_title is None else ""))
 
         gen.w_c_tag(h_d.T_TD)
