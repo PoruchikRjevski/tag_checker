@@ -49,10 +49,10 @@ class TagModel:
 class Department:
     """
     __name                      is name of department from config
-    __repos                     is {repo: flag}
+    __repos                     is [{repo: flag_updated}...]
     __commits                   is [CommitInfo object]
     __items                     is [Item...]
-    __devices                   is [dev...]
+    __devices                   is {dev: flag_updated}
     __soft_types                is [type...]
     """
     def __init__(self, name=""):
@@ -60,7 +60,7 @@ class Department:
         self.__repos = []
         self.__commits = []
         self.__items = []
-        self.__devices = []
+        self.__devices = {}
         self.__soft_types = [""]
 
     @property

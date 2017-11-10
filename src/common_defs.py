@@ -156,6 +156,7 @@ TAGS_NUM_TXT        = "Всего тэгов: {:s}"
 PROC_TAGS_NUM_TXT   = "Валидных тэгов: {:s}"
 SCAN_TIME_TXT       = "Общее время обработки: {:s}"
 LAST_AUTH_TXT       = "Последний коммитер: {:s}"
+UPDATED_DEVS_TXT    = "Обновлены: {:s}"
 
 REPO_TXT            = "Репозиторий: "
 AUTHOR_TXT          = "Автор коммита: "

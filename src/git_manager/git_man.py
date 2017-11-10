@@ -560,7 +560,7 @@ class GitMan:
             return round((diff.days / def_color_steps) + 0.5)
 
     def __do_get_metrics(self, items, dep_obj):
-        for dev_name in dep_obj.devices:
+        for dev_name, dev_updated in dep_obj.devices.items():
             for soft_t in dep_obj.soft_types:
                 dev_s_items = [item for item in items if (item.dev_name == dev_name
                                                           and dep_obj.repos[item.repo_i][REPO_OBJECT].soft_type == soft_t
@@ -671,8 +671,10 @@ class GitMan:
 
                     for item in items_list:
                         dep_obj.items.append(item)
-                        if item.dev_name not in dep_obj.devices:
-                            dep_obj.devices.append(item.dev_name)
+                        if item.dev_name not in dep_obj.devices.keys():
+                        # if not any(item.dev_name in d.keys() for d in dep_obj.devices):
+                            dep_obj.devices[item.dev_name] = repo_update_flag
+                            # dep_obj.devices.append({item.dev_name: repo_update_flag})
 
                     # do get metrics
                     if repo_update_flag:

@@ -41,7 +41,7 @@ class WebGenerator:
         self.__gen_script(index, os.path.join(c_d.JS_DIR, c_d.SCRIPTS_F_NAME))
         self.__gen_content_end(index)
 
-        self.__gen_page_foot_info(index)
+        self.__gen_page_foot_info(index, model)
         self.__gen_page_foot(index)
 
         index.close()
@@ -209,7 +209,15 @@ class WebGenerator:
     def __gen_table_foot(self, gen):
         gen.w_c_tag(h_d.T_TABLE)
 
-    def __gen_page_foot_info(self, gen):
+    def __get_updated_devices_str(self, model):
+        updated_list = []
+
+        for dep_name, dep_obj in model.departments.items():
+            updated_list += [model.get_tr_dev(dev_name) for dev_name, updated_flag in dep_obj.devices.items() if updated_flag]
+
+        return ", ".join(updated_list)
+
+    def __gen_page_foot_info(self, gen, model):
         gen.w_o_tag(h_d.T_DIV,
                     h_d.A_CLASS.format(c_d.CL_FOOTER))
 
@@ -220,6 +228,8 @@ class WebGenerator:
                                          + (" -{:s}".format(str(c_d.F_DEBUG_TXT)) if g_v.DEBUG else "")
                                          + (" -{:s}".format(str(c_d.F_TIMINGS_TXT)) if g_v.TIMEOUTS else ""))
 
+        updated_devices_txt = c_d.UPDATED_DEVS_TXT.format(self.__get_updated_devices_str(model))
+
         gen.w_tag(h_d.T_P,
                   c_d.LAST_UPD_TXT + self.__cur_timestamp,
                   h_d.A_CLASS.format(c_d.CL_FOOT_INFO)
@@ -227,7 +237,8 @@ class WebGenerator:
                                        + c_d.TAGS_NUM_TXT.format(str(g_v.TAGS_NUM)) + "\n"
                                        + c_d.PROC_TAGS_NUM_TXT.format(str(g_v.PROC_TAGS_NUM)) + "\n"
                                        + c_d.SCAN_TIME_TXT.format(g_v.SCAN_TIME) + "\n"
-                                       + flags_txt))
+                                       + flags_txt + "\n"
+                                       + updated_devices_txt))
 
         gen.w_o_tag(h_d.T_P,
                   h_d.A_CLASS.format(c_d.CL_FOOT_INFO))
@@ -350,7 +361,7 @@ class WebGenerator:
 
         for dep_name, dep_obj in model.departments.items():
             first_dep = True
-            for dev_name in dep_obj.devices:
+            for dev_name, dev_updated in dep_obj.devices.items():
                 file.w_o_tag(h_d.T_TR,
                              h_d.A_CLASS.format(c_d.CL_TR_1))
                 # department
@@ -812,7 +823,6 @@ class WebGenerator:
 
         if not partly_update:
             self.__clear_out_dir(g_v.OUT_PATH)
-
             self.__gen_read_metrics_help_page()
 
         self.__gen_index(model)
