@@ -6,6 +6,7 @@ TAG_C               = "/"
 
 # addings
 CR                  = "\n\r"
+TAB                 = "\t"
 WS                  = "&nbsp;"
 SHARP               = "#"
 

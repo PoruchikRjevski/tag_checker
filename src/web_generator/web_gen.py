@@ -82,14 +82,12 @@ class WebGenerator:
         gen.w_c_tag(h_d.T_TR)
 
     def __gen_rmhp_content_line(self, gen, color, bg_color, text_design, text_descr):
-        gen.w_o_tag(h_d.T_TR,
-                     h_d.A_CLASS.format(c_d.CL_TR_1))
+        gen.w_o_tag(h_d.T_TR, h_d.A_CLASS.format(c_d.CL_TR_1), True)
 
         metr_class = h_d.A_CLASS.format(c_d.CL_BLACK_TEXT
                                         + " " + c_d.CL_TEXT_CENTER)
 
-        gen.w_o_tag(h_d.T_TD,
-                    metr_class)
+        gen.w_o_tag(h_d.T_TD, metr_class, True)
         gen.w_tag(h_d.T_P,
                   2 * h_d.WS,
                   h_d.A_CLASS.format(c_d.CL_TEXT_CENTER
@@ -165,9 +163,7 @@ class WebGenerator:
                     h_d.A_REL.format(h_d.A_REL_SS)
                     + h_d.A_HREF.format(os.path.join(level, c_d.CSS_DIR, c_d.STYLE_F_NAME)), True)
 
-        gen.w_tag(h_d.T_TITLE, title, "", True)
-
-        self.__gen_script(gen, os.path.join(level, c_d.JS_DIR, c_d.JS_METRICS_F_NAME))
+        gen.w_tag(h_d.T_TITLE, title, "")
 
         gen.w_c_tag(h_d.T_HEAD)
         gen.w_o_tag(h_d.T_BODY, body_attr, True)
@@ -180,8 +176,7 @@ class WebGenerator:
         gen.w_c_tag(h_d.T_HTML)
 
     def __gen_content_start(self, gen):
-        gen.w_o_tag(h_d.T_DIV,
-                    h_d.A_CLASS.format(c_d.CL_CONTENT))
+        gen.w_o_tag(h_d.T_DIV, h_d.A_CLASS.format(c_d.CL_CONTENT), True)
 
     def __gen_content_end(self, gen):
         gen.w_c_tag(h_d.T_DIV)
@@ -749,8 +744,7 @@ class WebGenerator:
         return c_type
 
     def __gen_back_link(self, gen):
-        gen.w_o_tag(h_d.T_P,
-                    h_d.A_CLASS.format(c_d.CL_FOOT_BACK))
+        gen.w_o_tag(h_d.T_P, h_d.A_CLASS.format(c_d.CL_FOOT_BACK), True)
         gen.w_tag(h_d.T_A,
                   c_d.BACK_TXT,
                   h_d.BLK_ONCLICK_BACK)

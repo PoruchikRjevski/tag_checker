@@ -45,6 +45,7 @@ class HtmlGen:
         self.w_txt(text)
         self.w_c_tag(tag)
 
+
     def close(self):
         self.file.flush()
         self.file.close()
