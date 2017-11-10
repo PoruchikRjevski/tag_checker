@@ -8,7 +8,7 @@ import global_vars as g_v
 import version as s_v
 from cmd_executor.cmd_executor import *
 from git_manager import git_defs as g_d
-from logger import *
+from logger_depr import *
 from tag_model import *
 from time_profiler.time_checker import *
 

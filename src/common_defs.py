@@ -228,6 +228,7 @@ D_DOS               = "DOS"
 DOMENS_L            = [D_LINUX, D_WIN, D_DOS]
 
 # PLATFORMS ---------------------------------------------------------
+SOLUTION            = "tag_checker"
 WINDOWS_P           = "windows"
 LINUX_P             = "linux"
 
@@ -256,3 +257,7 @@ UPDATE_TABLE_PATH   = "/etc/tag_checker/update.ini"
 
 SECTION_UPD         = "UPDATE"
 OPTION_UPD          = "to_update"
+
+TYPICAL_TIMESTAMP   = "%Y-%m-%d %H:%M"
+
+LOG_FORMAT          = '[%(asctime)s] : [%(levelname)-8s] : [T:%(threadName)-15s] : [M:%(module)-25s] : [F:%(funcName)-25s] : [L:%(lineno)-4d] : [%(message)s]'

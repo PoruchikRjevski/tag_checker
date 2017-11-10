@@ -1,23 +1,29 @@
+import os
+import logging
 import datetime
 import inspect
-import os
-import threading
-from collections import OrderedDict
-from queue import Queue
 
 import common_defs as c_d
 import global_vars as g_v
 
-__all__ = ['init_log', 'out_log', 'out_err', 'start_thread_logging', 'finish_thread_logging', 'out_deffered_logs']
 
-threads_list = []
-threads_list_f = []
-threads_logs = OrderedDict()
-threads_errs = OrderedDict()
+__all__ = ['init_logging', 'debug', 'info', 'warning', 'error', 'critical']
 
 
-def init_log():
-    os.chdir(os.path.dirname(os.path.realpath(__file__)))
+logger = None
+FORMAT = '[%(asctime)s] : [%(levelname)-8s] : [%(funcName)-30s]'
+
+
+def is_inited(func):
+    def wrapped(msg, *args, **kwargs):
+        global logger
+        if not logger is None:
+            return func(msg, *args, **kwargs)
+    return wrapped
+
+
+def init_logging(name, debug):
+    global logger, FORMAT
 
     path = ""
 
@@ -26,104 +32,46 @@ def init_log():
     elif g_v.CUR_PLATFORM == c_d.WINDOWS_P:
         path = os.path.join(os.getcwd(), c_d.WIN_LOG_P_DEF)
 
+    path = os.path.join(path, "{:s}_{:s}".format(name, datetime.datetime.now().strftime(c_d.TYPICAL_TIMESTAMP)))
+
     if not os.path.isdir(path):
         os.mkdir(path, 0o777)
 
-    g_v.CUR_PATH = path
+    path = os.path.join(path, name)
 
-    open(g_v.CUR_PATH + c_d.LOG_T, 'w')
-    open(g_v.CUR_PATH + c_d.ERR_T, 'w')
-
-
-def start_thread_logging():
-    pid = str(threading.get_ident())
-    threads_list.append(pid)
-    threads_logs[pid] = []
-    threads_errs[pid] = []
+    logging.basicConfig(format=FORMAT,
+                        filename=path,
+                        level=(logging.DEBUG if debug else logging.WARNING))
 
 
-def finish_thread_logging():
-    pid = str(threading.get_ident())
-    threads_list_f.append(pid)
+@is_inited
+def debug(msg):
+    global logger
+    logger.debug(msg)
 
 
-def out_deffered_logs():
-    for pid in threads_list:
-        if pid in threads_logs.keys():
-            if threads_logs[pid]:
-                out_msg(gen_log_msg("", c_d.LOG_T, 2), c_d.LOG_T)
-                out_msg(gen_log_msg("PID: {:s}".format(pid), c_d.LOG_T, 2), c_d.LOG_T)
-                for out in threads_logs[pid]:
-                    out_msg(out, c_d.LOG_T)
-
-        if pid in threads_errs.keys():
-            if threads_errs[pid]:
-                out_msg(gen_log_msg("", c_d.ERR_T, 2), c_d.ERR_T)
-                out_msg(gen_log_msg("PID: {:s}".format(pid), c_d.ERR_T, 2), c_d.ERR_T)
-                for out in threads_errs[pid]:
-                    out_msg(out, c_d.ERR_T)
+@is_inited
+def info(msg):
+    global logger
+    logger.info(msg)
 
 
-def write_msg(msg, path):
-    if g_v.LOGGING:
-        with open(g_v.CUR_PATH + path, 'a') as f:
-            f.write(msg + "\n")
+@is_inited
+def warning(msg):
+    global logger
+    logger.warning(msg)
 
 
-def out_log(msg):
-    pid = str(threading.get_ident())
-
-    out = gen_log_msg(msg, c_d.LOG_T, 3)
-
-    if g_v.MULTITH:
-        check_pid(pid)
-
-        threads_logs[pid].append(out)
-    else:
-        out_msg(out, c_d.LOG_T)
+@is_inited
+def error(msg):
+    global logger
+    logger.error(msg)
 
 
-def out_msg(out, place):
-    write_msg(out, place)
-    show_msg(out)
-
-
-def check_pid(pid):
-    if pid not in threads_list:
-        threads_list.append(pid)
-        threads_logs[pid] = []
-        threads_errs[pid] = []
-
-
-def out_err(msg):
-    pid = str(threading.get_ident())
-
-    out = gen_log_msg(msg, c_d.ERR_T, 3)
-
-    if g_v.MULTITH:
-        check_pid(pid)
-
-        threads_errs[pid].append(out)
-    else:
-        out_msg(out, c_d.ERR_T)
-
-
-def gen_log_msg(msg, type, level):
-    (c_name, c_line) = get_caller_info(level)
-
-    c_name += "()" + " " * (c_d.LOG_SYMB_CALLER - len(c_name))
-    c_line = " " * (c_d.LOG_SYMB_C_LINE - len(c_line)) + c_line
-
-    return "[{:s}] : [{:s}] : [{:s}] : [L: {:s}] : [{:s}] ".format(datetime.datetime.now().__str__(),
-                                                                   type,
-                                                                   c_name,
-                                                                   c_line,
-                                                                   msg)
-
-
-def show_msg(msg):
-    if g_v.VERBOSE:
-        print(msg)
+@is_inited
+def critical(msg):
+    global logger
+    logger.critical(msg)
 
 
 def get_caller_info(level):
@@ -152,10 +100,3 @@ def get_caller_info(level):
                                  parent_frame.f_code.co_name)
 
     return full_name, line_num
-
-
-def main():
-    print("do nothing from there")
-    
-if __name__ == "__main__":
-    main()

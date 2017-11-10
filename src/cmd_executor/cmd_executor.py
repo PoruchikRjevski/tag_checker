@@ -3,7 +3,7 @@ import threading
 
 import common_defs as c_d
 import global_vars as g_v
-from logger import *
+from logger_depr import *
 from time_profiler.time_checker import *
 
 __all__ = ['run_cmd']

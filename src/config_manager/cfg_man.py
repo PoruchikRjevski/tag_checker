@@ -1,9 +1,10 @@
 import os
 import configparser
+import logging
 
 import common_defs as c_d
 import global_vars as g_v
-from logger import *
+from logger_depr import *
 from tag_model import *
 from cmd_executor.cmd_executor import *
 
@@ -14,7 +15,7 @@ __all__ = ['CfgLoader']
 
 class CfgLoader:
     def __init__(self):
-        if g_v.DEBUG: out_log("init")  # TODO: used logger?
+        if g_v.DEBUG: logging.info("init")
 
         self.__partly_update = False
         self.__update_list = []
@@ -184,7 +185,7 @@ class CfgLoader:
 
     def open_cfg(self):
         if not os.path.exists(self.__config_def_path):
-            out_err(c_d.E_CFNE_STR)
+            logging.critical(c_d.E_CFNE_STR)
             return c_d.EXIT_CFNE
 
         self.__cfg = configparser.ConfigParser()

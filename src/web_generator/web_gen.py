@@ -7,7 +7,7 @@ from web_generator.html_gen import HtmlGen
 import common_defs as c_d
 import global_vars as g_v
 import version as v
-from logger import *
+from logger_depr import *
 from tag_model import *
 from web_generator import html_defs as h_d
 
@@ -808,7 +808,7 @@ class WebGenerator:
                + c_d.COMM_MSG_SH_TXT.format(commMsg)
 
     def __set_current_timestamp(self):
-        self.__cur_timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+        self.__cur_timestamp = datetime.datetime.now().strftime(c_d.TYPICAL_TIMESTAMP)
 
     def generate_web(self, model, partly_update):
         if g_v.DEBUG: out_log("start gen web")

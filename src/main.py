@@ -1,12 +1,15 @@
 #!/usr/bin/sudo python3
+import os
 import sys
 from optparse import OptionParser
+import logging
+import datetime
+
 
 import common_defs as c_d
 import global_vars as g_v
 import version as v
 from git_manager import GitMan
-from logger import *
 from tag_model import TagModel
 from time_profiler.time_checker import *
 from config_manager import CfgLoader
@@ -173,23 +176,43 @@ def update(cfg_loader, git_man, tag_model):
     if cfg_loader.load_config(tag_model):
         # get tags and fill model
         scan_t = start(True)
-        git_man.scanning(tag_model)
+        # git_man.scanning(tag_model)
         stop(scan_t, True)
         g_v.SCAN_TIME = "{:s}".format(get_pass_time(scan_t))
-        out_log("Scan time: {:s}".format(g_v.SCAN_TIME))
+        logging.warning("Scan time: {:s}".format(g_v.SCAN_TIME))
 
         # generate web
-        web_gen_t = start()
-        web_gen = WebGenerator()
-        web_gen.generate_web(tag_model, cfg_loader.partly_update)
-        stop(web_gen_t)
-        if g_v.TIMEOUTS: out_log("web gen time: {:s}".format(get_pass_time(web_gen_t)))
+        # web_gen_t = start()
+        # web_gen = WebGenerator()
+        # web_gen.generate_web(tag_model, cfg_loader.partly_update)
+        # stop(web_gen_t)
+        # if g_v.TIMEOUTS: l.warning("web gen time: {:s}".format(get_pass_time(web_gen_t)))
 
 
 def setup_hooks(cfg_loader, tag_model):
     cfg_loader.load_config(tag_model)
 
     cfg_loader.setup_hooks(tag_model)
+
+
+def init_logging(name, debug):
+    path = ""
+
+    if g_v.CUR_PLATFORM == c_d.LINUX_P:
+        path = c_d.LIN_LOG_P_DEF
+    elif g_v.CUR_PLATFORM == c_d.WINDOWS_P:
+        path = os.path.join(os.getcwd(), c_d.WIN_LOG_P_DEF)
+
+    path = os.path.join(path, "{:s}_{:s}".format(name, datetime.datetime.now().strftime(c_d.TYPICAL_TIMESTAMP)))
+
+    if not os.path.isdir(path):
+        os.mkdir(path, 0o777)
+
+    path = os.path.join(path, name)
+
+    logging.basicConfig(format=c_d.LOG_FORMAT,
+                        filename=path,
+                        level=(logging.DEBUG if debug else logging.WARNING))
 
 
 def main():
@@ -218,10 +241,10 @@ def main():
 
     # init logger
     if g_v.LOGGING:
-        init_log()
+        init_logging(c_d.SOLUTION, g_v.DEBUG)
 
     # main func
-    if g_v.DEBUG: out_log("start work")
+    logging.info("start work: {:s}".format(" ".join(sys.argv)))
 
     git_man = GitMan()
     git_man.try_get_build_ver()
@@ -231,14 +254,15 @@ def main():
 
     res = cfg_loader.open_cfg()
     if res is not None:
+        logging.critical("can't open config")
         sys.exit(res)
 
     if g_v.DEBUG:
-        out_log("-q: " + str(g_v.VERBOSE))
-        out_log("-l: " + str(g_v.LOGGING))
-        out_log("-m: " + str(g_v.MULTITH))
-        out_log("-d: " + str(g_v.DEBUG))
-        out_log("-t: " + str(g_v.TIMEOUTS))
+        logging.info("-q {:s}".format(str(g_v.VERBOSE)))
+        logging.info("-l {:s}".format(str(g_v.LOGGING)))
+        logging.info("-m {:s}".format(str(g_v.MULTITH)))
+        logging.info("-d {:s}".format(str(g_v.DEBUG)))
+        logging.info("-t {:s}".format(str(g_v.TIMEOUTS)))
 
     # branch by options
     bad_args = False
@@ -297,15 +321,11 @@ def main():
             bad_args = True
 
     if bad_args:
-        print(c_d.E_BAD_ARGS)
-        out_err(c_d.E_BAD_ARGS)
+        logging.critical(c_d.E_BAD_ARGS)
         sys.exit(c_d.EXIT_WO)
 
     stop(main_t)
-    if g_v.TIMEOUTS: out_log("finish work: {:s}".format(get_pass_time(main_t)))
-
-    if g_v.MULTITH:
-        out_deffered_logs()
+    if g_v.TIMEOUTS: logging.warning("finish work: {:s}".format(get_pass_time(main_t)))
 
 if __name__ == "__main__":
     main()

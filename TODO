@@ -132,6 +132,8 @@
 
 - fix logging
 
+- separate load config for fully and partly update
+
 + change table view:
     + change style to more simplicity
 

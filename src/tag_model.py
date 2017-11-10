@@ -3,7 +3,7 @@ from queue import Queue
 
 import common_defs as c_d
 import global_vars as g_v
-from logger import *
+from logger_depr import *
 
 __all__ = ['TagModel', 'Department', 'Repo', 'Device', 'Item', 'CommitInfo', 'UPDATE_FLAG', 'REPO_OBJECT']
 
