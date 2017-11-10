@@ -138,6 +138,9 @@ td.td_inc_2 {
 }
 
 td.td_inc_0, td.td_inc_1, td.td_inc_2 {
+}
+
+.black_text {
     color: #000000;
 }
 

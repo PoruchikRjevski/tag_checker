@@ -45,6 +45,7 @@ CL_RED_BGRND        = "red"
 CL_YELLOW_BGRND     = "yellow"
 CL_WHITE_TXT        = "txt_white"
 CL_NO_WRAP          = "no_wrap"
+CL_BLACK_TEXT       = "black_text"
 
 CL_CIRCLE           = "circle"
 CL_BAGEL_BLUE       = "bagel_blue"

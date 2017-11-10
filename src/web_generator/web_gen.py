@@ -85,9 +85,8 @@ class WebGenerator:
         gen.w_o_tag(h_d.T_TR,
                      h_d.A_CLASS.format(c_d.CL_TR_1))
 
-        metr_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(0))
-                                        + " " + c_d.CL_TEXT_CENTER
-                                        + " " + c_d.CL_BORDER)
+        metr_class = h_d.A_CLASS.format(c_d.CL_BLACK_TEXT
+                                        + " " + c_d.CL_TEXT_CENTER)
 
         gen.w_o_tag(h_d.T_TD,
                     metr_class)
@@ -389,7 +388,8 @@ class WebGenerator:
         file.w_tag(h_d.T_TD,
                    text,
                    h_d.A_ROWSPAN.format(span) + h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(0))
-                                                                   + " " + c_d.CL_BORDER))
+                                                                   + " " + c_d.CL_BORDER
+                                                                   + " " + c_d.CL_BLACK_TEXT))
 
     def __gen_device_name(self, file, td_attr, link_attrs):
         self.__gen_linked_td(file, td_attr, link_attrs)
