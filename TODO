@@ -128,7 +128,7 @@
                         one time per minute -> run_helper.py --update
                         one time per day -> run_helper.py --update --fully
 
-- fix red intensity for metrics visualise
++ fix red intensity for metrics visualise
 
 - fix logging
 
