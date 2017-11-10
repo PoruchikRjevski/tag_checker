@@ -303,8 +303,8 @@ def copy_misc():
     css_full_path = os.path.join(SRC_DIR, MISC_DIR, CSS_DIR)
     js_full_path = os.path.join(SRC_DIR, MISC_DIR, JS_DIR)
 
-    cp_dir_star(css_full_path, OUT_CSS_DIR)
-    cp_dir_star(js_full_path, OUT_JS_DIR)
+    cp_dir_dot(css_full_path, OUT_CSS_DIR)
+    cp_dir_dot(js_full_path, OUT_JS_DIR)
 
     SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Copy: {:s} to {:s}".format(SRC_DIR, SETUP_DIR), NORMAL)
 
