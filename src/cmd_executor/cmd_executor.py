@@ -9,13 +9,9 @@ from time_profiler.time_checker import *
 __all__ = ['run_cmd']
 
 
-def run_cmd(cmd):
-    command = ""
-
-    if g_v.SUDOER:
-        command = c_d.SUDO_CMD
-
-    command += cmd
+def run_cmd(command):
+    if not command:
+        return ""
 
     if g_v.DEBUG: out_log("cmd: {:s}".format(command))
 

@@ -214,12 +214,11 @@ class WebGenerator:
                     h_d.A_CLASS.format(c_d.CL_FOOTER))
 
         # todo add info about flags
-        flags_txt = "Флаги: {:s}".format(" -{:s}".format(str(c_d.F_MULT_TXT)) if g_v.MULTITH else ""
-                                  + " -{:s}".format(str(c_d.F_LOG_TXT)) if g_v.LOGGING else ""
-                                  + " -{:s}".format(str(c_d.F_VERBOSE_TXT)) if g_v.VERBOSE else ""
-                                                                                                + " -{:s}".format(str(c_d.F_SUDO_TXT)) if g_v.SUDOER else ""
-                                  + " -{:s}".format(str(c_d.F_DEBUG_TXT)) if g_v.DEBUG else ""
-                                  + " -{:s}".format(str(c_d.F_TIMINGS_TXT)) if g_v.TIMEOUTS else "")
+        flags_txt = "Флаги: {:s}".format((" -{:s}".format(str(c_d.F_MULT_TXT)) if g_v.MULTITH else "")
+                                         + (" -{:s}".format(str(c_d.F_LOG_TXT)) if g_v.LOGGING else "")
+                                         + (" -{:s}".format(str(c_d.F_VERBOSE_TXT)) if g_v.VERBOSE else "")
+                                         + (" -{:s}".format(str(c_d.F_DEBUG_TXT)) if g_v.DEBUG else "")
+                                         + (" -{:s}".format(str(c_d.F_TIMINGS_TXT)) if g_v.TIMEOUTS else ""))
 
         gen.w_tag(h_d.T_P,
                   c_d.LAST_UPD_TXT + self.__cur_timestamp,
