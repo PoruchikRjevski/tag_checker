@@ -270,7 +270,7 @@ class WebGenerator:
                     h_d.A_CLASS.format(c_d.CL_MT_H),
                     True)
         gen.w_o_tag(h_d.T_TH,
-                    h_d.A_COLSPAN.format(columns) + h_d.A_CLASS.format(c_d.CL_BORDER),
+                    h_d.A_COLSPAN.format(columns),
                     True)
 
         gen.w_tag(h_d.T_H.format(""),
@@ -364,8 +364,8 @@ class WebGenerator:
                                   c_d.DEVICE_PATH + self.__get_device_file_name(dev_name),
                                   h_d.A_TITLE.format(c_d.TO_DEV_TXT))
                 self.__gen_device_name(file,
-                                       h_d.A_ROWSPAN.format(c_d.BTM_ROWS) + h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(0)),
-                                                                                               c_d.CL_BORDER),
+                                       h_d.A_ROWSPAN.format(c_d.BTM_ROWS) + h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(0))
+                                                                                               + " " + c_d.CL_BORDER),
                                        [dev_link_attrs])
 
                 file.w_c_tag(h_d.T_TR)
@@ -378,8 +378,8 @@ class WebGenerator:
     def __gen_department(self, file, text, span):
         file.w_tag(h_d.T_TD,
                    text,
-                   h_d.A_ROWSPAN.format(span) + h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(0)),
-                                                                   c_d.CL_BORDER))
+                   h_d.A_ROWSPAN.format(span) + h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(0))
+                                                                   + " " + c_d.CL_BORDER))
 
     def __gen_device_name(self, file, td_attr, link_attrs):
         self.__gen_linked_td(file, td_attr, link_attrs)
@@ -520,7 +520,7 @@ class WebGenerator:
                          h_d.A_CLASS.format(type_class_id))
 
             # order soft type
-            soft_type_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
+            soft_type_class = h_d.A_CLASS.format(type_class_id
                                                  + " " + c_d.CL_TEXT_CENTER
                                                  + " " + c_d.CL_BORDER)
             repo_obj = dep.repos[item.repo_i][REPO_OBJECT]
@@ -566,6 +566,8 @@ class WebGenerator:
 
                     ld_item = max(s_typed_items, key=lambda item: item.tag_date)
 
+                    type_class_id_str = c_d.CL_TD_INC.format(str(type_class_id))
+
                     file.w_o_tag(h_d.T_TR,
                                  h_d.A_CLASS.format(str(type_class_id)) +
                                  h_d.A_ON_MOUSE_OVER.format(c_d.CALC_METRICS_FUNC) +
@@ -581,14 +583,14 @@ class WebGenerator:
                                             h_d.A_TITLE.format(c_d.CNT_TXT + str(len(nummed_items))))
 
                         self.__gen_order_num(file,
-                                             h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
+                                             h_d.A_CLASS.format(type_class_id_str
                                                                 + " " + c_d.CL_TD_NUM
                                                                 + " " + c_d.CL_BORDER)
                                              + h_d.A_ROWSPAN.format(str(len(soft_type_by_num))),
                                              [order_link_attrs])
 
                     # order soft type
-                    soft_type_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
+                    soft_type_class = h_d.A_CLASS.format(type_class_id_str
                                                          + " " + c_d.CL_TEXT_CENTER
                                                          + " " + c_d.CL_BORDER)
                     self.__gen_item_soft_type(file,
@@ -602,7 +604,7 @@ class WebGenerator:
                                               repo,
                                               commit,
                                               ld_item,
-                                              type_class_id)
+                                              type_class_id_str)
                     file.w_c_tag(h_d.T_TR)
 
                 # generate page for item
@@ -629,7 +631,7 @@ class WebGenerator:
         return link
 
     def __gen_common_columns(self, file, repo, commit, item, type_class_id):
-        column_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
+        column_class = h_d.A_CLASS.format(type_class_id
                                           + " " + c_d.CL_TEXT_LEFT
                                           + " " + c_d.CL_BORDER)
         # tag date
@@ -656,7 +658,7 @@ class WebGenerator:
 
         links_list.append(repo_link_c)
 
-        ver_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
+        ver_class = h_d.A_CLASS.format(type_class_id
                                        + " " + c_d.CL_TD_VER
                                        + " " + c_d.CL_BORDER)
 
@@ -671,7 +673,7 @@ class WebGenerator:
                                       ver_class,
                                       links_list)
 
-        metr_class = h_d.A_CLASS.format(c_d.CL_TD_INC.format(str(type_class_id))
+        metr_class = h_d.A_CLASS.format(type_class_id
                                         + " " + c_d.CL_TEXT_RIGHT
                                         + " " + c_d.CL_BORDER)
         self.__gen_metrics_column(file, metr_class, item.metric)
@@ -771,7 +773,7 @@ class WebGenerator:
                     + h_d.A_TITLE.format(title),
                     True)
         gen.w_o_tag(h_d.T_TH,
-                    h_d.A_COLSPAN.format(span) + h_d.A_CLASS.format(c_d.CL_BORDER),
+                    h_d.A_COLSPAN.format(span),
                     True)
 
         gen.w_o_tag(h_d.T_H.format(""),

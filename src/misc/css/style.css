@@ -45,7 +45,7 @@ a:active {
 }
 
 table {
-    background-color: #333333;
+    /*background-color: #333333;*/
 
     font-size: 14px;
     font-family: Consolas, monaco, monospace;
@@ -57,9 +57,10 @@ table {
 }
 
 th {
-    color: white;
+    /*color: white;*/
     padding: 10px;
-    font-weight: bold;
+    border: 0px;
+    /*font-weight: bold;*/
 }
 
 .main_frame {
@@ -97,11 +98,11 @@ td {
 }
 
 .td_1 {
-    background-color: #eeeeee;
+    border: 1px solid #cccccc;
 }
 
 .td_2 {
-    background-color: #dddddd;
+    border: 1px solid #888888;
 }
 
 .version {
@@ -125,15 +126,15 @@ td {
 }
 
 td.td_inc_0 {
-    background-color: #eeeeee;
+    border: 1px solid #bbbbbb;
 }
 
 td.td_inc_1 {
-    background-color: #cecece;
+    border: 1px solid #888888;
 }
 
 td.td_inc_2 {
-    background-color: #bebebe;
+    border: 1px solid #000000;
 }
 
 td.td_inc_0, td.td_inc_1, td.td_inc_2 {
@@ -141,14 +142,18 @@ td.td_inc_0, td.td_inc_1, td.td_inc_2 {
 }
 
 tr.mt_head {
-    background-color: #333333;
+    background-color: #ffffff;
+    color: #000000;
+    border: 0px;
 
     width: 50%;
     height: 5%;
 }
 
 tr.mt_foot {
-    background-color: #555555;
+    /*background-color: #555555;*/
+    background-color: #333333;
+    color: #ffffff;
 
     height: 5%;
 }
