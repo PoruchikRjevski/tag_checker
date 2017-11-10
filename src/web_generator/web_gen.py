@@ -116,7 +116,7 @@ class WebGenerator:
 
         # gen body table
         self.__gen_rmhp_content_line(gen, c_d.CLR_GREEN, c_d.CLR_GREEN, c_d.CLR_GREEN_TXT,
-                                     "Последняя версия по дате коммита(обычно это элемент типа \"Для всех\")")
+                                     "Последняя версия по дате установки(обычно это элемент типа \"Для всех\")")
         self.__gen_rmhp_content_line(gen, c_d.CLR_RED_MIN, c_d.CLR_RED_MIN, c_d.CLR_RED_TXT,
                                      "Версия и дата установки рассматриваемого элемента{:s}, чем у базового.".format(h_d.ARR_DOWN))
         self.__gen_rmhp_content_line(gen, c_d.CLR_YEL, c_d.CLR_YEL, c_d.CLR_YEL_TXT,
