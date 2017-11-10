@@ -117,7 +117,7 @@ GW_SHORTLOG         = "shortlog"
 GW_COMMIT           = "commit"
 
 # footer
-LAST_UPD_TXT        = "Последнее полное обновление: "
+LAST_UPD_TXT        = "Последнее обновление: "
 CR_TXT              = "&copy; 2017 - 140 отдел. Буревестник."
 M_HEAD_TXT          = "Актуальные прошивки"
 DEP_TXT             = "Отдел"

@@ -814,9 +814,9 @@ class WebGenerator:
         if not partly_update:
             self.__clear_out_dir(g_v.OUT_PATH)
 
-            self.__gen_index(model)
             self.__gen_read_metrics_help_page()
 
+        self.__gen_index(model)
         self.__gen_pages(model)
 
         if g_v.DEBUG: out_log("finish gen web")
