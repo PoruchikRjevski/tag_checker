@@ -86,9 +86,9 @@ M_P_L                       = "-l"
 M_P_MULTITHR                = "Multithreading"
 M_P_MT                      = "-m"
 
-PARAMS_MENU_STATE = {M_P_LOG:       [1, False, M_P_L],
-                     M_P_MULTITHR:  [2, False, M_P_MT],
-                     M_P_VERBOSE:   [4, False, M_P_V]}
+PARAMS_MENU_STATE = {M_P_LOG:       [0, False, M_P_L],
+                     M_P_MULTITHR:  [1, False, M_P_MT],
+                     M_P_VERBOSE:   [2, False, M_P_V]}
 
 PARAMS_MENU_SZ = len(PARAMS_MENU_STATE)
 
