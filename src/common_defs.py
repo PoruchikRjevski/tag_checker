@@ -260,4 +260,12 @@ OPTION_UPD          = "to_update"
 
 TYPICAL_TIMESTAMP   = "%Y-%m-%d %H:%M"
 
-LOG_FORMAT          = '[%(asctime)s] : [%(levelname)-8s] : [T:%(threadName)-15s] : [M:%(module)-25s] : [F:%(funcName)-25s] : [L:%(lineno)-4d] : [%(message)s]'
+# LOGGER
+LOG_TIME            = '%(asctime)s'
+LOG_LEVEL           = '%(levelname)-8s'
+LOG_THREAD           = '%(threadName)-15s'
+LOG_FUNC            = '%(funcName)-30s'
+LOG_LINE            = "%(lineno)-4d"
+LOG_CALL            = '%(module)s:%(funcName)s():%(lineno)d'
+LOG_MSG             = '%(message)s'
+LOG_NAME            = '%(name)-30s'

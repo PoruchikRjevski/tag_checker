@@ -2,8 +2,8 @@
 import os
 import sys
 from optparse import OptionParser
-import logging
 import datetime
+import logging
 
 
 import common_defs as c_d
@@ -15,6 +15,20 @@ from time_profiler.time_checker import *
 from config_manager import CfgLoader
 from web_generator.web_gen import WebGenerator
 from cmd_executor.cmd_executor import *
+from logger import init_logging
+
+
+logger = logging.getLogger(c_d.SOLUTION)
+
+
+def init_logger(func):
+    def wrapped(*args, **kwargs):
+        init_logging()
+
+        return func(*args, **kwargs)
+
+    return wrapped
+
 
 def set_options(parser):
     usage = "usage: %prog [options] [args]"
@@ -91,14 +105,6 @@ def set_options(parser):
                       default=False,
                       help="exec script with using multithreading(may increase speed of esecution on really large "
                            "numbers of cpu cores")
-    parser.add_option("-d", "--debug",
-                      action="store_true", dest="debug_out",
-                      default=False,
-                      help="run debug out")
-    parser.add_option("-t", "--timings",
-                      action="store_true", dest="timings_out",
-                      default=False,
-                      help="run timings out if -d - True by default")
 
 
 def setup_options(opts):
@@ -108,11 +114,6 @@ def setup_options(opts):
         g_v.LOGGING = True
     if opts.multithreading:
         g_v.MULTITH = True
-    if opts.debug_out:
-        g_v.DEBUG = True
-        g_v.TIMEOUTS = True
-    if opts.timings_out:
-        g_v.TIMEOUTS = True
 
 
 def check_main_opts(opts):
@@ -151,7 +152,7 @@ def is_show(opts):
     return opts.show
 
 
-def is_update(opts):
+def is_partly_update(opts):
     return opts.update
 
 
@@ -172,47 +173,138 @@ def is_setup_hooks(opts):
 
 
 def update(cfg_loader, git_man, tag_model):
+    main_t = start()
+    logger.info("Start work")
     # load config
     if cfg_loader.load_config(tag_model):
         # get tags and fill model
-        scan_t = start(True)
-        # git_man.scanning(tag_model)
-        stop(scan_t, True)
+        scan_t = start()
+        git_man.scanning(tag_model)
+        stop(scan_t)
         g_v.SCAN_TIME = "{:s}".format(get_pass_time(scan_t))
-        logging.warning("Scan time: {:s}".format(g_v.SCAN_TIME))
+        logger.info("Scan time: {:s}".format(g_v.SCAN_TIME))
 
         # generate web
-        # web_gen_t = start()
-        # web_gen = WebGenerator()
-        # web_gen.generate_web(tag_model, cfg_loader.partly_update)
-        # stop(web_gen_t)
-        # if g_v.TIMEOUTS: l.warning("web gen time: {:s}".format(get_pass_time(web_gen_t)))
+        web_gen_t = start()
+        web_gen = WebGenerator()
+        web_gen.generate_web(tag_model, cfg_loader.partly_update)
+        stop(web_gen_t)
+        logger.info("web gen time: {:s}".format(get_pass_time(web_gen_t)))
+
+    stop(main_t)
+    logger.info("finish work: {:s}".format(get_pass_time(main_t)))
 
 
-def setup_hooks(cfg_loader, tag_model):
+def setup_hooks():
+    tag_model = TagModel()
+    cfg_loader = CfgLoader()
+
     cfg_loader.load_config(tag_model)
 
     cfg_loader.setup_hooks(tag_model)
 
 
-def init_logging(name, debug):
-    path = ""
+@init_logger
+def full_update(updates_list = []):
+    tag_model = TagModel()
+    git_man = GitMan()
+    cfg_loader = CfgLoader(updates_list)
 
-    if g_v.CUR_PLATFORM == c_d.LINUX_P:
-        path = c_d.LIN_LOG_P_DEF
-    elif g_v.CUR_PLATFORM == c_d.WINDOWS_P:
-        path = os.path.join(os.getcwd(), c_d.WIN_LOG_P_DEF)
+    update(cfg_loader, git_man, tag_model)
 
-    path = os.path.join(path, "{:s}_{:s}".format(name, datetime.datetime.now().strftime(c_d.TYPICAL_TIMESTAMP)))
 
-    if not os.path.isdir(path):
-        os.mkdir(path, 0o777)
+def partly_update():
+    updates_list = CfgLoader.get_list_of_updates()
 
-    path = os.path.join(path, name)
+    if updates_list:
+        full_update(updates_list)
 
-    logging.basicConfig(format=c_d.LOG_FORMAT,
-                        filename=path,
-                        level=(logging.DEBUG if debug else logging.WARNING))
+
+def add_related_update(args):
+    if args and len(args) == 1:
+        CfgLoader.add_repo_to_updates(args[0])
+        return False
+
+    return True
+
+
+def show_config(args):
+    cfg_loader = CfgLoader()
+
+    if args and len(args) > 1:
+        cfg_loader.show(args[0])
+    else:
+        cfg_loader.show()
+
+
+def add_repo(args):
+    cfg_loader = CfgLoader()
+
+    if args and len(args) > 1:
+        cfg_loader.add_repo(args[0], args[1:])
+        return False
+
+    return True
+
+
+def rem_repo(args):
+    cfg_loader = CfgLoader()
+
+    if args and len(args) > 1:
+        cfg_loader.rem_repo(args[0], args[1:])
+        return False
+
+    return True
+
+
+def add_tr(args):
+    cfg_loader = CfgLoader()
+
+    if args and len(args) == 2:
+        cfg_loader.add_translate(args[0], args[1])
+        return False
+
+    return True
+
+
+def rem_tr(args):
+    cfg_loader = CfgLoader()
+
+    if args and len(args) > 0:
+        cfg_loader.rem_translate(args)
+        return False
+
+    return True
+
+
+def add_dep(args):
+    cfg_loader = CfgLoader()
+
+    if args and len(args) > 0:
+        cfg_loader.add_department(args)
+        return False
+
+    return True
+
+
+def rem_dep(args):
+    cfg_loader = CfgLoader()
+
+    if args and len(args) > 0:
+        cfg_loader.rem_department(args)
+        return False
+
+    return True
+
+
+def change_prefix(args):
+    cfg_loader = CfgLoader()
+
+    if args and len(args) == 2:
+        cfg_loader.change_prefix(args[0], args[1])
+        return False
+
+    return True
 
 
 def main():
@@ -234,98 +326,40 @@ def main():
         optParser.print_help()
         sys.exit(c_d.EXIT_WO)
 
-    main_t = start()
-
     # check platform
     g_v.CUR_PLATFORM = sys.platform
 
-    # init logger
-    if g_v.LOGGING:
-        init_logging(c_d.SOLUTION, g_v.DEBUG)
-
-    # main func
-    logging.info("start work: {:s}".format(" ".join(sys.argv)))
-
-    git_man = GitMan()
-    git_man.try_get_build_ver()
-
-    tag_model = TagModel()
-    cfg_loader = CfgLoader()
-
-    res = cfg_loader.open_cfg()
-    if res is not None:
-        logging.critical("can't open config")
-        sys.exit(res)
-
-    if g_v.DEBUG:
-        logging.info("-q {:s}".format(str(g_v.VERBOSE)))
-        logging.info("-l {:s}".format(str(g_v.LOGGING)))
-        logging.info("-m {:s}".format(str(g_v.MULTITH)))
-        logging.info("-d {:s}".format(str(g_v.DEBUG)))
-        logging.info("-t {:s}".format(str(g_v.TIMEOUTS)))
-
-    # branch by options
+    # options branch
     bad_args = False
 
-    if is_setup_hooks(opts):
-        setup_hooks(cfg_loader, tag_model)
-    elif is_related_update(opts):
-        if args and len(args) == 1:
-            cfg_loader.add_repo_to_updates(args[0])
-        else:
-            bad_args = True
+    if is_related_update(opts):
+        bad_args = add_related_update(args)
     elif is_full_update(opts):
-        update(cfg_loader, git_man, tag_model)
-    elif is_update(opts):
-        cfg_loader.partly_update = True
-        update(cfg_loader, git_man, tag_model)
+        full_update()
+    elif is_partly_update(opts):
+        partly_update()
+    elif is_setup_hooks(opts):
+        setup_hooks()
     elif is_show(opts):
-        if args:
-            cfg_loader.show(args[0])
-        else:
-            cfg_loader.show()
+        show_config(args)
     elif is_add_repo(opts):
-        if args and len(args) > 1:
-            cfg_loader.add_repo(args[0], args[1:])
-        else:
-            bad_args = True
+        bad_args = add_repo(args)
     elif is_remove_repo(opts):
-        if args and len(args) > 1:
-            cfg_loader.rem_repo(args[0], args[1:])
-        else:
-            bad_args = True
+        bad_args = rem_repo(args)
     elif is_add_translate(opts):
-        if args and len(args) == 2:
-            cfg_loader.add_translate(args[0], args[1])
-        else:
-            bad_args = True
+        bad_args = add_tr(args)
     elif is_remove_translate(opts):
-        if args and len(args) > 0:
-            cfg_loader.rem_translate(args)
-        else:
-            bad_args = True
+        bad_args = rem_tr(args)
     elif is_add_department(opts):
-        if args and len(args) > 0:
-            cfg_loader.add_department(args)
-        else:
-            bad_args = True
+        bad_args = add_dep(args)
     elif is_remove_department(opts):
-        if args and len(args) > 0:
-            cfg_loader.rem_department(args)
-        else:
-            bad_args = True
+        bad_args = rem_dep(args)
     elif is_change_prefix(opts):
-        if args and len(args) == 2:
-            cfg_loader.change_prefix(args[0], args[1])
-        else:
-            bad_args = True
+        bad_args = change_prefix(args)
 
     if bad_args:
-        logging.critical(c_d.E_BAD_ARGS)
+        logger.critical(c_d.E_BAD_ARGS)
         sys.exit(c_d.EXIT_WO)
-
-    stop(main_t)
-    if g_v.TIMEOUTS: logging.warning("finish work: {:s}".format(get_pass_time(main_t)))
 
 if __name__ == "__main__":
     main()

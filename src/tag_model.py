@@ -3,7 +3,6 @@ from queue import Queue
 
 import common_defs as c_d
 import global_vars as g_v
-from logger_depr import *
 
 __all__ = ['TagModel', 'Department', 'Repo', 'Device', 'Item', 'CommitInfo', 'UPDATE_FLAG', 'REPO_OBJECT']
 
@@ -20,8 +19,6 @@ class TagModel:
     def __init__(self):
         self.__departments = OrderedDict()
         self.__tr_dev_names = {}
-
-        if g_v.DEBUG: out_log("inited")
 
     def get_tr_dev_name(self, key=None):
         if key:

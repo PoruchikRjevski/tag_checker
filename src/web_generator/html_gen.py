@@ -1,10 +1,14 @@
 import os
+import logging
 
 import global_vars as g_v
-from logger_depr import *
+import common_defs as c_d
 from web_generator import html_defs as h_d
 
 __all__ = ['HtmlGen']
+
+
+logger = logging.getLogger("{:s}.HtmlGen".format(c_d.SOLUTION))
 
 
 class HtmlGen:
@@ -23,7 +27,7 @@ class HtmlGen:
 
         self.file = open(file_path, 'w')
 
-        if g_v.DEBUG: out_log("create file: " + file_path)
+        logger.info("create file: " + file_path)
 
     def w_o_tag(self, tag, attr="", cr=False):
         self.file.write(h_d.TAG.format("", tag, attr))

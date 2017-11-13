@@ -1,19 +1,22 @@
 import subprocess
 import threading
+import logging
 
 import common_defs as c_d
 import global_vars as g_v
-from logger_depr import *
 from time_profiler.time_checker import *
 
 __all__ = ['run_cmd']
+
+
+logger = logging.getLogger("{:s}.CmdExecutor".format(c_d.SOLUTION))
 
 
 def run_cmd(command):
     if not command:
         return ""
 
-    if g_v.DEBUG: out_log("cmd: {:s}".format(command))
+    logger.info("cmd: {:s}".format(command))
 
     cmd_run_t = start()
     proc = subprocess.Popen(['{:s}\n'.format(command)],
@@ -23,17 +26,17 @@ def run_cmd(command):
     (out, err) = proc.communicate()
     stop(cmd_run_t)
 
-    if g_v.TIMEOUTS: out_log("exec time: {:s} | pid: {:s} | cmd: \"{:s}\"".format(get_pass_time(cmd_run_t),
+    logger.info("exec time: {:s} | pid: {:s} | cmd: \"{:s}\"".format(get_pass_time(cmd_run_t),
                                                                                   str(threading.get_ident()),
                                                                                   command))
 
     u_out = out.decode(c_d.DOC_CODE).strip()
     u_err = err.decode(c_d.DOC_CODE).strip()
 
-    if g_v.DEBUG: out_log("out: {:s}".format(u_out))
+    logger.info("out: {:s}".format(u_out))
 
     if u_err:
-        out_err("err: {:s}".format(u_err))
+        logger.error("err: {:s}".format(u_err))
 
     return u_out
 

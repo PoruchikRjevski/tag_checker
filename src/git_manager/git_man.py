@@ -2,13 +2,13 @@ import multiprocessing
 import os
 import datetime
 from multiprocessing.dummy import Pool as ThreadPool
+import logging
 
 import common_defs as c_d
 import global_vars as g_v
 import version as s_v
 from cmd_executor.cmd_executor import *
 from git_manager import git_defs as g_d
-from logger_depr import *
 from tag_model import *
 from time_profiler.time_checker import *
 
@@ -20,9 +20,11 @@ P_PROD, P_DEV, P_ITEM, P_DATE, P_PLATFORM = range(5)
 __all__ = ['GitMan']
 
 
+logger = logging.getLogger("{:s}.GitMan".format(c_d.SOLUTION))
+
+
 class GitMan:
     def __init__(self):
-        if g_v.DEBUG: out_log("init")
         self.__lastBranch = None
         self.__needReturnBranch = False
         self.__cpus = 1
@@ -34,7 +36,7 @@ class GitMan:
 
     def __is_dir_exist(self, link):
         if not os.path.isdir(link):
-            out_err("can't find dir of repo: {:s}".format(link))
+            logger.error("can't find dir of repo: {:s}".format(link))
             return False
         return True
 
@@ -88,23 +90,23 @@ class GitMan:
             elif len(parts) >= 3 and pos >= P_ITEM:
                 state[0] = W_DATE
             else:
-                out_err("Parce error. Bad item num or date.")
+                logger.error("Parce error. Bad item num or date.")
                 state[0] = W_BREAK
 
         # main
         # W_START
         if state[0] == W_START:
             if self.__is_tag_valid(item_out.tag):
-                if g_v.DEBUG: out_log("tag is valid")
+                logger.info("tag is valid")
                 state[0] = W_DEV
             else:
-                if g_v.DEBUG: out_log("tag is not valid")
+                logger.info("tag is not valid")
                 state[0] = W_BREAK
         # W_DEV
         elif state[0] == W_DEV:
             item_out.dev_name = tag_part
             state[0] = W_OFFSET
-            if g_v.DEBUG: out_log("name: {:s}".format(item_out.dev_name))
+            logger.info("name: {:s}".format(item_out.dev_name))
         # W_ITEM
         elif state[0] == W_ITEM:
             parts = tag_part.split("-")
@@ -121,14 +123,14 @@ class GitMan:
                     state[0] = W_BREAK
                 else:
                     if g_v.DEBUG:
-                        out_log("type: {:s}".format(item_out.item_type))
-                        out_log("num: {:s}".format(str(item_out.item_num)))
+                        logger.info("type: {:s}".format(item_out.item_type))
+                        logger.info("num: {:s}".format(str(item_out.item_num)))
                 state[0] = W_DATE
         # W_DATE
         elif state[0] == W_DATE:
             item_out.tag_date = self.__repair_tag_date(tag_part)
 
-            if g_v.DEBUG: out_log("date: {:s}".format(item_out.tag_date))
+            logger.info("date: {:s}".format(item_out.tag_date))
 
             if item_out.tag_date == c_d.BAD_DATE:
                 state[0] = W_BREAK
@@ -139,7 +141,7 @@ class GitMan:
         # W_DOMEN
         elif state[0] == W_DOMEN:
             item_out.platform = tag_part
-            if g_v.DEBUG: out_log("platform: {:s}".format(item_out.platform))
+            logger.info("platform: {:s}".format(item_out.platform))
 
         # end
         if state[0] == W_BREAK:
@@ -148,15 +150,13 @@ class GitMan:
             return True
 
     def __parce_tag(self, items_out):
-        parce_t = -1
-        if g_v.DEBUG:
-            parce_t = start()
-            out_log("start parce tag")
+        parce_t = start()
+        logger.info("start parce tag")
 
         tag_parts = items_out.tag.split("/")
 
         if len(tag_parts) < 3:
-            out_err("bad tag size: {:s}".format(str(len(tag_parts))))
+            logger.error("bad tag size: {:s}".format(str(len(tag_parts))))
             return False
 
         state = [W_START]
@@ -164,9 +164,8 @@ class GitMan:
             if not self.__parce_tag_sm(part, tag_parts.index(part), items_out, state):
                 return False
 
-        if g_v.DEBUG:
-            stop(parce_t)
-            out_log("parce tag time: {:s}".format(get_pass_time(parce_t)))
+        stop(parce_t)
+        logger.info("parce tag time: {:s}".format(get_pass_time(parce_t)))
 
         return True
 
@@ -250,18 +249,18 @@ class GitMan:
 
     def __get_parents_short_hash(self, note_hash, date):
         branch = self.__get_develop_branch_by_hash(note_hash)
-        if g_v.DEBUG: out_log("finded branch: {:s}".format(str(branch)))
+        logger.info("finded branch: {:s}".format(str(branch)))
         if branch is None:
             return -1
 
         last_commit_s_hash = self.__get_last_commit_on_branch(branch)
-        if g_v.DEBUG: out_log("last commit short hash: {:s}".format(str(last_commit_s_hash)))
+        logger.info("last commit short hash: {:s}".format(str(last_commit_s_hash)))
         if last_commit_s_hash is None:
             return -1
 
         parents_hash = self.__get_parent_commit_hash(note_hash, last_commit_s_hash)
         # parents_hash = self.__get_parent_commit_hash_in_dev_branch(note_hash, branch, date)
-        if g_v.DEBUG: out_log("parent's hash: {:s}".format(str(parents_hash)))
+        logger.info("parent's hash: {:s}".format(str(parents_hash)))
         if parents_hash is None or not parents_hash:
             return -1
         else:
@@ -286,7 +285,7 @@ class GitMan:
             try:
                 jumps = int(out)
             except ValueError:
-                out_err("EXCEPT Bad jumps between: {:s} and {:s} out: {:s}".format(hash_a,
+                logger.error("EXCEPT Bad jumps between: {:s} and {:s} out: {:s}".format(hash_a,
                                                                                    hash,
                                                                                    out))
                 jumps = -1
@@ -364,7 +363,7 @@ class GitMan:
                                                date[4])
 
             except Exception:
-                out_err("Bad date: {:s}".format(date))
+                logger.error("Bad date: {:s}".format(date))
                 return c_d.BAD_DATE
 
         return res
@@ -385,7 +384,7 @@ class GitMan:
                                                     time_temp[1],
                                                     time_temp[2])
         except Exception:
-            out_err("Bad date: {:s}".format(date))
+            logger.error("Bad date: {:s}".format(date))
 
         return (sh_res, full_res)
 
@@ -403,8 +402,7 @@ class GitMan:
         return f_hash[:g_d.SHORT_HASH_SIZE] if len(f_hash) >= g_d.SHORT_HASH_SIZE else f_hash
 
     def __gen_item(self, tag_info):
-        if g_v.DEBUG:
-            out_log("Gen item for tag: {:s}".format(tag_info))
+        logger.info("Gen item for tag: {:s}".format(tag_info))
 
         item = Item()
         tag, f_hash = self.__repair_tag_info(tag_info)
@@ -416,7 +414,7 @@ class GitMan:
         item.f_hash = f_hash
 
         if not self.__parce_tag(item):
-            out_err("Bad tag: " + tag)
+            logger.error("Bad tag: " + tag)
             return item
 
         item.valid = True
@@ -452,7 +450,7 @@ class GitMan:
 
         for cm_tag_info in cm_tags_info_true:
             if g_v.DEBUG:
-                out_log("Gen commit for: {:s}".format(cm_tag_info))
+                logger.info("Gen commit for: {:s}".format(cm_tag_info))
 
             separated = cm_tag_info.split("&|")
             raw_hash = separated[0] if len(separated) >= 1 else ""
@@ -472,14 +470,14 @@ class GitMan:
             commit.date = sh_date
             commit.date_full = full_date
             commit.date_obj = datetime.datetime.strptime(sh_date, "%Y-%m-%d %H:%M")
-            if g_v.DEBUG: out_log("item commit date: {:s}".format(commit.date))
+            logger.info("item commit date: {:s}".format(commit.date))
 
             commit.auth = cm_auth
-            if g_v.DEBUG: out_log("item author: {:s}".format(commit.auth))
+            logger.info("item author: {:s}".format(commit.auth))
 
             msg = raw_msg
             commit.msg = self.__repair_commit_msg(msg)
-            if g_v.DEBUG: out_log("item commMsg: {:s}".format(commit.msg))
+            logger.info("item commMsg: {:s}".format(commit.msg))
 
             commit.repo_i = repo_i
 
@@ -489,7 +487,7 @@ class GitMan:
                 commit.p_hash = commit.hash
             else:
                 commit.p_hash = self.__strict_f_hash(commit.p_hash)
-            if g_v.DEBUG: out_log("item pHash: {:s}".format(str(commit.p_hash)))
+            logger.info("item pHash: {:s}".format(str(commit.p_hash)))
 
             commit.valid = True
 
@@ -506,7 +504,7 @@ class GitMan:
         work_t = start()
         items_out = self.__gen_items(tags_list, repo_i)
         stop(work_t)
-        if g_v.TIMEOUTS: out_log("Gen {:s} items by {:s} tags time: {:s}".format(str(len(items_out)),
+        logger.info("Gen {:s} items by {:s} tags time: {:s}".format(str(len(items_out)),
                                                                                  str(len(tags_list)),
                                                                                  get_pass_time(work_t)))
 
@@ -519,7 +517,7 @@ class GitMan:
             work_t = start()
             unic_hashes = list(set([item.f_hash for item in items_out]))
             stop(work_t)
-            if g_v.TIMEOUTS: out_log("Create helpers lists: {:s}".format(get_pass_time(work_t)))
+            logger.info("Create helpers lists: {:s}".format(get_pass_time(work_t)))
 
             # get commits info
             work_t = start()
@@ -529,7 +527,7 @@ class GitMan:
                 commits.append(commit)
 
             stop(work_t)
-            if g_v.TIMEOUTS: out_log("Get commits info: {:s}".format(get_pass_time(work_t)))
+            logger.info("Get commits info: {:s}".format(get_pass_time(work_t)))
 
         return items_out
 
@@ -628,10 +626,10 @@ class GitMan:
                     dep_obj.items[item_i].metric.jumps = unic_jumps_by_cm_hash[item.cm_hash]
 
     def scanning(self, model):
-        if g_v.DEBUG: out_log("start scanning")
+        logger.info("start scanning")
 
         for dep_name, dep_obj in model.departments.items():
-            if g_v.DEBUG: out_log("department: \"{:s}\"".format(dep_name))
+            logger.info("department: \"{:s}\"".format(dep_name))
 
             g_v.REPOS_NUM = g_v.REPOS_NUM + len(dep_obj.repos)
 
@@ -639,10 +637,9 @@ class GitMan:
                 repo_obj = repo[REPO_OBJECT]
                 repo_update_flag = repo[UPDATE_FLAG]
 
-                if g_v.DEBUG:
-                    out_log("repo: \"{:s}\"".format(repo_obj.name))
-                    out_log("repo-link: \"{:s}\"".format(repo_obj.link))
-                    out_log("repo-soft-type: \"{:s}\"".format(repo_obj.soft_type))
+                logger.info("repo: \"{:s}\"".format(repo_obj.name))
+                logger.info("repo-link: \"{:s}\"".format(repo_obj.link))
+                logger.info("repo-soft-type: \"{:s}\"".format(repo_obj.soft_type))
 
                 if self.__is_dir_exist(repo_obj.link):
                     self.__go_to_dir(repo_obj.link)
@@ -654,8 +651,7 @@ class GitMan:
 
                     g_v.TAGS_NUM = g_v.TAGS_NUM + len(tags_list)
 
-                    if g_v.DEBUG:
-                        out_log("Tags number: {:s}".format(str(len(tags_list))))
+                    logger.info("Tags number: {:s}".format(str(len(tags_list))))
 
                     items_list = self.__do_main_work(tags_list,
                                                      dep_obj.commits,
@@ -681,23 +677,6 @@ class GitMan:
                         metr_t = start()
                         self.__do_get_metrics(items_list, dep_obj)
                         stop(metr_t)
-                        if g_v.TIMEOUTS: out_log("Metrics time: {:s}".format(get_pass_time(metr_t)))
+                        logger.info("Metrics time: {:s}".format(get_pass_time(metr_t)))
 
-        if g_v.DEBUG: out_log("stop scanning")
-
-    def try_get_build_ver(self):
-        cmd = g_d.GIT_CMD.format(g_d.A_REV_LIST
-                                 + g_d.A_ALL
-                                 + g_d.A_COUNT)
-
-        out = run_cmd(cmd)
-
-        try:
-            out_int = int(out)
-        except ValueError:
-            s_v.V_BUILD = s_v.CURRENT
-        else:
-            s_v.V_BUILD = out
-            out_log("change build version: {:s}".format(out))
-
-        return
+        logger.info("stop scanning")

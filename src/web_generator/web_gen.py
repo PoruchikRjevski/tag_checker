@@ -1,5 +1,6 @@
-import datetime
 import os
+import logging
+import datetime
 from collections import OrderedDict
 
 from web_generator.html_gen import HtmlGen
@@ -7,14 +8,19 @@ from web_generator.html_gen import HtmlGen
 import common_defs as c_d
 import global_vars as g_v
 import version as v
-from logger_depr import *
 from tag_model import *
 from web_generator import html_defs as h_d
 
 
+__all__ = ['WebGenerator']
+
+
+logger = logging.getLogger("{:s}.HtmlGen".format(c_d.SOLUTION))
+
+
 class WebGenerator:
     def __init__(self):
-        if g_v.DEBUG: out_log("init")
+        logger.info("init")
 
         self.__cur_timestamp = None
 
@@ -28,10 +34,10 @@ class WebGenerator:
                     elif os.path.isdir(item_path):
                         self.__clear_out_dir(item_path)
                 except Exception as e:
-                    out_err(e)
+                    logger.error(e)
 
     def __gen_index(self, model):
-        if g_v.DEBUG: out_log("start gen index")
+        logger.info("start gen index")
         index = HtmlGen(g_v.OUT_PATH, c_d.INDEX_F_NAME)
 
         self.__gen_page_head(index, c_d.M_HEAD_TXT, "", h_d.A_CLASS.format(c_d.CL_BACK_CIRLE))
@@ -45,10 +51,10 @@ class WebGenerator:
         self.__gen_page_foot(index)
 
         index.close()
-        if g_v.DEBUG: out_log("finish gen index")
+        logger.info("finish gen index")
 
     def __gen_read_metrics_help_page(self):
-        if g_v.DEBUG: out_log("start gen read metrics help page")
+        logger.info("start gen read metrics help page")
         help = HtmlGen(g_v.OUT_PATH, c_d.HELP_METR_F_NAME)
 
         self.__gen_page_head(help, c_d.READ_METR_TXT, "", h_d.A_CLASS.format(c_d.CL_BACK_CIRLE))
@@ -63,7 +69,7 @@ class WebGenerator:
         self.__gen_page_foot(help)
 
         help.close()
-        if g_v.DEBUG: out_log("finish gen read metrics help page")
+        logger.info("finish gen read metrics help page")
 
     def __gen_rmhp_table_head(self, gen):
         gen.w_o_tag(h_d.T_TR,
@@ -126,7 +132,7 @@ class WebGenerator:
         gen.w_c_tag(h_d.T_TABLE)
 
     def __gen_pages(self, model):
-        if g_v.DEBUG: out_log("start gen main")
+        logger.info("start gen main")
         main = HtmlGen(g_v.OUT_PATH, c_d.MAIN_F_NAME)
 
         self.__gen_page_head(main, c_d.M_HEAD_TXT, "")
@@ -142,7 +148,7 @@ class WebGenerator:
         self.__gen_page_foot(main)
 
         main.close()
-        if g_v.DEBUG: out_log("finish gen main")
+        logger.info("finish gen main")
 
     def __gen_page_head(self, gen, title, level, body_attr=""):
         gen.w_o_tag(h_d.T_HTML, "", True)
@@ -351,7 +357,7 @@ class WebGenerator:
         return False
 
     def __gen_main_content(self, model, file):
-        if g_v.DEBUG: out_log("start gen main content")
+        logger.info("start gen main content")
 
         for dep_name, dep_obj in model.departments.items():
             first_dep = True
@@ -377,7 +383,7 @@ class WebGenerator:
                 if self.__is_need_update_device_page(model, dev_name, dep_name):
                     self.__gen_device_page(model, dep_name, dev_name)
 
-        if g_v.DEBUG: out_log("finish gen main content")
+        logger.info("finish gen main content")
 
     def __gen_department(self, file, text, span):
         file.w_tag(h_d.T_TD,
@@ -440,7 +446,7 @@ class WebGenerator:
         file.w_c_tag(h_d.T_TD)
 
     def __gen_device_page(self, model, dep_name, dev_name):
-        if g_v.DEBUG: out_log("start gen pages for device: " + dev_name)
+        logger.info("start gen pages for device: " + dev_name)
         page = HtmlGen(c_d.DEVICE_PATH, self.__get_device_file_name(dev_name))
 
         dev_str = "{:s} \"{:s}\" [{:s}]".format(c_d.HISTORY_TXT,
@@ -469,10 +475,10 @@ class WebGenerator:
 
         page.close()
 
-        if g_v.DEBUG: out_log("finish gen pages for device: " + dev_name)
+        logger.info("finish gen pages for device: " + dev_name)
 
     def __gen_history_page(self, model, dep, dev_name, item_num, type, items):
-        if g_v.DEBUG: out_log("start gen item page: " + str(item_num))
+        logger.info("start gen item page: " + str(item_num))
 
         item_file_name = self.__get_item_file_name(dev_name, item_num)
         item_dir_name = self.__get_item_dir_name(dev_name, item_num)
@@ -502,7 +508,7 @@ class WebGenerator:
 
         page.close()
 
-        if g_v.DEBUG: out_log("finish gen item page: " + str(item_num))
+        logger.info("finish gen item page: " + str(item_num))
 
     def __gen_items_content(self, page, dep, items):
         type_class_id = c_d.CL_TD_1
@@ -811,7 +817,7 @@ class WebGenerator:
         self.__cur_timestamp = datetime.datetime.now().strftime(c_d.TYPICAL_TIMESTAMP)
 
     def generate_web(self, model, partly_update):
-        if g_v.DEBUG: out_log("start gen web")
+        logger.info("start gen web")
 
         self.__set_current_timestamp()
 
@@ -822,5 +828,5 @@ class WebGenerator:
         self.__gen_index(model)
         self.__gen_pages(model)
 
-        if g_v.DEBUG: out_log("finish gen web")
+        logger.info("finish gen web")
 

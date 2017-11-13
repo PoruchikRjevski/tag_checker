@@ -1,32 +1,22 @@
 import os
 import logging
 import datetime
-import inspect
 
 import common_defs as c_d
 import global_vars as g_v
 
 
-__all__ = ['init_logging', 'debug', 'info', 'warning', 'error', 'critical']
+__all__ = ['init_logging']
 
 
 logger = None
-FORMAT = '[%(asctime)s] : [%(levelname)-8s] : [%(funcName)-30s]'
+formatter = None
+file_handler = None
+stream_handler = None
 
 
-def is_inited(func):
-    def wrapped(msg, *args, **kwargs):
-        global logger
-        if not logger is None:
-            return func(msg, *args, **kwargs)
-    return wrapped
-
-
-def init_logging(name, debug):
-    global logger, FORMAT
-
+def gen_path(name):
     path = ""
-
     if g_v.CUR_PLATFORM == c_d.LINUX_P:
         path = c_d.LIN_LOG_P_DEF
     elif g_v.CUR_PLATFORM == c_d.WINDOWS_P:
@@ -34,69 +24,43 @@ def init_logging(name, debug):
 
     path = os.path.join(path, "{:s}_{:s}".format(name, datetime.datetime.now().strftime(c_d.TYPICAL_TIMESTAMP)))
 
-    if not os.path.isdir(path):
-        os.mkdir(path, 0o777)
+    if not os.path.exists(path):
+        os.makedirs(path, 0o777, True)
 
-    path = os.path.join(path, name)
-
-    logging.basicConfig(format=FORMAT,
-                        filename=path,
-                        level=(logging.DEBUG if debug else logging.WARNING))
+    return os.path.join(path, name)
 
 
-@is_inited
-def debug(msg):
+def init_logging():
     global logger
-    logger.debug(msg)
 
+    name = c_d.SOLUTION
 
-@is_inited
-def info(msg):
-    global logger
-    logger.info(msg)
+    file_handler = None
+    stream_handler = None
+    formatter = logging.Formatter("[{:s}] : [{:s}] : [{:s}] : [{:s}] : [{:s}] : [{:s}] : [{:s}]".format(c_d.LOG_TIME,
+                                                                                                        c_d.LOG_LEVEL,
+                                                                                                        c_d.LOG_THREAD,
+                                                                                                        c_d.LOG_NAME,
+                                                                                                        c_d.LOG_FUNC,
+                                                                                                        c_d.LOG_LINE,
+                                                                                                        c_d.LOG_MSG))
+    log_level = logging.DEBUG
 
+    logger = logging.getLogger(name)
+    logger.propagate = False
+    logger.setLevel(log_level)
 
-@is_inited
-def warning(msg):
-    global logger
-    logger.warning(msg)
+    if g_v.VERBOSE:
+        logger.propagate = True
 
+        stream_handler = logging.StreamHandler()
+        stream_handler.setLevel(log_level)
+        stream_handler.setFormatter(formatter)
+        logger.addHandler(stream_handler)
 
-@is_inited
-def error(msg):
-    global logger
-    logger.error(msg)
-
-
-@is_inited
-def critical(msg):
-    global logger
-    logger.critical(msg)
-
-
-def get_caller_info(level):
-    stack = inspect.stack()
-
-    if len(stack) < level:
-        return ""
-
-    parent_frame = stack[level][0]
-
-    # get line number
-    line_num = str(inspect.getframeinfo(parent_frame).lineno)
-
-    full_name = "{:s}:{:s}"
-    module_name = ""
-
-    # get class or module name
-    if 'self' in parent_frame.f_locals:
-        module_name = parent_frame.f_locals['self'].__class__.__name__
-    else:
-        module = inspect.getmodule(parent_frame)
-        if module:
-            module_name = module.__name__
-
-    full_name = full_name.format(module_name,
-                                 parent_frame.f_code.co_name)
-
-    return full_name, line_num
+    if g_v.LOGGING:
+        path = gen_path(name)
+        file_handler = logging.FileHandler(path)
+        file_handler.setFormatter(formatter)
+        file_handler.setLevel(log_level)
+        logger.addHandler(file_handler)

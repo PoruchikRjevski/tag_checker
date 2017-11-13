@@ -1,28 +1,35 @@
 import os
+import sys
 import configparser
 import logging
 
 import common_defs as c_d
 import global_vars as g_v
-from logger_depr import *
 from tag_model import *
 from cmd_executor.cmd_executor import *
 
 __all__ = ['CfgLoader']
 
 
+logger = logging.getLogger("{:s}.CfgLoader".format(c_d.SOLUTION))
+
+
 # TODO: maybe json will be simpler?
 
 class CfgLoader:
-    def __init__(self):
-        if g_v.DEBUG: logging.info("init")
+    def __init__(self, updates_list = []):
+        logging.info("init")
 
         self.__partly_update = False
-        self.__update_list = []
+        self.__update_list = updates_list
 
         self.__cfg = None
         self.__gen_paths()
         CfgLoader.__set_default_out_path()
+
+        res = self.open_cfg()
+        if not res is None:
+            sys.exit(res)
 
     @property
     def partly_update(self):
@@ -67,7 +74,6 @@ class CfgLoader:
 
     @staticmethod
     def get_sw_module_uid_from_repo_full_link(repo_full_link):
-
         id = repo_full_link
 
         std_prefix = "/home/git/repositories/"
@@ -185,7 +191,6 @@ class CfgLoader:
 
     def open_cfg(self):
         if not os.path.exists(self.__config_def_path):
-            logging.critical(c_d.E_CFNE_STR)
             return c_d.EXIT_CFNE
 
         self.__cfg = configparser.ConfigParser()
@@ -204,7 +209,7 @@ class CfgLoader:
             file.close()
 
     @staticmethod
-    def __get_list_of_updates():
+    def get_list_of_updates():
         cfg_parser = configparser.ConfigParser()
 
         cfg_parser.read(c_d.UPDATE_TABLE_PATH)
@@ -219,6 +224,8 @@ class CfgLoader:
 
         if not repos is None:
             res = repos.split("\n")
+            res = [repo for repo in res if repo]
+
             CfgLoader.__rewrite_update_file(cfg_parser, "")
 
             return res
@@ -275,16 +282,9 @@ class CfgLoader:
             CfgLoader.__rewrite_update_file(cfg_parser, repos)
 
     def load_config(self, model):
-        if g_v.DEBUG: out_log("start load config")
+        logger.info("start load config")
 
         blocks = self.__cfg.sections()
-
-        if self.__partly_update:
-            self.__update_list = self.__get_list_of_updates()
-            out_log(" ".join(self.__update_list))
-
-            if not self.__update_list:
-                return False
 
         for block in blocks:
             if block == c_d.BLOCK_CONFIG:
@@ -294,7 +294,7 @@ class CfgLoader:
             else:
                 self.__add_department(block, model)
 
-        if g_v.DEBUG: out_log("config was loaded")
+        logger.info("config was loaded")
 
         return True
 
