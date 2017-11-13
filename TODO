@@ -130,9 +130,9 @@
 
 + fix red intensity for metrics visualise
 
-- fix logging
++ fix logging
 
-- separate load config for fully and partly update
++ separate load config for fully and partly update
 
 + change table view:
     + change style to more simplicity
