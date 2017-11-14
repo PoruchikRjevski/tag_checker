@@ -145,6 +145,7 @@ class Repo:
     def sw_archive_module_group_id(self, sw_archive_module_group_id):
         self.__sw_archive_module_group_id = sw_archive_module_group_id
 
+
 class Device:
     """
     __name                      is device name

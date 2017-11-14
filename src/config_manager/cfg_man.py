@@ -7,6 +7,7 @@ import common_defs as c_d
 import global_vars as g_v
 from tag_model import *
 from cmd_executor.cmd_executor import *
+from logger import log_func_name
 
 __all__ = ['CfgLoader']
 
@@ -17,8 +18,11 @@ logger = logging.getLogger("{:s}.CfgLoader".format(c_d.SOLUTION))
 # TODO: maybe json will be simpler?
 
 class CfgLoader:
-    def __init__(self, updates_list = []):
-        logging.info("init")
+    def __init__(self, updates_list = None):
+        if updates_list is None:
+            updates_list = []
+
+        logging.info("{:s} init".format(CfgLoader.__name__))
 
         self.__partly_update = False
         self.__update_list = updates_list
@@ -60,11 +64,13 @@ class CfgLoader:
         else:
             return default_value
 
+    @log_func_name(logger)
     def __load_config_block(self, block):
         g_v.OUT_PATH = self.__try_load(block, c_d.OUT_P, g_v.OUT_PATH)
         g_v.DIST_LINK_PREFIX = self.__try_load(block, c_d.SECT_DIST_LINK_PREFIX, g_v.DIST_LINK_PREFIX)
         g_v.DIST_LINK_PATTERN = self.__try_load(block, c_d.SECT_DIST_LINK_PATTERN, g_v.DIST_LINK_PATTERN)
 
+    @log_func_name(logger)
     def __load_translate_block(self, block, model):
         if self.__cfg.has_option(block, c_d.SECT_PAIRS):
             pairs = self.__cfg.get(block, c_d.SECT_PAIRS)
@@ -107,6 +113,7 @@ class CfgLoader:
 
         return ""
 
+    @log_func_name(logger)
     def __add_department(self, block, model):
         prefix = self.__get_dep_prefix(block)
 
@@ -208,6 +215,8 @@ class CfgLoader:
             file.flush()
             file.close()
 
+            logger.info("update.ini was rewrited.")
+
     @staticmethod
     def get_list_of_updates():
         cfg_parser = configparser.ConfigParser()
@@ -234,6 +243,7 @@ class CfgLoader:
 
     @staticmethod
     def add_repo_to_updates(repo_name):
+        logger.info("try add repo {:s} to updates.ini".format(str(repo_name)))
         cfg_parser = configparser.ConfigParser()
 
         cfg_parser.read(c_d.UPDATE_TABLE_PATH)
@@ -255,10 +265,13 @@ class CfgLoader:
 
                 repos = "\n".join(repos_splitted)
 
+        logger.info("Now repos in updates.ini: {:s}".format(repos))
+
         CfgLoader.__rewrite_update_file(cfg_parser, repos)
 
     @staticmethod
     def __rem_repo_from_updates(repo_name):
+        logger.info("try del repo {:s} from updates.ini".format(str(repo_name)))
         cfg_parser = configparser.ConfigParser()
 
         cfg_parser.read(c_d.UPDATE_TABLE_PATH)
@@ -281,9 +294,11 @@ class CfgLoader:
 
             CfgLoader.__rewrite_update_file(cfg_parser, repos)
 
-    def load_config(self, model):
-        logger.info("start load config")
+        logger.info("Now repos in updates.ini: {:s}".format(repos))
 
+
+    @log_func_name(logger)
+    def load_config(self, model):
         blocks = self.__cfg.sections()
 
         for block in blocks:
@@ -294,11 +309,14 @@ class CfgLoader:
             else:
                 self.__add_department(block, model)
 
-        logger.info("config was loaded")
-
         return True
 
     def show(self, block=""):
+        if block:
+            logger.info("Reques to show {:s}".format(block))
+        else:
+            logger.info("Reques to show departments")
+
         if block:
             if self.__cfg.has_section(block):
                 print("Department: {:s}".format(block))
@@ -338,6 +356,8 @@ class CfgLoader:
         run_cmd("rm -f {:s}".format(dst))
 
     def __add_git_hooks(self, dep, repo):
+        logger.info("try to add githook to {:s} of {:s}".format(repo,
+                                                                dep))
         _, repo = self.__separate_repo_and_soft_type(repo)
 
         hooks_path = os.path.join(c_d.GIT_HOOKS_PATH, c_d.POST_RX_HOOK_NAME)
@@ -348,6 +368,8 @@ class CfgLoader:
         self.__do_add_hook(hooks_path, repo_hooks_dir_path)
 
     def __rem_git_hooks(self, dep, repo):
+        logger.info("try to del githook from {:s} of {:s}".format(repo,
+                                                                dep))
         _, repo = self.__separate_repo_and_soft_type(repo)
 
         repo_path = self.__get_repo_path(dep, repo)
@@ -355,7 +377,8 @@ class CfgLoader:
 
         self.__do_rem_hook(hook_path)
 
-    def setup_hooks(self, tag_model):
+    @staticmethod
+    def setup_hooks(tag_model):
         hook_path = os.path.join(c_d.GIT_HOOKS_PATH, c_d.POST_RX_HOOK_NAME)
 
         for dep_name, dep_obj in tag_model.departments.items():
@@ -365,11 +388,14 @@ class CfgLoader:
                 if os.path.exists(repo_obj.link):
                     dst = os.path.join(repo_obj.link, c_d.HOOKS_PATH)
 
-                    self.__do_add_hook(hook_path, dst)
+                    CfgLoader.__do_add_hook(hook_path, dst)
 
     def add_repo(self, block, repos):
         if not block or not repos:
             return
+
+        logger.info("try to add {:s} to {:s}".format(" ".join(repos) if isinstance(repos, list) else repos,
+                                                     block))
 
         repos_b = ""
 
@@ -398,6 +424,9 @@ class CfgLoader:
         if not block or not repos:
             return
 
+        logger.info("try to del {:s} from {:s}".format(" ".join(repos) if isinstance(repos, list) else repos,
+                                                     block))
+
         repos_b = ""
 
         if self.__cfg.has_section(block):
@@ -419,6 +448,7 @@ class CfgLoader:
                 self.__write_cfg()
 
     def add_translate(self, name, tr_name):
+        logger.info("try to add tr {:s} for {:s}".format(tr_name, name))
         if not self.__cfg.has_section(c_d.BLOCK_TRAN):
             self.__cfg[c_d.BLOCK_TRAN] = {}
 
@@ -434,11 +464,14 @@ class CfgLoader:
 
         pairs = "|".join("{:s}:{:s}".format(key, value) for key, value in tr_dict.items())
 
+        logger.info("now translates: {:s}".format(pairs))
+
         self.__cfg[c_d.BLOCK_TRAN][c_d.SECT_PAIRS] = pairs
 
         self.__write_cfg()
 
     def rem_translate(self, translates):
+        logger.info("try to rem tr for {:s}".format(" ".join(translates) if isinstance(translates, list) else translates))
         if self.__cfg.has_section(c_d.BLOCK_TRAN):
             if self.__cfg.has_option(c_d.BLOCK_TRAN, c_d.SECT_PAIRS):
                 pairs = self.__cfg[c_d.BLOCK_TRAN][c_d.SECT_PAIRS]
@@ -460,28 +493,33 @@ class CfgLoader:
 
                 self.__write_cfg()
 
-    def add_department(self, departments):
-        if isinstance(departments, list):
-            for dep in departments:
+                logger.info("now translates: {:s}".format(pairs))
+
+    def add_department(self, deps):
+        logger.info("try to add departments {:s}".format(" ".join(deps) if isinstance(deps, list) else deps))
+        if isinstance(deps, list):
+            for dep in deps:
                 if not self.__cfg.has_section(dep):
                     self.__cfg[dep] = {}
         else:
-            self.__cfg[departments] = {}
+            self.__cfg[deps] = {}
 
         self.__write_cfg()
 
-    def rem_department(self, departments):
-        if isinstance(departments, list):
-            for dep in departments:
+    def rem_department(self, deps):
+        logger.info("try to del departments {:s}".format(" ".join(deps) if isinstance(deps, list) else deps))
+        if isinstance(deps, list):
+            for dep in deps:
                 if self.__cfg.has_section(dep):
                     del self.__cfg[dep]
         else:
-            del self.__cfg[departments]
+            del self.__cfg[deps]
 
         self.__write_cfg()
 
-    def change_prefix(self, department, prefix):
-        if self.__cfg.has_section(department):
-            self.__cfg[department][c_d.OPTION_PREFIX] = prefix
+    def change_prefix(self, dep, prefix):
+        logger.info("try to change prefix {:s} in dep {:s}".format(prefix, dep))
+        if self.__cfg.has_section(dep):
+            self.__cfg[dep][c_d.OPTION_PREFIX] = prefix
 
             self.__write_cfg()

@@ -27,8 +27,8 @@ def run_cmd(command):
     stop(cmd_run_t)
 
     logger.info("exec time: {:s} | pid: {:s} | cmd: \"{:s}\"".format(get_pass_time(cmd_run_t),
-                                                                                  str(threading.get_ident()),
-                                                                                  command))
+                                                                     str(threading.get_ident()),
+                                                                     command))
 
     u_out = out.decode(c_d.DOC_CODE).strip()
     u_err = err.decode(c_d.DOC_CODE).strip()
@@ -42,7 +42,7 @@ def run_cmd(command):
 
 
 def main():
-    print ("do nothing from there")
+    print("do nothing from there")
 
 if __name__ == "__main__":
     main()

@@ -15,10 +15,10 @@ from time_profiler.time_checker import *
 from config_manager import CfgLoader
 from web_generator.web_gen import WebGenerator
 from cmd_executor.cmd_executor import *
-from logger import init_logging
+from logger import init_logging, log_func_name
 
 
-logger = logging.getLogger(c_d.SOLUTION)
+logger = logging.getLogger("{:s}.main".format(c_d.SOLUTION))
 
 
 def init_logger(func):
@@ -195,6 +195,8 @@ def update(cfg_loader, git_man, tag_model):
     logger.info("finish work: {:s}".format(get_pass_time(main_t)))
 
 
+@init_logger
+@log_func_name(logger)
 def setup_hooks():
     tag_model = TagModel()
     cfg_loader = CfgLoader()
@@ -205,7 +207,11 @@ def setup_hooks():
 
 
 @init_logger
-def full_update(updates_list = []):
+@log_func_name(logger)
+def full_update(updates_list = None):
+    if updates_list is None:
+        updates_list = []
+
     tag_model = TagModel()
     git_man = GitMan()
     cfg_loader = CfgLoader(updates_list)
@@ -220,6 +226,8 @@ def partly_update():
         full_update(updates_list)
 
 
+@init_logger
+@log_func_name(logger)
 def add_related_update(args):
     if args and len(args) == 1:
         CfgLoader.add_repo_to_updates(args[0])
@@ -228,6 +236,8 @@ def add_related_update(args):
     return True
 
 
+@init_logger
+@log_func_name(logger)
 def show_config(args):
     cfg_loader = CfgLoader()
 
@@ -237,6 +247,8 @@ def show_config(args):
         cfg_loader.show()
 
 
+@init_logger
+@log_func_name(logger)
 def add_repo(args):
     cfg_loader = CfgLoader()
 
@@ -247,6 +259,8 @@ def add_repo(args):
     return True
 
 
+@init_logger
+@log_func_name(logger)
 def rem_repo(args):
     cfg_loader = CfgLoader()
 
@@ -257,6 +271,8 @@ def rem_repo(args):
     return True
 
 
+@init_logger
+@log_func_name(logger)
 def add_tr(args):
     cfg_loader = CfgLoader()
 
@@ -267,6 +283,8 @@ def add_tr(args):
     return True
 
 
+@init_logger
+@log_func_name(logger)
 def rem_tr(args):
     cfg_loader = CfgLoader()
 
@@ -277,6 +295,8 @@ def rem_tr(args):
     return True
 
 
+@init_logger
+@log_func_name(logger)
 def add_dep(args):
     cfg_loader = CfgLoader()
 
@@ -287,6 +307,8 @@ def add_dep(args):
     return True
 
 
+@init_logger
+@log_func_name(logger)
 def rem_dep(args):
     cfg_loader = CfgLoader()
 
@@ -297,6 +319,8 @@ def rem_dep(args):
     return True
 
 
+@init_logger
+@log_func_name(logger)
 def change_prefix(args):
     cfg_loader = CfgLoader()
 
@@ -307,13 +331,28 @@ def change_prefix(args):
     return True
 
 
-def main():
-    ver = "Версия: {:s}.{:s}.{:s}({:s}) {:s}:{:s}".format(v.V_MAJ,
+def get_version_str():
+    commits_diff = int(v.LAST)
+
+    try:
+        cur = int(v.CURRENT)
+
+        commits_diff = cur - commits_diff
+    except ValueError:
+        commits_diff = 0
+
+    version = "Версия: {:s}.{:s}.{:s}({:s}) {:s}:{:s}".format(v.V_MAJ,
                                                           v.V_MIN,
-                                                          str(int(v.V_BUILD) - int(v.LAST)),
+                                                          str(commits_diff),
                                                           v.V_BUILD,
                                                           v.V_STAT,
                                                           v.HASH)
+    return version
+
+
+def main():
+    ver = get_version_str()
+
     # check options
     optParser = OptionParser(version=ver)
     set_options(optParser)
@@ -331,6 +370,8 @@ def main():
 
     # options branch
     bad_args = False
+
+    # set version
 
     if is_related_update(opts):
         bad_args = add_related_update(args)
