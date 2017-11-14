@@ -338,8 +338,6 @@ def get_version_str():
         cur = int(v.CURRENT)
         v.V_BUILD = str(cur)
 
-        print("cur {:s}".format(str(cur)))
-
         commits_diff = cur - commits_diff
     except ValueError:
         commits_diff = 0
