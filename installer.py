@@ -110,7 +110,7 @@ SCROLLBAR_HEIGHT            = 10
 CUR_WIDTH                   = 0
 
 BACKUPS_MENU_NAME_TXT       = "Select backup"
-CONFIDENCE_MENU_NAME_TXT    = "Are you sure?"
+CONFIDENCE_MENU_NAME_TXT    = "Are you sure to {:s}?"
 
 
 def screen_height_update(func):
@@ -158,23 +158,41 @@ def screen_refresh(func):
 
 @screen_height_update
 @screen_refresh
-def show_confidence_menu():
-    SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, CONFIDENCE_MENU_NAME_TXT, curses.A_BOLD)
+def show_confidence_menu(text):
+    SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, CONFIDENCE_MENU_NAME_TXT.format(text), curses.A_BOLD)
 
     SCREEN.addstr(BODY_HEIGHT + 2, CUR_WIDTH + 2,
                   "ENTER - OK, ESC - Cancel", NORMAL)
 
 
-def check_confidence(func):
-    def wrapped(*args, **kwargs):
-        show_confidence_menu()
+@screen_height_update
+@screen_refresh
+def show_msg(text, timeout = 1.0):
+    SCREEN.addstr(BODY_HEIGHT + 2, CUR_WIDTH + 2, text, NORMAL)
 
-        key = get_key()
+    do_sleep(timeout)
 
-        if key == curses.KEY_ENTER or key == KEY_RETURN:
-            return func(*args, **kwargs)
 
-    return wrapped
+def do_sleep(timeout = 1.0):
+    time.sleep(timeout)
+
+
+def check_confidence(text):
+    def real_check_confidence(func):
+        def wrapped(*args, **kwargs):
+            show_confidence_menu(text)
+
+            key = get_key()
+            while key != KEY_ESC:
+                if key == curses.KEY_ENTER or key == KEY_RETURN:
+                    return func(*args, **kwargs)
+                elif key == KEY_ESC:
+                    break
+
+                key = get_key()
+
+        return wrapped
+    return real_check_confidence
 
 
 def check_existence_strong(func):
@@ -204,6 +222,7 @@ def create_dir(path):
         SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Create dir: {:s}".format(path), NORMAL)
     else:
         SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Dir already exist: {:s}".format(path), NORMAL)
+        do_sleep()
 
 
 @screen_refresh
@@ -215,6 +234,7 @@ def remove_dir(path):
         SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Remove dir: {:s}".format(path), NORMAL)
     else:
         SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Dir already removed: {:s}".format(path), NORMAL)
+        do_sleep()
 
 
 @screen_height_update
@@ -303,6 +323,7 @@ def copy_misc():
     SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Copy: {:s} to {:s}".format(SRC_DIR, SETUP_DIR), NORMAL)
 
 
+@check_confidence("do backup")
 @screen_refresh
 def backup_config():
     SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, COPYING_TXT, curses.A_BOLD)
@@ -325,6 +346,8 @@ def backup_config():
 
     if do_backup:
         cp_dir_dot(CONFIG_DIR, backup_dir)
+    else:
+        show_msg("Same backup already exists or smth else.")
 
     SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Backup config: {:s}".format(CONFIG_FILE), NORMAL)
 
@@ -369,7 +392,14 @@ def create_executable():
     run_helper_file = os.path.join(SETUP_DIR,
                                    RUN_HELPER_FILE)
 
-    if not os.path.exists(SETUP_DIR) or not os.path.exists(run_helper_file):
+    if not os.path.exists(SETUP_DIR):
+        show_msg("{:s} is not exists.".format(SETUP_DIR))
+
+        return
+
+    if not os.path.exists(run_helper_file):
+        show_msg("{:s} is not exists.".format(run_helper_file))
+
         return
 
     create_exec_file(exec_file, run_helper_file)
@@ -448,7 +478,7 @@ def remove_from_crontab():
     SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Task was removed from crontab.", NORMAL)
 
 
-@check_confidence
+@check_confidence("remove backup")
 @screen_refresh
 def remove_backup(pos, backups):
     SCREEN.addstr(NAME_HEIGHT, CUR_WIDTH + 2, REMOVE_BACKUP_TXT, curses.A_BOLD)
@@ -465,12 +495,16 @@ def set_version():
     version_file_path = os.path.join(SETUP_DIR, VERSION_FILE)
 
     if not os.path.exists(version_file_path):
+        show_msg("{:s} is not exists.".format(version_file_path))
+
         return
 
     # get info from repo
     branch = exec_cmd("git rev-parse --abbrev-ref HEAD")
 
     if not branch:
+        show_msg("No git repo.")
+
         return
 
     commits = exec_cmd("git rev-list {:s} --count".format(str(branch)))
@@ -555,6 +589,8 @@ def backups_context():
 
         if selected != "":
             restore_cfg(selected)
+    else:
+        backup_config()
 
 
 def change_params_context():
@@ -616,7 +652,10 @@ def show_backups_menu(pos, backups_list):
         else:
             SCREEN.addstr(BODY_HEIGHT + id, CUR_WIDTH + 2, backup, NORMAL)
 
-    SCREEN.addstr(BODY_HEIGHT + len(backups_list) + 2, CUR_WIDTH + 2, "ENTER - restore, DEL - remove, ESC - cancel", NORMAL)
+    SCREEN.addstr(BODY_HEIGHT + len(backups_list) + 2,
+                  CUR_WIDTH + 2,
+                  "ENTER - restore, SPACE - do backup, DEL - remove, ESC - cancel",
+                  NORMAL)
 
 
 @screen_height_update
@@ -662,7 +701,9 @@ def true_exit(res, msg=""):
     curses.endwin()
 
     if res != 0:
-        print("Error number {:d}. Error Message: {:s}".format(res, msg))
+        text = "Error number {:d}. Error Message: {:s}".format(res, msg)
+        show_msg(text)
+        print(text)
 
     exit(res)
 
@@ -771,6 +812,13 @@ def backups_menu_loop(backups_list):
     show_backups_menu(pos, backups_list)
     menu_sz = len(backups_list)
 
+    def update_backups_list(b_list):
+        b_list = sorted(get_list_of_backups())
+        menu_sz = len(b_list)
+        pos = 0
+
+        return b_list, menu_sz, pos
+
     key = get_key()
     while key != KEY_ESC:
         if key == curses.KEY_UP:
@@ -783,10 +831,14 @@ def backups_menu_loop(backups_list):
                 pos = pos + 1
             else:
                 pos = 0
+        elif key == KEY_SPACE:
+            backup_config()
+
+            backups_list, menu_sz, pos = update_backups_list(backups_list)
         elif key == KEY_DELETE:
             remove_backup(pos, backups_list)
-            menu_sz = len(backups_list)
-            pos = 0
+
+            backups_list, menu_sz, pos = update_backups_list(backups_list)
         elif key == curses.KEY_ENTER or key == KEY_RETURN:
             return backups_menu_accept_actions(pos, backups_list)
 
@@ -794,6 +846,7 @@ def backups_menu_loop(backups_list):
             break
 
         show_backups_menu(pos, backups_list)
+
         key = get_key()
 
     return ""
