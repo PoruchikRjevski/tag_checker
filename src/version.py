@@ -8,6 +8,8 @@ CURRENT         = "current_commits"
 COMMITER        = "last_commiter"
 HASH            = "last_hash"
 
+FULL_VERSION    = ""
+
 
 # 1.5.xx - 286
 # - separate updater

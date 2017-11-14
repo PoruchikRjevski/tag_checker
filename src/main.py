@@ -336,33 +336,35 @@ def get_version_str():
 
     try:
         cur = int(v.CURRENT)
+        v.V_BUILD = str(cur)
+
+        print("cur {:s}".format(str(cur)))
 
         commits_diff = cur - commits_diff
     except ValueError:
         commits_diff = 0
 
-    version = "Версия: {:s}.{:s}.{:s}({:s}) {:s}:{:s}".format(v.V_MAJ,
-                                                          v.V_MIN,
-                                                          str(commits_diff),
-                                                          v.V_BUILD,
-                                                          v.V_STAT,
-                                                          v.HASH)
-    return version
+    v.FULL_VERSION = "Версия: {:s}.{:s}.{:s}({:s}) {:s}:{:s}".format(v.V_MAJ,
+                                                                     v.V_MIN,
+                                                                     str(commits_diff),
+                                                                     v.V_BUILD,
+                                                                     v.V_STAT,
+                                                                     v.HASH)
 
 
 def main():
-    ver = get_version_str()
+    get_version_str()
 
     # check options
-    optParser = OptionParser(version=ver)
-    set_options(optParser)
+    opt_parser = OptionParser(version=v.FULL_VERSION)
+    set_options(opt_parser)
 
-    (opts, args) = optParser.parse_args()
+    (opts, args) = opt_parser.parse_args()
 
     if check_main_opts(opts):
         setup_options(opts)
     else:
-        optParser.print_help()
+        opt_parser.print_help()
         sys.exit(c_d.EXIT_WO)
 
     # check platform
