@@ -1,4 +1,4 @@
-#!/usr/bin/sudo python3
+#!/usr/local/bin/python3
 #post-receive
 
 import os
