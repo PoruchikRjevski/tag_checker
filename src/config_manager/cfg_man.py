@@ -350,7 +350,7 @@ class CfgLoader:
     @staticmethod
     def __do_add_hook(src, dst):
         run_cmd("yes | cp -rf {:s} {:s}".format(src, dst))
-        run_cmd("chmod +x {:s}".format(dst))
+        run_cmd("sudo chmod +x {:s}".format(dst))
 
     @staticmethod
     def __do_rem_hook(dst):
