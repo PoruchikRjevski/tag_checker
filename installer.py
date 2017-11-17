@@ -300,6 +300,11 @@ def add_runnable_rights(dst):
 
 
 @check_existence_weak
+def set_owner_git_to_dir(dst):
+    exec_cmd("chown -R git {:s}*".format(dst))
+
+
+@check_existence_weak
 def create_ln(src, dst):
     exec_cmd("ln -s {:s} {:s}".format(src, dst))
 
@@ -359,6 +364,7 @@ def copy_config():
                                 CONFIG_EXMPL_DIR)
 
     cp_dir_star(src_conf_dir, CONFIG_DIR)
+    set_owner_git_to_dir(CONFIG_DIR)
     SCREEN.addstr(BODY_HEIGHT, CUR_WIDTH + 2, "Copied: {:s} to {:s}".format(SRC_DIR, SETUP_DIR), NORMAL)
 
 
