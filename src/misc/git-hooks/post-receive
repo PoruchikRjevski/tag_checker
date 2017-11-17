@@ -1,18 +1,41 @@
 #!/usr/bin/sudo python3
 #post-receive
 
-import sys
 import os
+import sys
 import configparser
+import subprocess
 
+
+DOC_CODE                        = "utf-8"
 
 UPDATE_TABLE_PATH               = "/etc/tag_checker/update.ini"
 SECTION_UPD                     = "UPDATE"
 OPTION_UPD                      = "to_update"
 
+GIT_REPO_PATH_CMD               = "git rev-parse --show-toplevel"
+
+
+def exec_cmd(cmd):
+    proc = subprocess.Popen(['{:s}\n'.format(cmd)],
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                            shell=True)
+
+    out, _ = proc.communicate()
+
+    out = out.decode(DOC_CODE).strip()
+
+    return out
+
 
 def get_current_repo_name():
-    return os.path.basename(os.getcwd())
+    repo_path = exec_cmd(GIT_REPO_PATH_CMD)
+
+    if not repo_path:
+        repo_path = os.getcwd()
+
+    return os.path.basename(repo_path)
 
 
 def add_repo_to_update_table(repo_name):
