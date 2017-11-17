@@ -153,7 +153,7 @@ def is_show(opts):
 
 
 def is_partly_update(opts):
-    return opts.update
+    return (not opts.fully) and opts.update
 
 
 def is_full_update(opts):
@@ -215,6 +215,8 @@ def full_update(updates_list = None):
     tag_model = TagModel()
     git_man = GitMan()
     cfg_loader = CfgLoader(updates_list)
+    if updates_list:
+        cfg_loader.partly_update = True
 
     update(cfg_loader, git_man, tag_model)
 
