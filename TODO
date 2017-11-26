@@ -1,3 +1,14 @@
+-< TODO >-----------------------------------------------------------------------------------------------------------------------------------------
+
+- solution versions DOMAINS. See [doc/SIH-00003.domains.md]
+
+-< NEED TO RECHECK >------------------------------------------------------------------------------------------------------------------------------
+
++ add "metric" column after version column. See [doc/SIH-00004.metric.md]
+
+-< SEEMS DONE >-----------------------------------------------------------------------------------------------------------------------------------
+
++ add TEST - prefix for tag
 + BUG: sometimes <hash> in link to gitweb not present
     Example: 
         ASE-2 
@@ -24,86 +35,6 @@
 
         item 66 : .... : 491845 2017-04-22 16:33
         for all : .... : 491845 2017-04-22 16:33 [R]
-    
-- add "metric" column after version column. Metric for tags A and B for one device class defined as:
- 
-    def: INST(A, B) - install date and time diff:       -,0,+     A < B => "-",  A = B => "0"  A > B "+"    A relative to B
-    def: DIST(A, B) - direct path commits count diff: x,-,0,+ 
-    
-    Values:
-    
-        -   : lesser
-        0   : equals
-        +   : greater
-        *   : any
-        x   : not exist
-    
-    def: DIST(A, B) = x   =>   A and B in different branches without direct way to each other
-    
-    ISB - [I]tem [S]pecific [B]ranch name is in form "release/<device_class>/item-<id>"
-        
-    if A in ISB              : x => DIST(A, B) = '+'
-    if A in any other branch : x => DIST(A, B) = '-'
-
-    DI(A, B)   B - is the BASE commit, A - testable, D - DIST, I - INST
-    ===:==A is==:==============================================================:===============
-    x* : ****** : see branch specialization                                    :
-    -+ : FORCED : A forced to install old version                              :
-    -* : OLD    : A < B                                                        :
-    0* : OK     : A == B                                                       :
-    +- : OK+EXP : Too scary to move base upper, but A is ok or EXPerimental    :
-    +* : OK     : A >= B                                                       :
-    xxx: ERROR  : base is not exists
-    
-    Realized
-    
-    def: CREAT(A, B) - commit creation date:     x,-,0,+
-    
-    CURRENT realized: 
-    
-    CI (A, B)   B - is the BASE commit, A - testable, I - INST, C - commit create 
-    ===:==A is=====:==============================================================:=========:==============:=============:
-    -+ : FORCED OLD: YLW :                                                        : FORCED  : FORCED OLD   : GRN+RED/BLK :
-    -- : FORCED BB : R+G : why FORCED? m.b. simply old?                           : OLD     : OLD          : YELLOW      :
-    0* : BASE      : GRN : Last by CMT.DATE - ? m.b. simply equals to base?       : OK      : BASE         : GRN+GRN     :
-    +- : EXP_CAN   : BLO : Cancelled experimental?                                : OK+EXP  : EXPERIMENTAL : BLU+BLU     :
-    ++ : EXP       : BLU :                                                        : OK      : BASE+        : GRN+BLU     :
-    ?? : OLD       : RED :                                                        : ERROR   : ERROR        : RED         :
-    
-    Show in metric:
-        <RES> (d/c)
-        <RES> ::= 
-            OK     |    A new            (green)
-            OK/EXP |    A new and exp    (green)
-            FORCED |    A old but forced (yellow)
-            OLD         A old            (red)
-            
-    d - days between commits     (positive is A > B)
-    c - commits between commits  (positive is A > B)
-
-    for "item" or "order" lines -> A is line version, B - base version
-    for "all versions" lines -> A is line version, B - latest installed version to specific device
-    
-- production versions domains. Tag names are:
-
-    <suffix>/<device_class>/ITEM-<id>/<time_stamp>[/<domains>]
-    <suffix>/<device_class>/ORDER-<id>/<time_stamp>[/<domains>]
-    <suffix>/<device_class>/<time_stamp>[/<domains>]
-
-    <suffix> ::= PROD | TEST
-
-    
-    <device_class> ::= ASW-1 | ...
-    <id> ::= 0000 | 0001 | ...
-    <time_stamp> ::= YYYY-MM-DD-HHMM
-    
-    <domains> ::= <domain> | <domain>/<domains>
-    <domain> ::= "linux" | "dos" | ...
-    
-    
-    - show "for all" version for each found domains and for root domain
-    - check versions metrics with base in same domain or in upper domain (if same domain base is not exists)
-
 + for each repo add sw name prefix in config:
 
     HL:asv-1_v2_hl.git
@@ -115,7 +46,6 @@
     then show table in table
         | ASW-1 | #14 | HL | 2017-xx-xx-xxxx
                         DRV| 2017-xx-xx-xxxx
-
 + separate project for true update repo:
     update.ini          -> notes about updated repos
     git_hook            -> [when repo updated] -> add to /etc/tag_checker/update.ini note with updated repo_name
@@ -132,20 +62,12 @@
                         one time per day -> run_helper.py --update --fully
 
 + fix red intensity for metrics visualise
-
 + fix logging
-
 + separate load config for fully and partly update
-
 + change table view:
     + change style to more simplicity
 
 + delete forced to base version
-
 + move jumps to title
-
 + change all hashes visible for user to 9
-
 + reorganizate generated web files structure
-
-- add TEST - prefix for tag

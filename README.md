@@ -34,7 +34,9 @@ Software version installation history web visualization tool.
 - all available actions you can find in ui-menu of script "install.sh"
 
 # Developer manual #
+
 ## Main modules ##
+
 - logger
 - config loader(CfgLoader)
     - load config and put it to model
@@ -49,5 +51,26 @@ Software version installation history web visualization tool.
         - main - last changes for all departments, devices and types(ITEM, ORDER, ALL)
         - for every device
         - for every item number
+        
 ## Hints ##
+
 - use --cfg-dir option for run during debug to setup specific environment
+    for example: 
+        - create folders in <project_root_dir>:
+            [.work/test]
+                [config]
+                [www]
+                [log]
+                [data]
+        - create config file:
+            <project_root_dir>/.work/test/config/config.ini
+                [CONFIG]
+                root_dir = ..
+                out_dir = www
+                log_dir = log
+                data_dir = data
+                ...
+        - create new PyCharm configuration: 
+            CWD:    <project_root_dir>
+            PARAMS: -u -f ... --cfg-dir=.work/test/config
+        
