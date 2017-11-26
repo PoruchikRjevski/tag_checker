@@ -241,7 +241,7 @@ class GitMan:
                                  + g_d.A_FORMAT.format(g_d.AA_FHASH)
                                  + " " + branch)
 
-        return run_cmd(cmd)
+        return run_cmd(cmd).strip('"')
 
     @staticmethod
     def __get_parent_commit_hash(note_hash, last_commit_hash):
