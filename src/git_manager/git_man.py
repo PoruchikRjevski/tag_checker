@@ -570,7 +570,14 @@ class GitMan:
     @staticmethod
     def __get_base_items_list(items):
         if items:
-            return [item for item in items if item.device_selector_type == c_d.TAG_DEVICE_SELECTOR_TYPE_ALL]
+            return [item for item in items if item.is_base_prod()]
+
+        return []
+
+    @staticmethod
+    def __get_test_items_list(items):
+        if items:
+            return [item for item in items if item.is_base_test()]
 
         return []
 
@@ -608,16 +615,9 @@ class GitMan:
                 if not dev_s_items:
                     continue
 
-                base_items = GitMan.__get_base_items_list(dev_s_items)
                 newer_base_item = GitMan.__get_max_item_by_tag_date(GitMan.__get_base_items_list(dev_s_items))
                 newer_of_all_item = GitMan.__get_max_item_by_tag_date(dev_s_items)
                 older_item = GitMan.__get_min_item_by_tag_date(dev_s_items)
-                newer_version_date = None
-
-                red_intense_steps = 1
-                blue_intense_steps = 1
-
-                unic_jumps_by_commit_hash = {}
 
                 if not newer_base_item:
                     newer_base_item = newer_of_all_item

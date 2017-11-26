@@ -49,7 +49,7 @@ class WebGenerator:
 
         WebGenerator.__gen_content_start(index)
         WebGenerator.__gen_iframe(index)
-        WebGenerator.__gen_script(index, os.path.join(c_d.JS_DIR, c_d.SCRIPTS_F_NAME))
+        WebGenerator.__gen_script(index, WebGenerator.join_path(c_d.JS_DIR, c_d.SCRIPTS_F_NAME))
         WebGenerator.__gen_content_end(index)
 
         self.__gen_page_foot_info(index, model)
@@ -158,6 +158,17 @@ class WebGenerator:
         main.close()
 
     @staticmethod
+    def join_path(root, *items):
+        res = root
+        for i in items:
+            if res:
+                res = res + "/" + i
+            else:
+                res = i
+        return res
+
+
+    @staticmethod
     def __gen_page_head(gen, title, level, body_attr=""):
         gen.w_o_tag(h_d.T_HTML, "", True)
         gen.w_o_tag(h_d.T_HEAD, "", True)
@@ -175,7 +186,7 @@ class WebGenerator:
 
         gen.w_o_tag(h_d.T_LINK,
                     h_d.A_REL.format(h_d.A_REL_SS)
-                    + h_d.A_HREF.format(os.path.join(level, c_d.CSS_DIR, c_d.STYLE_F_NAME)), True)
+                    + h_d.A_HREF.format(WebGenerator.join_path(level, c_d.CSS_DIR, c_d.STYLE_F_NAME)), True)
 
         gen.w_tag(h_d.T_TITLE, title, "")
 
@@ -393,7 +404,7 @@ class WebGenerator:
 
                 # device name
                 dev_link_attrs = (model.get_tr_dev(dev_name),
-                                  dir_man.g_dir_man.output_device_dir + WebGenerator.__get_device_file_name(dev_name),
+                                  WebGenerator.join_path(c_d.OUTPUT_DEVICE_REL_DIR, WebGenerator.__get_device_file_name(dev_name)),
                                   h_d.A_TITLE.format(c_d.TO_DEV_TXT))
                 WebGenerator.__gen_device_name(file,
                                                h_d.A_ROWSPAN.format(c_d.BTM_ROWS)

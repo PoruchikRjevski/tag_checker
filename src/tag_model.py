@@ -173,7 +173,7 @@ class Item:
     describes one item
     """
     def __init__(self):
-        self.tag_class = ""
+        self.tag_class = c_d.TAG_CLASS_PROD
         self.device_class = ""
         self.device_selector_id = -1
         self.device_selector_type = c_d.TAG_DEVICE_SELECTOR_TYPE_ALL
@@ -189,6 +189,20 @@ class Item:
         self.commit_index = -1
         self.metric = MetricsInfo()
 
+    def is_base(self):
+        return self.device_selector_type == c_d.TAG_DEVICE_SELECTOR_TYPE_ALL
+
+    def is_prod(self):
+        return self.device_class == c_d.TAG_CLASS_PROD
+
+    def is_test(self):
+        return self.device_class == c_d.TAG_CLASS_TEST
+
+    def is_base_prod(self):
+        return self.is_base() and self.is_prod()
+
+    def is_base_test(self):
+        return self.is_base() and self.is_test()
 
 class CommitInfo:
     """

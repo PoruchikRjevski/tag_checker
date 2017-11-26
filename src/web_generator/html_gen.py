@@ -14,10 +14,8 @@ logger = logging.getLogger("{:s}.HtmlGen".format(c_d.SOLUTION))
 
 class HtmlGen:
     def __init__(self, path, name):
-        dir_p = dir_man.g_dir_man.output_dir
-
         if not os.path.isabs(path):
-            dir_p = os.path.join(dir_p, path)
+            dir_p = os.path.join(dir_man.g_dir_man.output_dir, path)
         else:
             dir_p = path
 
