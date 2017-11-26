@@ -31,9 +31,9 @@ def run_cmd(command):
                                                                      str(threading.get_ident()),
                                                                      command))
 
-    u_out = out.decode(c_d.DOC_CODE).strip()
+    u_out = out.decode(c_d.DOC_ENCODING).strip()
     try:
-        u_err = err.decode(c_d.DOC_CODE).strip()
+        u_err = err.decode(c_d.DOC_ENCODING).strip()
     except:
         try:
             u_err = err.decode("cp866").strip()

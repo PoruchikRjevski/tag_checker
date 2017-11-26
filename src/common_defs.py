@@ -235,7 +235,7 @@ SUDO_CMD            = "sudo "
 
 # OTHER -------------------------------------------------------------
 REPO_SUFFIX         = ".git"
-DOC_CODE            = "utf-8"
+DOC_ENCODING        = "utf-8"
 POST_RX_HOOK_NAME   = "post-receive"
 HOOKS_PATH          = "hooks/"
 

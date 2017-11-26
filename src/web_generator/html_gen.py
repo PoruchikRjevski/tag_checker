@@ -26,7 +26,7 @@ class HtmlGen:
         if not os.path.exists(dir_p):
             os.makedirs(dir_p)
 
-        self.file = open(file_path, 'w')
+        self.file = open(file_path, 'w', encoding=c_d.DOC_ENCODING)
 
         logger.info("create file: " + file_path)
 

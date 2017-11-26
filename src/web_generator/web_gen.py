@@ -161,7 +161,7 @@ class WebGenerator:
     def __gen_page_head(gen, title, level, body_attr=""):
         gen.w_o_tag(h_d.T_HTML, "", True)
         gen.w_o_tag(h_d.T_HEAD, "", True)
-        gen.w_o_tag(h_d.T_META, h_d.A_CHARSET.format(c_d.DOC_CODE), True)
+        gen.w_o_tag(h_d.T_META, h_d.A_CHARSET.format(c_d.DOC_ENCODING), True)
         gen.w_o_tag(h_d.T_META,
                     h_d.A_HTTP_EQUIV.format(h_d.A_HE_CACHE_CONTR)
                     + h_d.A_CONTENT.format(h_d.A_C_NO_CACHE + ", "

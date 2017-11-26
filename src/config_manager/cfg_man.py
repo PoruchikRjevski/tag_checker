@@ -191,7 +191,7 @@ class CfgLoader:
             model.departments[block] = dep
 
     def __write_cfg(self):
-        with open(self.__config_def_path, 'w') as config_file:
+        with open(self.__config_def_path, 'w', encoding=c_d.DOC_ENCODING) as config_file:
             self.__cfg.write(config_file)
 
     @staticmethod
@@ -214,7 +214,7 @@ class CfgLoader:
             return c_d.EXIT_CFNE
 
         self.__cfg = configparser.ConfigParser()
-        self.__cfg.read(self.__config_def_path)
+        self.__cfg.read(self.__config_def_path, encoding=c_d.DOC_ENCODING)
 
         return None
 
@@ -222,7 +222,7 @@ class CfgLoader:
     def __rewrite_update_file(cfg_parser, repos):
         cfg_parser[c_d.SECTION_UPD][c_d.OPTION_UPD] = repos
 
-        with open(dir_man.g_dir_man.git_update_table_file_path, 'w') as file:
+        with open(dir_man.g_dir_man.git_update_table_file_path, 'w', encoding=c_d.DOC_ENCODING) as file:
             cfg_parser.write(file)
 
             file.flush()
