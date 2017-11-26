@@ -2,7 +2,7 @@ import subprocess
 import threading
 import logging
 
-import os
+import sys
 
 import common_defs as c_d
 import global_vars as g_v
@@ -22,7 +22,7 @@ def run_cmd(command):
 
     cmd_run_t = start()
 
-    if os.platform == "win32":
+    if sys.platform == "win32":
         params = '{:s} \n'.format(command).split(" ")
         params = [param for param in params if param]
     else:
