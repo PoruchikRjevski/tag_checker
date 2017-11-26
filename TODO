@@ -86,9 +86,12 @@
     
 - production versions domains. Tag names are:
 
-    PROD/<device_class>/ITEM-<id>/<time_stamp>[/<domains>]
-    PROD/<device_class>/ORDER-<id>/<time_stamp>[/<domains>]
-    PROD/<device_class>/<time_stamp>[/<domains>]
+    <suffix>/<device_class>/ITEM-<id>/<time_stamp>[/<domains>]
+    <suffix>/<device_class>/ORDER-<id>/<time_stamp>[/<domains>]
+    <suffix>/<device_class>/<time_stamp>[/<domains>]
+
+    <suffix> ::= PROD | TEST
+
     
     <device_class> ::= ASW-1 | ...
     <id> ::= 0000 | 0001 | ...
