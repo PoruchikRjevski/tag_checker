@@ -204,27 +204,29 @@ class GitMan:
     def __find_develop_branch(branches):
         res = None
 
-        b_tmp = None
-
         if not isinstance(branches, list):
             b_tmp = [branches]
         else:
             b_tmp = branches
 
         for branch in b_tmp:
-            if g_d.BRANCH_DEVELOP in branch:
-                res = branch
-                if "* " in res:
-                    res = res.replace("* ", "")
+            if "HEAD" not in branch:
+                if g_d.BRANCH_DEVELOP in branch:
+                    res = branch
+                    break
+                else:
+                    if not res:
+                            res = branch
 
-                break
+        if "* " in res:
+            res = res.replace("* ", "")
 
         return res
 
     @staticmethod
     def __get_develop_branch_by_hash(hash):
         cmd = g_d.GIT_CMD.format(g_d.A_BRANCH
-                                 + g_d.A_CONTAINS.format(hash))
+                                 + g_d.A_CONTAINS.format(hash) + " --all")
 
         out = run_cmd(cmd)
 
