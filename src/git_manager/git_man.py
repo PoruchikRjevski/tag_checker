@@ -147,13 +147,13 @@ class GitMan:
                 state[0] = W_BREAK
             else:
                 state[0] = W_DOMAIN
-                item_out.domain = "/"
+                item_out.solution_domain = "/"
                 item_out.tag_date_obj = GitMan.__get_tag_datetime_object(item_out.tag_date)
                 item_out.tag_date_ord = item_out.tag_date_obj.toordinal()
         # W_DOMAIN
         elif state[0] == W_DOMAIN:
-            item_out.domain = item_out.domain + "/" + tag_part
-            logger.info("domain: {:s}".format(item_out.domain))
+            item_out.solution_domain = item_out.solution_domain + "/" + tag_part
+            logger.info("solution domain: {:s}".format(item_out.solution_domain))
 
         # end
         return state[0] != W_BREAK
@@ -423,27 +423,27 @@ class GitMan:
             return None, None
 
         temp = tag_info.split(" {:s}".format(g_d.REFS_TAGS))
-        f_hash = temp[0] if len(temp) >= 1 else None
+        commit_hash_full = temp[0] if len(temp) >= 1 else None
         tag = temp[1] if len(temp) >= 2 else None
 
-        return tag, f_hash
+        return tag, commit_hash_full
 
     @staticmethod
-    def __strict_f_hash(f_hash):
-        return f_hash[:g_d.SHORT_HASH_SIZE] if len(f_hash) >= g_d.SHORT_HASH_SIZE else f_hash
+    def __strict_f_hash(commit_hash_full):
+        return commit_hash_full[:g_d.SHORT_HASH_SIZE] if len(commit_hash_full) >= g_d.SHORT_HASH_SIZE else commit_hash_full
 
     @staticmethod
     def __gen_item(tag_info):
         logger.info("Gen item for tag: {:s}".format(tag_info))
 
         item = Item()
-        tag, f_hash = GitMan.__repair_tag_info(tag_info)
+        tag, commit_hash_full = GitMan.__repair_tag_info(tag_info)
 
-        if tag is None or f_hash is None:
+        if tag is None or commit_hash_full is None:
             return item
 
         item.tag = tag
-        item.f_hash = f_hash
+        item.commit_hash_full = commit_hash_full
 
         if not GitMan.__try_parse_tag(item):
             logger.error("Tag is not classified: " + tag)
@@ -453,7 +453,7 @@ class GitMan:
 
         return item
 
-    def __gen_items(self, tags_list, repo_i):
+    def __gen_items(self, tags_list, repo_index):
         items_out = []
 
         if g_v.MULTITH and len(tags_list) >= self.__m_tasks:
@@ -470,16 +470,16 @@ class GitMan:
         items_out = [item for item in items_out if item.valid]
 
         for item in items_out:
-            item.repo_i = repo_i
+            item.repo_index = repo_index
 
         return items_out
 
     @staticmethod
-    def __get_commits_info(unic_hashes, repo_i):
+    def __get_commits_info(unic_hashes, repo_index):
         commits_out = []
 
         cm_tags_info = GitMan.__get_commit_info_for_all_tags().split("\n")
-        cm_tags_info_true = [cm_tag_info for cm_tag_info in cm_tags_info if cm_tag_info.split("&|")[0] in unic_hashes]
+        cm_tags_info_true = [cm_tag_info for cm_tag_info in cm_tags_info if cm_tag_info.split("&|")[0].strip('"') in unic_hashes]
 
         for cm_tag_info in cm_tags_info_true:
             if g_v.DEBUG:
@@ -512,7 +512,7 @@ class GitMan:
             commit.msg = GitMan.__repair_commit_msg(msg)
             logger.info("item commMsg: {:s}".format(commit.msg))
 
-            commit.repo_i = repo_i
+            commit.repo_index = repo_index
 
             # get pHash
             commit.p_hash = GitMan.__get_parents_short_hash(commit.hash, commit.date)
@@ -529,14 +529,14 @@ class GitMan:
         return commits_out
 
     @log_func_name(logger)
-    def __do_main_work(self, tags_list, commits, repo_i, full_update):
+    def __do_main_work(self, tags_list, commits, repo_index, full_update):
         self.__get_cpus()
 
         items_out = []
 
         # parse tags and gen items
         work_t = start()
-        items_out = self.__gen_items(tags_list, repo_i)
+        items_out = self.__gen_items(tags_list, repo_index)
         stop(work_t)
         logger.info("Gen {:s} items by {:s} tags time: {:s}".format(str(len(items_out)),
                                                                                  str(len(tags_list)),
@@ -544,18 +544,18 @@ class GitMan:
 
         # strict commits hashes from
         for item in items_out:
-            item.cm_hash = GitMan.__strict_f_hash(item.f_hash)
+            item.commit_hash_short = GitMan.__strict_f_hash(item.commit_hash_full)
 
         if full_update:
             # create helper lists
             work_t = start()
-            unic_hashes = list(set([item.f_hash for item in items_out]))
+            unic_hashes = list(set([item.commit_hash_full for item in items_out]))
             stop(work_t)
             logger.info("Create helpers lists: {:s}".format(get_pass_time(work_t)))
 
             # get commits info
             work_t = start()
-            commits_out = GitMan.__get_commits_info(unic_hashes, repo_i)
+            commits_out = GitMan.__get_commits_info(unic_hashes, repo_index)
 
             for commit in commits_out:
                 commits.append(commit)
@@ -568,7 +568,7 @@ class GitMan:
     @staticmethod
     def __get_base_items_list(items):
         if items:
-            return [item for item in items if item.item_type == c_d.TAG_DEVICE_SELECTOR_TYPE_ALL]
+            return [item for item in items if item.device_selector_type == c_d.TAG_DEVICE_SELECTOR_TYPE_ALL]
 
         return []
 
@@ -599,9 +599,9 @@ class GitMan:
     def __do_get_metrics(self, items, dep_obj):
         for dev_name, dev_updated in dep_obj.devices.items():
             for soft_t in dep_obj.soft_types:
-                dev_s_items = [item for item in items if (item.dev_name == dev_name
-                                                          and dep_obj.repos[item.repo_i][REPO_OBJECT].soft_type == soft_t
-                                                          and item.cm_i < len(dep_obj.commits))]
+                dev_s_items = [item for item in items if (item.device_class == dev_name
+                                                          and dep_obj.repos[item.repo_index][REPO_OBJECT].soft_type == soft_t
+                                                          and item.commit_index < len(dep_obj.commits))]
 
                 if not dev_s_items:
                     continue
@@ -615,7 +615,7 @@ class GitMan:
                 red_intense_steps = 1
                 blue_intense_steps = 1
 
-                unic_jumps_by_cm_hash = {}
+                unic_jumps_by_commit_hash = {}
 
                 if not newer_base_item:
                     newer_base_item = newer_of_all_item
@@ -623,7 +623,7 @@ class GitMan:
                 if not newer_base_item:
                     continue
 
-                newer_version_date = dep_obj.commits[newer_base_item.cm_i].date_obj
+                newer_version_date = dep_obj.commits[newer_base_item.commit_index].date_obj
 
                 red_intense_steps = GitMan.__get_steps_for_color_intensity(newer_base_item.tag_date_obj,
                                                                          older_item.tag_date_obj,
@@ -633,13 +633,13 @@ class GitMan:
                                                                           c_d.CLR_BLUE_STEPS)
 
                 # get jumps
-                unic_hashes_list = list(set([item.cm_hash for item in dev_s_items]))
-                unic_jumps_by_cm_hash = GitMan.__get_dict_of_jumps_between_commits(newer_base_item.cm_hash,
+                unic_hashes_list = list(set([item.commit_hash_short for item in dev_s_items]))
+                unic_jumps_by_commit_hash = GitMan.__get_dict_of_jumps_between_commits(newer_base_item.commit_hash_short,
                                                                                  unic_hashes_list)
 
                 for item in dev_s_items:
                     item_i = dep_obj.items.index(item)
-                    item_version_date = dep_obj.commits[item.cm_i].date_obj
+                    item_version_date = dep_obj.commits[item.commit_index].date_obj
 
                     if item.tag_date_obj < newer_base_item.tag_date_obj:
                         dep_obj.items[item_i].metric.old = True
@@ -662,7 +662,7 @@ class GitMan:
                     else:
                         dep_obj.items[item_i].metric.diff_d = newer_base_item.tag_date_obj - item.tag_date_obj
 
-                    dep_obj.items[item_i].metric.jumps = unic_jumps_by_cm_hash[item.cm_hash]
+                    dep_obj.items[item_i].metric.jumps = unic_jumps_by_commit_hash[item.commit_hash_short]
 
     @log_func_name(logger)
     def scanning(self, model):
@@ -700,13 +700,13 @@ class GitMan:
 
                     for commit in dep_obj.commits:
                         for item in items_list:
-                            if commit.repo_i == item.repo_i and commit.hash == item.cm_hash:
-                                item.cm_i = dep_obj.commits.index(commit)
+                            if commit.repo_index == item.repo_index and commit.hash == item.commit_hash_short:
+                                item.commit_index = dep_obj.commits.index(commit)
 
                     for item in items_list:
                         dep_obj.items.append(item)
-                        if item.dev_name not in dep_obj.devices.keys():
-                            dep_obj.devices[item.dev_name] = repo_update_flag
+                        if item.device_class not in dep_obj.devices.keys():
+                            dep_obj.devices[item.device_class] = repo_update_flag
 
                     # do get metrics
                     if repo_update_flag:

@@ -171,7 +171,7 @@ def is_show(opts):
     return opts.show
 
 
-def is_partly_update(opts):
+def is_partial_update(opts):
     return (not opts.fully) and opts.update
 
 
@@ -240,7 +240,7 @@ def full_update(updates_list = None):
     update(cfg_loader, git_man, tag_model)
 
 
-def partly_update():
+def partial_update():
     updates_list = CfgLoader.get_list_of_updates()
 
     if updates_list:
@@ -395,8 +395,8 @@ def main():
         bad_args = add_related_update(args)
     elif is_full_update(opts):
         full_update()
-    elif is_partly_update(opts):
-        partly_update()
+    elif is_partial_update(opts):
+        partial_update()
     elif is_setup_hooks(opts):
         setup_hooks()
     elif is_show(opts):

@@ -181,12 +181,12 @@ class Item:
         self.tag_date = ""
         self.tag_date_obj = None
         self.tag_date_ord = 0
-        self.cm_hash = ""
-        self.f_hash = None
-        self.domain = "/"
+        self.commit_hash_short = ""
+        self.commit_hash_full = None
+        self.solution_domain = "/"
         self.valid = False
-        self.repo_i = -1
-        self.cm_i = -1
+        self.repo_index = -1
+        self.commit_index = -1
         self.metric = MetricsInfo()
 
 
@@ -203,7 +203,7 @@ class CommitInfo:
         self.msg = ""
         self.auth = ""
         self.valid = False
-        self.repo_i = -1
+        self.repo_index = -1
 
 
 class MetricsInfo:

@@ -363,13 +363,13 @@ class WebGenerator:
         dev_item = None
 
         for item in dep.items:
-            if item.dev_name == dev_name:
+            if item.device_class == dev_name:
                 dev_item = item
 
                 break
 
         if not dev_item is None:
-            repo = dep.repos[dev_item.repo_i]
+            repo = dep.repos[dev_item.repo_index]
 
             if UPDATE_FLAG in repo.keys():
                 flag = repo[UPDATE_FLAG]
@@ -506,15 +506,15 @@ class WebGenerator:
 
         logger.info("finish gen pages for device: {:s}".format(dev_name))
 
-    def __gen_history_page(self, model, dep, dev_name, item_num, type, items):
-        logger.info("start gen item page: {:s}".format(str(item_num)))
+    def __gen_history_page(self, model, dep, dev_name, device_selector_id, type, items):
+        logger.info("start gen item page: {:s}".format(str(device_selector_id)))
 
-        item_file_name = WebGenerator.__get_item_file_name(dev_name, item_num)
-        item_dir_name = WebGenerator.__get_item_dir_name(dev_name, item_num)
+        item_file_name = WebGenerator.__get_item_file_name(dev_name, device_selector_id)
+        item_dir_name = WebGenerator.__get_item_dir_name(dev_name, device_selector_id)
 
         dev_str = "{:s} \"{:s}\" - \"{:s}\" [{:s}]".format(c_d.HISTORY_TXT,
                                                            model.get_tr_dev(dev_name),
-                                                           WebGenerator.__get_num_by_type(type, item_num),
+                                                           WebGenerator.__get_num_by_type(type, device_selector_id),
                                                            self.__cur_timestamp)
         dep_str = "{:s} {:s}".format(c_d.DEPART_TXT,
                                      str(dep.name))
@@ -537,7 +537,7 @@ class WebGenerator:
 
         page.close()
 
-        logger.info("finish gen item page: {:s}".format(str(item_num)))
+        logger.info("finish gen item page: {:s}".format(str(device_selector_id)))
 
     @staticmethod
     def __gen_items_content(page, dep, items):
@@ -564,7 +564,7 @@ class WebGenerator:
             soft_type_class = h_d.A_CLASS.format(type_class_id
                                                  + " " + c_d.CL_TEXT_CENTER
                                                  + " " + c_d.CL_BORDER)
-            repo_obj = dep.repos[item.repo_i][REPO_OBJECT]
+            repo_obj = dep.repos[item.repo_index][REPO_OBJECT]
             WebGenerator.__gen_item_soft_type(page,
                                               repo_obj.soft_type,
                                               soft_type_class)
@@ -572,7 +572,7 @@ class WebGenerator:
             # tag date and commit hash
             WebGenerator.__gen_common_columns(page,
                                               repo_obj,
-                                              dep.commits[item.cm_i],
+                                              dep.commits[item.commit_index],
                                               item,
                                               type_class_id)
 
@@ -580,27 +580,27 @@ class WebGenerator:
 
     def __gen_device_content(self, file, model, dep_name, dev_name):
         dep = model.departments[dep_name]
-        dev_items = [item for item in dep.items if item.dev_name == dev_name]
+        dev_items = [item for item in dep.items if item.device_class == dev_name]
 
         type_class_id = 0
         for type in c_d.TAG_DEVICE_SELECTORS:
-            typed_items = [item for item in dev_items if item.item_type == type]
+            typed_items = [item for item in dev_items if item.device_selector_type == type]
 
-            unic_nums = sorted([key for key in dict.fromkeys([item.item_num for item in typed_items]).keys()],
+            unic_nums = sorted([key for key in dict.fromkeys([item.device_selector_id for item in typed_items]).keys()],
                                reverse=False)
 
             for num in unic_nums:
                 first_s_t = True
-                nummed_items = [item for item in typed_items if item.item_num == num]
+                nummed_items = [item for item in typed_items if item.device_selector_id == num]
 
                 soft_type_by_num = []
                 for n_item in nummed_items:
-                    s_type = dep.repos[n_item.repo_i][REPO_OBJECT].soft_type
+                    s_type = dep.repos[n_item.repo_index][REPO_OBJECT].soft_type
                     if s_type not in soft_type_by_num:
                         soft_type_by_num.append(s_type)
 
                 for soft_t in dep.soft_types:
-                    s_typed_items = [item for item in nummed_items if dep.repos[item.repo_i][REPO_OBJECT].soft_type == soft_t]
+                    s_typed_items = [item for item in nummed_items if dep.repos[item.repo_index][REPO_OBJECT].soft_type == soft_t]
 
                     if not s_typed_items:
                         continue
@@ -617,10 +617,10 @@ class WebGenerator:
                     # order num
                     if first_s_t:
                         first_s_t = False
-                        order_link_attrs = (WebGenerator.__get_num_by_type(ld_item.item_type, ld_item.item_num),
+                        order_link_attrs = (WebGenerator.__get_num_by_type(ld_item.device_selector_type, ld_item.device_selector_id),
                                             os.path.join(c_d.OUTPUT_DEVICE_ORDERS_REL_DIR,
-                                                         WebGenerator.__get_item_dir_name(dev_name, ld_item.item_num),
-                                                         WebGenerator.__get_item_file_name(dev_name, ld_item.item_num)),
+                                                         WebGenerator.__get_item_dir_name(dev_name, ld_item.device_selector_id),
+                                                         WebGenerator.__get_item_file_name(dev_name, ld_item.device_selector_id)),
                                             h_d.A_TITLE.format(c_d.CNT_TXT + str(len(nummed_items))))
 
                         WebGenerator.__gen_order_num(file,
@@ -639,8 +639,8 @@ class WebGenerator:
                                                       soft_type_class)
 
                     # tag date and commit hash
-                    repo = dep.repos[ld_item.repo_i][REPO_OBJECT]
-                    commit = dep.commits[ld_item.cm_i]
+                    repo = dep.repos[ld_item.repo_index][REPO_OBJECT]
+                    commit = dep.commits[ld_item.commit_index]
                     WebGenerator.__gen_common_columns(file,
                                                       repo,
                                                       commit,
@@ -704,7 +704,7 @@ class WebGenerator:
                                        + " " + c_d.CL_TD_VER
                                        + " " + c_d.CL_BORDER)
 
-        if item.item_type is c_d.TAG_DEVICE_SELECTOR_TYPE_ALL:
+        if item.device_selector_type is c_d.TAG_DEVICE_SELECTOR_TYPE_ALL:
             ftp_link_c = (c_d.REDIST_TXT,
                           WebGenerator.form_dist_link(commit, repo),
                           h_d.A_TITLE.format(c_d.LINK_FTP_TXT)
