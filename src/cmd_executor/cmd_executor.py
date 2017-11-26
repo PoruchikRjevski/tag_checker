@@ -19,7 +19,9 @@ def run_cmd(command):
     logger.info("cmd: {:s}".format(command))
 
     cmd_run_t = start()
-    params = '{:s}\n'.format(command).split(" ");
+    params = '{:s} \n'.format(command).split(" ")
+    params = [param for param in params if param]
+
     proc = subprocess.Popen(params,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE,
