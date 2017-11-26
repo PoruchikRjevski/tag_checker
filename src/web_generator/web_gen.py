@@ -167,7 +167,6 @@ class WebGenerator:
                 res = i
         return res
 
-
     @staticmethod
     def __gen_page_head(gen, title, level, body_attr=""):
         gen.w_o_tag(h_d.T_HTML, "", True)
@@ -392,11 +391,15 @@ class WebGenerator:
 
     @log_func_name(logger)
     def __gen_main_content(self, model, file):
-        for dep_name, dep_obj in model.departments.items():
+        sorted_dps = sorted(model.departments)
+        for dep_name in sorted_dps:
+            dep_obj = model.departments[dep_name]
             first_dep = True
-            for dev_name, dev_updated in dep_obj.devices.items():
+            sorted_devs = sorted(dep_obj.devices)
+            for dev_name in sorted_devs:
+                dev_updated = dep_obj.devices[dev_name]
                 file.w_o_tag(h_d.T_TR,
-                             h_d.A_CLASS.format(c_d.CL_TR_1))
+                                 h_d.A_CLASS.format(c_d.CL_TR_1))
                 # department
                 if first_dep:
                     first_dep = False
