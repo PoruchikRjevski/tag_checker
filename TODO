@@ -1,5 +1,6 @@
 -< TODO >-----------------------------------------------------------------------------------------------------------------------------------------
 
+! installer MUST NOT overwrite existen config file!!!
 - solution versions DOMAINS. See [doc/SIH-00003.domains.md]
 - form to add info about installed software. See [doc/SIH-00004.tag_create_form.md]
 - domains: fix metric calculations
