@@ -681,8 +681,11 @@ class GitMan:
                 logger.info("repo-link: \"{:s}\"".format(repo_obj.link))
                 logger.info("repo-soft-type: \"{:s}\"".format(repo_obj.soft_type))
 
-                if GitMan.__is_dir_exist(repo_obj.link):
-                    GitMan.__go_to_dir(repo_obj.link)
+                if not GitMan.__is_dir_exist(repo_obj.link):
+                    logger.error("repo not exits: \"{:s}\"".format(repo_obj.link))
+                    continue
+
+                GitMan.__go_to_dir(repo_obj.link)
 
                 tags = GitMan.__get_tags_with_fhash()
 
