@@ -2,8 +2,8 @@ import os
 import global_vars as g_v
 
 # WEB_GEN -----------------------------------------------------------
-OUTPUT_DEVICE_REL_DIR          = "devices/"
-OUTPUT_DEVICE_ORDERS_REL_DIR   = "orders/"
+OUTPUT_DEVICE_REL_DIR          = "devices"
+OUTPUT_DEVICE_ORDERS_REL_DIR   = "orders"
 HTML_EXT            = ".html"
 
 LEVEL_UP            = "../"

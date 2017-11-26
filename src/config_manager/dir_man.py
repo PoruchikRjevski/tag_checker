@@ -70,28 +70,28 @@ class DirManager:
     def default_configure_short_rel_paths(self, root_dir = ""):
         if root_dir:
             self.def_root_dir = root_dir
-        self.def_logger_dir = "log/"
-        self.def_config_dir = "cfg/"
-        self.def_bin_dir = "bin/"
-        self.def_data_dir = "data/"
-        self.def_output_dir = "www/"
+        self.def_logger_dir = "log"
+        self.def_config_dir = "cfg"
+        self.def_bin_dir = "bin"
+        self.def_data_dir = "data"
+        self.def_output_dir = "www"
         self.reconfigure()
 
     def default_configure_long_rel_paths(self, name = "tag_checker", root_dir = ""):
         if root_dir:
             self.def_root_dir = root_dir
-        self.def_logger_dir = "tmp/{:s}/log/".format(name)
-        self.def_config_dir = "etc/{:s}/".format(name)
-        self.def_bin_dir = "opt/{:s}/".format(name)
-        self.def_data_dir = "opt/{:s}/".format(name)
-        self.def_output_dir = "var/www/swver_hist/"
+        self.def_logger_dir = os.path.join("tmp", name, "log")
+        self.def_config_dir = os.path.join("etc", name)
+        self.def_bin_dir = os.path.join("opt", name)
+        self.def_data_dir = os.path.join("opt", name)
+        self.def_output_dir = os.path.join("var", "www", "swver_hist")
         self.reconfigure()
 
     def default_configure_for_in_project_run(self):
-        self.default_configure_short_rel_paths(os.path.join(os.getcwd(), "../.work/root"))
+        self.default_configure_short_rel_paths(os.path.join(os.getcwd(), "..", ".work", "root"))
 
     def default_configure_for_win(self):
-        self.default_configure_short_rel_paths("/C/opt/tag_checker")
+        self.default_configure_short_rel_paths("C:\\opt\\tag_checker")
 
     def default_configure_for_unix(self):
         self.default_configure_long_rel_paths("tag_checker", "/")

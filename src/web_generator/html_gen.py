@@ -24,7 +24,7 @@ class HtmlGen:
         file_path = os.path.join(dir_p, name)
 
         if not os.path.exists(dir_p):
-            os.mkdir(dir_p)
+            os.makedirs(dir_p)
 
         self.file = open(file_path, 'w')
 

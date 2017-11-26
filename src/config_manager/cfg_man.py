@@ -78,7 +78,7 @@ class CfgLoader:
         if not os.path.isabs(dir_man.g_dir_man.def_root_dir):
             dir_man.g_dir_man.def_root_dir = os.path.join(dir_man.g_dir_man.config_dir, dir_man.g_dir_man.def_root_dir)
 
-        dir_man.g_dir_man.reconfigure()
+        dir_man.g_dir_man.reconfigure(dir_man.g_dir_man.def_root_dir)
 
         g_v.DIST_LINK_PREFIX = self.__try_load(block, c_d.SECT_DIST_LINK_PREFIX, g_v.DIST_LINK_PREFIX)
         g_v.DIST_LINK_PATTERN = self.__try_load(block, c_d.SECT_DIST_LINK_PATTERN, g_v.DIST_LINK_PATTERN)
@@ -164,7 +164,7 @@ class CfgLoader:
                 else:
                     pre_link = repo_name
 
-                repo_obj.link = prefix + pre_link
+                repo_obj.link = os.path.join(prefix, pre_link)
                 repo_obj.name = pre_link
                 
                 if not sw_archive_module_id:

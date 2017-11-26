@@ -1,20 +1,18 @@
 #!/usr/bin/sudo python3
-import os
 import sys
 from optparse import OptionParser
-import datetime
 import logging
 
+import os
 
 import common_defs as c_d
 import global_vars as g_v
 import version as v
+from config_manager import CfgLoader, dir_man
 from git_manager import GitMan
 from tag_model import TagModel
 from time_profiler.time_checker import *
-from config_manager import CfgLoader, dir_man
 from web_generator.web_gen import WebGenerator
-from cmd_executor.cmd_executor import *
 from logger import init_logging, log_func_name
 
 
@@ -126,12 +124,18 @@ def setup_options(opts):
     if opts.multithreading:
         g_v.MULTITH = True
     if opts.root_dir:
-        dir_man.g_dir_man.def_root_dir = opts.root_dir
+        if not os.path.isabs(opts.root_dir):
+            dir_man.g_dir_man.def_root_dir = os.path.join(os.getcwd(), opts.root_dir)
+        else:
+            dir_man.g_dir_man.def_root_dir = opts.root_dir
         dir_man.g_dir_man.reconfigure()
     if opts.short_dirs:
         dir_man.g_dir_man.default_configure_short_rel_paths()
     if opts.config_dir:
-        dir_man.g_dir_man.def_config_dir = opts.config_dir
+        if not os.path.isabs(opts.config_dir):
+            dir_man.g_dir_man.def_config_dir = os.path.join(os.getcwd(), opts.config_dir)
+        else:
+            dir_man.g_dir_man.def_config_dir = opts.config_dir
         dir_man.g_dir_man.reconfigure()
 
 

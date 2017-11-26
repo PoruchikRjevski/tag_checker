@@ -840,7 +840,7 @@ class WebGenerator:
 
     @staticmethod
     def __get_item_dir_name(name, num):
-        return "{:s}_{:s}/".format(name, str(num))
+        return "{:s}_{:s}".format(name, str(num))
 
     @staticmethod
     def __get_device_file_name(name):
