@@ -14,9 +14,9 @@ from time_profiler.time_checker import *
 from logger import log_func_name
 
 # parse state machine environment
-W_START, W_DEV, W_OFFSET, W_ITEM, W_DATE, W_DOMEN, W_BREAK = range(7)
-P_PROD, P_DEV, P_ITEM, P_DATE, P_PLATFORM = range(5)
-# true tag seq: P_PROD/P_DEV/P_ITEM(?)/P_DATE/P_PLATFORM(?)
+W_START, W_DEVICE_CLASS, W_DEVICE_SELECTOR_TYPE_DETECTION, W_DEVICE_SELECTOR_TYPE, W_TIMESTAMP, W_DOMAIN, W_BREAK = range(7)
+POS_TAG_CLASS, POS_DEVICE_CLASS, POS_DEVICE_SELECTOR_TYPE, POS_TIMESTAMP, POS_DOMAIN = range(5)
+# true tag naming seq: P_TAG_CLASS/P_DEVICE_CLASS[/P_DEVICE_ITEM]/P_TIMESTAMP[/P_DOMAIN]
 
 __all__ = ['GitMan']
 
@@ -54,8 +54,8 @@ class GitMan:
         return run_cmd(cmd)
 
     @staticmethod
-    def __is_tag_valid(tag):
-        for inc in c_d.PROD:
+    def __is_tag_classified(tag):
+        for inc in c_d.TAG_CLASSES:
             if inc in tag:
                 return True
 
@@ -88,53 +88,57 @@ class GitMan:
         return cur_datetime
 
     @staticmethod
-    def __parce_tag_sm(tag_part, pos, item_out, state):
-        # offset
-        if state[0] == W_OFFSET:
+    def __parse_tag_state_machine(tag_part, pos, item_out, state):
+        """Process one sub-item of tag, update state and return success or not.
+
+        Keyword arguments:
+        tag_part  -- [i]  tag sub-item
+        pos       -- [i]  position of sub-item in tag name sequence
+        item_out  -- [io] Item instance to hold parsed meta data
+        state     -- [io] finite state machine state
+        """
+        if state[0] == W_DEVICE_SELECTOR_TYPE_DETECTION:   # must be resolved separately and in one step with next state
             parts = tag_part.split("-")
-            if len(parts) == 2 and pos == P_ITEM:
-                state[0] = W_ITEM
-            elif len(parts) >= 3 and pos >= P_ITEM:
-                state[0] = W_DATE
+            if len(parts) == 2 and pos == POS_DEVICE_SELECTOR_TYPE:
+                state[0] = W_DEVICE_SELECTOR_TYPE
+            elif len(parts) >= 3 and pos >= POS_DEVICE_SELECTOR_TYPE:
+                state[0] = W_TIMESTAMP
             else:
-                logger.error("Parce error. Bad item num or date.")
+                logger.error("Parse error. Bad item num or date.")
                 state[0] = W_BREAK
 
-        # main
-        # W_START
+        # main processing
         if state[0] == W_START:
-            if GitMan.__is_tag_valid(item_out.tag):
-                logger.info("tag is valid")
-                state[0] = W_DEV
+            if GitMan.__is_tag_classified(item_out.tag):
+                item_out.tag_class = tag_part
+                logger.info("tag class: {:s}".format(item_out.tag_class))
+                state[0] = W_DEVICE_CLASS
             else:
-                logger.info("tag is not valid")
+                logger.info("tag is not classified => bypass")
                 state[0] = W_BREAK
-        # W_DEV
-        elif state[0] == W_DEV:
-            item_out.dev_name = tag_part
-            state[0] = W_OFFSET
-            logger.info("name: {:s}".format(item_out.dev_name))
-        # W_ITEM
-        elif state[0] == W_ITEM:
+        elif state[0] == W_DEVICE_CLASS:
+            item_out.device_class = tag_part
+            state[0] = W_DEVICE_SELECTOR_TYPE_DETECTION
+            logger.info("device class: {:s}".format(item_out.device_class))
+        elif state[0] == W_DEVICE_SELECTOR_TYPE:
             parts = tag_part.split("-")
-            item_out.item_type = parts[0]
+            item_out.device_selector_type = parts[0]
 
             try:
-                item_out.item_num = int(parts[1])
+                item_out.device_selector_id = int(parts[1])
             except ValueError:
-                logger.error("EXCEPT Bad item num: {:s}".format(parts[1]))
+                logger.error("EXCEPT Bad device item num: {:s}".format(parts[1]))
                 state[0] = W_BREAK
             else:
-                if item_out.item_type not in c_d.TYPES_L:
-                    logger.error("Bad item type: {:s}".format(item_out.item_type))
+                if item_out.device_selector_type not in c_d.TAG_DEVICE_SELECTORS:
+                    logger.error("Bad device selector type: {:s}".format(item_out.device_selector_type))
                     state[0] = W_BREAK
                 else:
                     if g_v.DEBUG:
-                        logger.info("type: {:s}".format(item_out.item_type))
-                        logger.info("num: {:s}".format(str(item_out.item_num)))
-                state[0] = W_DATE
-        # W_DATE
-        elif state[0] == W_DATE:
+                        logger.info("type: {:s}".format(item_out.device_selector_type))
+                        logger.info("num: {:s}".format(str(item_out.device_selector_id)))
+                state[0] = W_TIMESTAMP
+        elif state[0] == W_TIMESTAMP:
             item_out.tag_date = GitMan.__repair_tag_date(tag_part)
 
             logger.info("date: {:s}".format(item_out.tag_date))
@@ -142,38 +146,41 @@ class GitMan:
             if item_out.tag_date == c_d.BAD_DATE:
                 state[0] = W_BREAK
             else:
-                state[0] = W_DOMEN
+                state[0] = W_DOMAIN
+                item_out.domain = "/"
                 item_out.tag_date_obj = GitMan.__get_tag_datetime_object(item_out.tag_date)
                 item_out.tag_date_ord = item_out.tag_date_obj.toordinal()
-        # W_DOMEN
-        elif state[0] == W_DOMEN:
-            item_out.platform = tag_part
-            logger.info("platform: {:s}".format(item_out.platform))
+        # W_DOMAIN
+        elif state[0] == W_DOMAIN:
+            item_out.domain = item_out.domain + "/" + tag_part
+            logger.info("domain: {:s}".format(item_out.domain))
 
         # end
-        if state[0] == W_BREAK:
-            return False
-        else:
-            return True
+        return state[0] != W_BREAK
 
     @staticmethod
-    def __parce_tag(items_out):
-        parce_t = start()
-        logger.info("start parce tag")
+    def __try_parse_tag(item):
+        """Parse item tag to meta info.
 
-        tag_parts = items_out.tag.split("/")
+        :param item: Item instance to hold all parsed tag data
+        :return:     success or not
+        """
+        parse_t = start()
+        logger.info("start parse tag")
+
+        tag_parts = item.tag.split("/")
 
         if len(tag_parts) < 3:
-            logger.error("bad tag size: {:s}".format(str(len(tag_parts))))
+            logger.error("tag size mismatch: {:s} => bypass".format(str(len(tag_parts))))
             return False
 
         state = [W_START]
         for part in tag_parts:
-            if not GitMan.__parce_tag_sm(part, tag_parts.index(part), items_out, state):
+            if not GitMan.__parse_tag_state_machine(part, tag_parts.index(part), item, state):
                 return False
 
-        stop(parce_t)
-        logger.info("parce tag time: {:s}".format(get_pass_time(parce_t)))
+        stop(parse_t)
+        logger.info("parse tag time: {:s}".format(get_pass_time(parse_t)))
 
         return True
 
@@ -438,8 +445,8 @@ class GitMan:
         item.tag = tag
         item.f_hash = f_hash
 
-        if not GitMan.__parce_tag(item):
-            logger.error("Bad tag: " + tag)
+        if not GitMan.__try_parse_tag(item):
+            logger.error("Tag is not classified: " + tag)
             return item
 
         item.valid = True
@@ -561,7 +568,7 @@ class GitMan:
     @staticmethod
     def __get_base_items_list(items):
         if items:
-            return [item for item in items if item.item_type == c_d.TYPE_ALL]
+            return [item for item in items if item.item_type == c_d.TAG_DEVICE_SELECTOR_TYPE_ALL]
 
         return []
 

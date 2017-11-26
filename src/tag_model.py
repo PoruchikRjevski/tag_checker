@@ -173,16 +173,17 @@ class Item:
     describes one item
     """
     def __init__(self):
-        self.dev_name = ""
-        self.item_num = -1
-        self.item_type = c_d.TYPE_ALL
+        self.tag_class = ""
+        self.device_class = ""
+        self.device_selector_id = -1
+        self.device_selector_type = c_d.TAG_DEVICE_SELECTOR_TYPE_ALL
         self.tag = ""
         self.tag_date = ""
         self.tag_date_obj = None
         self.tag_date_ord = 0
         self.cm_hash = ""
         self.f_hash = None
-        self.platform = c_d.D_LINUX
+        self.domain = "/"
         self.valid = False
         self.repo_i = -1
         self.cm_i = -1
