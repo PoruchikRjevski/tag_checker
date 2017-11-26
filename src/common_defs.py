@@ -216,7 +216,10 @@ GIT_VER             = "version"
 BAD_DATE            = "BAD DATE"
 
 # TAG MODEL ---------------------------------------------------------
-TAG_CLASSES         = ("PROD", "ROD", "TEST")  # TODO 1: what is "ROD", typo or for testing?
+TAG_CLASS_PROD      = "PROD"
+TAG_CLASS_TEST      = "TEST"
+TAG_CLASSES         = (TAG_CLASS_TEST, TAG_CLASS_PROD, "ROD")  # TODO 1: what is "ROD", typo or for testing?
+TAG_CLASSES_I10N    = ("[тестовая] ", "[актуальная] ", "[?] ")
 WRONG_NUM           = ("xxxx", "XXXX")
 
 TAG_DEVICE_SELECTOR_TYPE_ITEM   = "ITEM"

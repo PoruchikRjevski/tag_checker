@@ -584,79 +584,87 @@ class WebGenerator:
 
         type_class_id = 0
         for type in c_d.TAG_DEVICE_SELECTORS:
-            typed_items = [item for item in dev_items if item.device_selector_type == type]
+            for tag_class in c_d.TAG_CLASSES:
+                tag_class_index = c_d.TAG_CLASSES.index(tag_class)
+                tag_class_i10n = c_d.TAG_CLASSES_I10N[tag_class_index]
 
-            unic_nums = sorted([key for key in dict.fromkeys([item.device_selector_id for item in typed_items]).keys()],
-                               reverse=False)
+                typed_items = [item for item in dev_items if item.device_selector_type == type and item.tag_class == tag_class]
 
-            for num in unic_nums:
-                first_s_t = True
-                nummed_items = [item for item in typed_items if item.device_selector_id == num]
+                unic_nums = sorted([key for key in dict.fromkeys([item.device_selector_id for item in typed_items]).keys()],
+                                   reverse=False)
 
-                soft_type_by_num = []
-                for n_item in nummed_items:
-                    s_type = dep.repos[n_item.repo_index][REPO_OBJECT].soft_type
-                    if s_type not in soft_type_by_num:
-                        soft_type_by_num.append(s_type)
+                for num in unic_nums:
+                    first_s_t = True
+                    nummed_items = [item for item in typed_items if item.device_selector_id == num]
 
-                for soft_t in dep.soft_types:
-                    s_typed_items = [item for item in nummed_items if dep.repos[item.repo_index][REPO_OBJECT].soft_type == soft_t]
+                    soft_type_by_num = []
+                    for n_item in nummed_items:
+                        s_type = dep.repos[n_item.repo_index][REPO_OBJECT].soft_type
+                        if s_type not in soft_type_by_num:
+                            soft_type_by_num.append(s_type)
 
-                    if not s_typed_items:
-                        continue
+                    for soft_t in dep.soft_types:
+                        s_typed_items = [item for item in nummed_items if dep.repos[item.repo_index][REPO_OBJECT].soft_type == soft_t]
 
-                    ld_item = max(s_typed_items, key=lambda item: item.tag_date)
+                        if not s_typed_items:
+                            continue
 
-                    type_class_id_str = c_d.CL_TD_INC.format(str(type_class_id))
+                        ld_item = max(s_typed_items, key=lambda item: item.tag_date)
 
-                    file.w_o_tag(h_d.T_TR,
-                                 h_d.A_CLASS.format(str(type_class_id)) +
-                                 h_d.A_ON_MOUSE_OVER.format(c_d.CALC_METRICS_FUNC) +
-                                 h_d.A_ON_MOUSE_OUT.format(c_d.CALC_DEF_METR_FUNC))
+                        type_class_id_str = c_d.CL_TD_INC.format(str(type_class_id))
 
-                    # order num
-                    if first_s_t:
-                        first_s_t = False
-                        order_link_attrs = (WebGenerator.__get_num_by_type(ld_item.device_selector_type, ld_item.device_selector_id),
-                                            os.path.join(c_d.OUTPUT_DEVICE_ORDERS_REL_DIR,
-                                                         WebGenerator.__get_item_dir_name(dev_name, ld_item.device_selector_id),
-                                                         WebGenerator.__get_item_file_name(dev_name, ld_item.device_selector_id)),
-                                            h_d.A_TITLE.format(c_d.CNT_TXT + str(len(nummed_items))))
+                        file.w_o_tag(h_d.T_TR,
+                                     h_d.A_CLASS.format(str(type_class_id)) +
+                                     h_d.A_ON_MOUSE_OVER.format(c_d.CALC_METRICS_FUNC) +
+                                     h_d.A_ON_MOUSE_OUT.format(c_d.CALC_DEF_METR_FUNC))
 
-                        WebGenerator.__gen_order_num(file,
-                                                     h_d.A_CLASS.format(type_class_id_str
-                                                                        + " " + c_d.CL_TD_NUM
-                                                                        + " " + c_d.CL_BORDER)
-                                                     + h_d.A_ROWSPAN.format(str(len(soft_type_by_num))),
-                                                     [order_link_attrs])
+                        # order num
+                        if first_s_t:
+                            first_s_t = False
+                            title = WebGenerator.__get_num_by_type(ld_item.device_selector_type, ld_item.device_selector_id)
+                            if ld_item.device_selector_type == c_d.TAG_DEVICE_SELECTOR_TYPE_ALL:
+                                title = tag_class_i10n + title
 
-                    # order soft type
-                    soft_type_class = h_d.A_CLASS.format(type_class_id_str
-                                                         + " " + c_d.CL_TEXT_CENTER
-                                                         + " " + c_d.CL_BORDER)
-                    WebGenerator.__gen_item_soft_type(file,
-                                                      soft_t,
-                                                      soft_type_class)
+                            order_link_attrs = (title,
+                                                c_d.OUTPUT_DEVICE_ORDERS_REL_DIR + "/" +
+                                                WebGenerator.__get_item_dir_name(dev_name, ld_item.device_selector_id) + "/" +
+                                                WebGenerator.__get_item_file_name(dev_name, ld_item.device_selector_id),
+                                                h_d.A_TITLE.format(c_d.CNT_TXT + str(len(nummed_items))))
 
-                    # tag date and commit hash
-                    repo = dep.repos[ld_item.repo_index][REPO_OBJECT]
-                    commit = dep.commits[ld_item.commit_index]
-                    WebGenerator.__gen_common_columns(file,
-                                                      repo,
-                                                      commit,
-                                                      ld_item,
-                                                      type_class_id_str)
-                    file.w_c_tag(h_d.T_TR)
+                            WebGenerator.__gen_order_num(file,
+                                                         h_d.A_CLASS.format(type_class_id_str
+                                                                            + " " + c_d.CL_TD_NUM
+                                                                            + " " + c_d.CL_BORDER)
+                                                         + h_d.A_ROWSPAN.format(str(len(soft_type_by_num))),
+                                                         [order_link_attrs])
 
-                # generate page for item
-                self.__gen_history_page(model,
-                                        dep,
-                                        dev_name,
-                                        num,
-                                        type,
-                                        nummed_items)
+                        # order soft type
+                        soft_type_class = h_d.A_CLASS.format(type_class_id_str
+                                                             + " " + c_d.CL_TEXT_CENTER
+                                                             + " " + c_d.CL_BORDER)
+                        WebGenerator.__gen_item_soft_type(file,
+                                                          soft_t,
+                                                          soft_type_class)
 
-            type_class_id += 1
+                        # tag date and commit hash
+                        repo = dep.repos[ld_item.repo_index][REPO_OBJECT]
+                        commit = dep.commits[ld_item.commit_index]
+                        WebGenerator.__gen_common_columns(file,
+                                                          repo,
+                                                          commit,
+                                                          ld_item,
+                                                          type_class_id_str)
+                        file.w_c_tag(h_d.T_TR)
+
+                    # generate page for item
+                    self.__gen_history_page(model,
+                                            dep,
+                                            dev_name,
+                                            num,
+                                            type,
+                                            nummed_items)
+
+                type_class_id += 1
 
     @staticmethod
     def form_dist_link(commit, repo):
