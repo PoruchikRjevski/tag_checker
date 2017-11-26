@@ -173,21 +173,36 @@ class Item:
     describes one item
     """
     def __init__(self):
-        self.dev_name = ""
-        self.item_num = -1
-        self.item_type = c_d.TYPE_ALL
+        self.tag_class = c_d.TAG_CLASS_PROD
+        self.device_class = ""
+        self.device_selector_id = -1
+        self.device_selector_type = c_d.TAG_DEVICE_SELECTOR_TYPE_ALL
         self.tag = ""
         self.tag_date = ""
         self.tag_date_obj = None
         self.tag_date_ord = 0
-        self.cm_hash = ""
-        self.f_hash = None
-        self.platform = c_d.D_LINUX
+        self.commit_hash_short = ""
+        self.commit_hash_full = None
+        self.solution_domain = "/"
         self.valid = False
-        self.repo_i = -1
-        self.cm_i = -1
+        self.repo_index = -1
+        self.commit_index = -1
         self.metric = MetricsInfo()
 
+    def is_base(self):
+        return self.device_selector_type == c_d.TAG_DEVICE_SELECTOR_TYPE_ALL
+
+    def is_prod(self):
+        return self.device_class == c_d.TAG_CLASS_PROD
+
+    def is_test(self):
+        return self.device_class == c_d.TAG_CLASS_TEST
+
+    def is_base_prod(self):
+        return self.is_base() and self.is_prod()
+
+    def is_base_test(self):
+        return self.is_base() and self.is_test()
 
 class CommitInfo:
     """
@@ -202,7 +217,7 @@ class CommitInfo:
         self.msg = ""
         self.auth = ""
         self.valid = False
-        self.repo_i = -1
+        self.repo_index = -1
 
 
 class MetricsInfo:

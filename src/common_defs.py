@@ -2,10 +2,8 @@ import os
 import global_vars as g_v
 
 # WEB_GEN -----------------------------------------------------------
-DEVICE_DIR          = "devices/"
-DEVICE_PATH         = os.path.join(g_v.OUT_PATH, DEVICE_DIR)
-ORDERS_DIR          = "orders/"
-ORDERS_PATH         = os.path.join(DEVICE_PATH, ORDERS_DIR)
+OUTPUT_DEVICE_REL_DIR          = "devices"
+OUTPUT_DEVICE_ORDERS_REL_DIR   = "orders"
 HTML_EXT            = ".html"
 
 LEVEL_UP            = "../"
@@ -189,9 +187,16 @@ OPTION_PREFIX         = "prefix"
 SECT_DIST_LINK_PATTERN = "dist_link_pattern"
 SECT_DIST_LINK_PREFIX = "dist_link_prefix"
 SECT_PAIRS          = "pairs"
-OUT_P               = "out"
 
-CFG_F_NAME          = "config.ini"
+CFG_OUTPUT_DIR_OLD_P = "out"       # deprecated
+CFG_OUTPUT_DIR_P    = "out_dir"
+CFG_ROOT_DIR_P      = "root_dir"
+CFG_BIN_DIR_P       = "bin_dir"
+CFG_CONFIG_DIR_P    = "cfg_dir"
+CFG_DATA_DIR_P      = "data_dir"
+CFG_LOGGER_DIR_P    = "log_dir"
+
+CONFIG_FILE_NAME    = "config.ini"
 
 # LOGGER
 LOG_T               = "LOG"
@@ -211,49 +216,34 @@ GIT_VER             = "version"
 BAD_DATE            = "BAD DATE"
 
 # TAG MODEL ---------------------------------------------------------
-PROD                = ("PROD", "ROD")
+TAG_CLASS_PROD      = "PROD"
+TAG_CLASS_TEST      = "TEST"
+TAG_CLASSES         = (TAG_CLASS_TEST, TAG_CLASS_PROD, "ROD")  # TODO 1: what is "ROD", typo or for testing?
+TAG_CLASSES_I10N    = ("[тестовая] ", "[актуальная] ", "[?] ")
 WRONG_NUM           = ("xxxx", "XXXX")
 
-TYPE_ITEM           = "ITEM"
-TYPE_ORDER          = "ORDER"
-TYPE_ALL            = "ALL"
+TAG_DEVICE_SELECTOR_TYPE_ITEM   = "ITEM"
+TAG_DEVICE_SELECTOR_TYPE_SERIE  = "ORDER"
+TAG_DEVICE_SELECTOR_TYPE_ALL    = "ALL"
 
-TYPES_L             = [TYPE_ITEM, TYPE_ORDER, TYPE_ALL]
-
-D_UNK               = "UNKNOWN"
-D_LINUX               = "LINUX"
-D_WIN               = "WIN"
-D_DOS               = "DOS"
-
-DOMENS_L            = [D_LINUX, D_WIN, D_DOS]
+TAG_DEVICE_SELECTORS = [TAG_DEVICE_SELECTOR_TYPE_ITEM, TAG_DEVICE_SELECTOR_TYPE_SERIE, TAG_DEVICE_SELECTOR_TYPE_ALL]
 
 # PLATFORMS ---------------------------------------------------------
 SOLUTION            = "tag_checker"
-WINDOWS_P           = "windows"
+WINDOWS_P           = "win32"
 LINUX_P             = "linux"
-
-LIN_MAIN_PATH_DEF   = "/opt/tag_checker/"
-
-LIN_OUT_P_DEF       = "/var/www/swver_hist/"
-WIN_OUT_P_DEF       = "../out/"
-
-WIN_LOG_P_DEF       = "../log/"
-LIN_LOG_P_DEF       = "/tmp/tag_checker_log/"
-
-LIN_CFG_P           = "/etc/tag_checker/"
-WIN_CFG_P           = "../cfg/"
 
 # CMD WRAP ----------------------------------------------------------
 SUDO_CMD            = "sudo "
 
 # OTHER -------------------------------------------------------------
 REPO_SUFFIX         = ".git"
-DOC_CODE            = "utf-8"
+DOC_ENCODING        = "utf-8"
 POST_RX_HOOK_NAME   = "post-receive"
 HOOKS_PATH          = "hooks/"
 
-GIT_HOOKS_PATH      = "/opt/tag_checker/misc/git-hooks/"
-UPDATE_TABLE_PATH   = "/etc/tag_checker/update.ini"
+GIT_HOOKS_PATH      = "misc/git-hooks/"
+UPDATE_TABLE_FILE_NAME = "update.ini"
 
 SECTION_UPD         = "UPDATE"
 OPTION_UPD          = "to_update"
@@ -263,7 +253,7 @@ TYPICAL_TIMESTAMP   = "%Y-%m-%d %H:%M"
 # LOGGER
 LOG_TIME            = '%(asctime)s'
 LOG_LEVEL           = '%(levelname)-8s'
-LOG_THREAD           = '%(threadName)-15s'
+LOG_THREAD          = '%(threadName)-15s'
 LOG_FUNC            = '%(funcName)-30s'
 LOG_LINE            = "%(lineno)-4d"
 LOG_CALL            = '%(module)s:%(funcName)s():%(lineno)d'

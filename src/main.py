@@ -1,20 +1,18 @@
 #!/usr/bin/sudo python3
-import os
 import sys
 from optparse import OptionParser
-import datetime
 import logging
 
+import os
 
 import common_defs as c_d
 import global_vars as g_v
 import version as v
+from config_manager import CfgLoader, dir_man
 from git_manager import GitMan
 from tag_model import TagModel
 from time_profiler.time_checker import *
-from config_manager import CfgLoader
 from web_generator.web_gen import WebGenerator
-from cmd_executor.cmd_executor import *
 from logger import init_logging, log_func_name
 
 
@@ -106,6 +104,17 @@ def set_options(parser):
                       help="exec script with using multithreading(may increase speed of esecution on really large "
                            "numbers of cpu cores")
 
+    parser.add_option("-c", "--cfg-dir",
+                      dest="config_dir",
+                      help="overrides config file directory path (rel or abs)")
+    parser.add_option("--root-dir",
+                      dest="root_dir",
+                      help="overrides root directory path")
+    parser.add_option("--short-dirs",
+                      action="store_true", dest="short_dirs",
+                      default=False,
+                      help="do use short relative dirs")
+
 
 def setup_options(opts):
     if opts.verbose:
@@ -114,6 +123,20 @@ def setup_options(opts):
         g_v.LOGGING = True
     if opts.multithreading:
         g_v.MULTITH = True
+    if opts.root_dir:
+        if not os.path.isabs(opts.root_dir):
+            dir_man.g_dir_man.def_root_dir = os.path.join(os.getcwd(), opts.root_dir)
+        else:
+            dir_man.g_dir_man.def_root_dir = opts.root_dir
+        dir_man.g_dir_man.reconfigure()
+    if opts.short_dirs:
+        dir_man.g_dir_man.default_configure_short_rel_paths()
+    if opts.config_dir:
+        if not os.path.isabs(opts.config_dir):
+            dir_man.g_dir_man.def_config_dir = os.path.join(os.getcwd(), opts.config_dir)
+        else:
+            dir_man.g_dir_man.def_config_dir = opts.config_dir
+        dir_man.g_dir_man.reconfigure()
 
 
 def check_main_opts(opts):
@@ -152,7 +175,7 @@ def is_show(opts):
     return opts.show
 
 
-def is_partly_update(opts):
+def is_partial_update(opts):
     return (not opts.fully) and opts.update
 
 
@@ -221,7 +244,7 @@ def full_update(updates_list = None):
     update(cfg_loader, git_man, tag_model)
 
 
-def partly_update():
+def partial_update():
     updates_list = CfgLoader.get_list_of_updates()
 
     if updates_list:
@@ -367,9 +390,6 @@ def main():
         opt_parser.print_help()
         sys.exit(c_d.EXIT_WO)
 
-    # check platform
-    g_v.CUR_PLATFORM = sys.platform
-
     # options branch
     bad_args = False
 
@@ -379,8 +399,8 @@ def main():
         bad_args = add_related_update(args)
     elif is_full_update(opts):
         full_update()
-    elif is_partly_update(opts):
-        partly_update()
+    elif is_partial_update(opts):
+        partial_update()
     elif is_setup_hooks(opts):
         setup_hooks()
     elif is_show(opts):

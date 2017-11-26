@@ -1,1 +1,2 @@
 from config_manager.cfg_man import CfgLoader
+from config_manager.dir_man import DirManager

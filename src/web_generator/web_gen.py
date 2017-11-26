@@ -3,6 +3,7 @@ import logging
 import datetime
 from collections import OrderedDict
 
+from config_manager import dir_man
 from web_generator.html_gen import HtmlGen
 
 import common_defs as c_d
@@ -42,13 +43,13 @@ class WebGenerator:
     @log_func_name(logger)
     def __gen_index(self, model):
         logger.info("start gen index")
-        index = HtmlGen(g_v.OUT_PATH, c_d.INDEX_F_NAME)
+        index = HtmlGen(dir_man.g_dir_man.output_dir, c_d.INDEX_F_NAME)
 
         WebGenerator.__gen_page_head(index, c_d.M_HEAD_TXT, "", h_d.A_CLASS.format(c_d.CL_BACK_CIRLE))
 
         WebGenerator.__gen_content_start(index)
         WebGenerator.__gen_iframe(index)
-        WebGenerator.__gen_script(index, os.path.join(c_d.JS_DIR, c_d.SCRIPTS_F_NAME))
+        WebGenerator.__gen_script(index, WebGenerator.join_path(c_d.JS_DIR, c_d.SCRIPTS_F_NAME))
         WebGenerator.__gen_content_end(index)
 
         self.__gen_page_foot_info(index, model)
@@ -60,7 +61,7 @@ class WebGenerator:
     @staticmethod
     @log_func_name(logger)
     def __gen_read_metrics_help_page():
-        help_p = HtmlGen(g_v.OUT_PATH, c_d.HELP_METR_F_NAME)
+        help_p = HtmlGen(dir_man.g_dir_man.output_dir, c_d.HELP_METR_F_NAME)
 
         WebGenerator.__gen_page_head(help_p, c_d.READ_METR_TXT, "", h_d.A_CLASS.format(c_d.CL_BACK_CIRLE))
 
@@ -140,7 +141,7 @@ class WebGenerator:
 
     @log_func_name(logger)
     def __gen_pages(self, model):
-        main = HtmlGen(g_v.OUT_PATH, c_d.MAIN_F_NAME)
+        main = HtmlGen(dir_man.g_dir_man.output_dir, c_d.MAIN_F_NAME)
 
         WebGenerator.__gen_page_head(main, c_d.M_HEAD_TXT, "")
 
@@ -157,10 +158,20 @@ class WebGenerator:
         main.close()
 
     @staticmethod
+    def join_path(root, *items):
+        res = root
+        for i in items:
+            if res:
+                res = res + "/" + i
+            else:
+                res = i
+        return res
+
+    @staticmethod
     def __gen_page_head(gen, title, level, body_attr=""):
         gen.w_o_tag(h_d.T_HTML, "", True)
         gen.w_o_tag(h_d.T_HEAD, "", True)
-        gen.w_o_tag(h_d.T_META, h_d.A_CHARSET.format(c_d.DOC_CODE), True)
+        gen.w_o_tag(h_d.T_META, h_d.A_CHARSET.format(c_d.DOC_ENCODING), True)
         gen.w_o_tag(h_d.T_META,
                     h_d.A_HTTP_EQUIV.format(h_d.A_HE_CACHE_CONTR)
                     + h_d.A_CONTENT.format(h_d.A_C_NO_CACHE + ", "
@@ -174,7 +185,7 @@ class WebGenerator:
 
         gen.w_o_tag(h_d.T_LINK,
                     h_d.A_REL.format(h_d.A_REL_SS)
-                    + h_d.A_HREF.format(os.path.join(level, c_d.CSS_DIR, c_d.STYLE_F_NAME)), True)
+                    + h_d.A_HREF.format(WebGenerator.join_path(level, c_d.CSS_DIR, c_d.STYLE_F_NAME)), True)
 
         gen.w_tag(h_d.T_TITLE, title, "")
 
@@ -362,13 +373,13 @@ class WebGenerator:
         dev_item = None
 
         for item in dep.items:
-            if item.dev_name == dev_name:
+            if item.device_class == dev_name:
                 dev_item = item
 
                 break
 
         if not dev_item is None:
-            repo = dep.repos[dev_item.repo_i]
+            repo = dep.repos[dev_item.repo_index]
 
             if UPDATE_FLAG in repo.keys():
                 flag = repo[UPDATE_FLAG]
@@ -380,11 +391,15 @@ class WebGenerator:
 
     @log_func_name(logger)
     def __gen_main_content(self, model, file):
-        for dep_name, dep_obj in model.departments.items():
+        sorted_dps = sorted(model.departments)
+        for dep_name in sorted_dps:
+            dep_obj = model.departments[dep_name]
             first_dep = True
-            for dev_name, dev_updated in dep_obj.devices.items():
+            sorted_devs = sorted(dep_obj.devices)
+            for dev_name in sorted_devs:
+                dev_updated = dep_obj.devices[dev_name]
                 file.w_o_tag(h_d.T_TR,
-                             h_d.A_CLASS.format(c_d.CL_TR_1))
+                                 h_d.A_CLASS.format(c_d.CL_TR_1))
                 # department
                 if first_dep:
                     first_dep = False
@@ -392,7 +407,7 @@ class WebGenerator:
 
                 # device name
                 dev_link_attrs = (model.get_tr_dev(dev_name),
-                                  c_d.DEVICE_PATH + WebGenerator.__get_device_file_name(dev_name),
+                                  WebGenerator.join_path(c_d.OUTPUT_DEVICE_REL_DIR, WebGenerator.__get_device_file_name(dev_name)),
                                   h_d.A_TITLE.format(c_d.TO_DEV_TXT))
                 WebGenerator.__gen_device_name(file,
                                                h_d.A_ROWSPAN.format(c_d.BTM_ROWS)
@@ -421,11 +436,11 @@ class WebGenerator:
     def __get_num_by_type(type, num):
         res = ""
 
-        if c_d.TYPE_ALL in type:
+        if c_d.TAG_DEVICE_SELECTOR_TYPE_ALL in type:
             res = c_d.T_FOR_ALL_TXT
-        elif c_d.TYPE_ITEM in type:
+        elif c_d.TAG_DEVICE_SELECTOR_TYPE_ITEM in type:
             res = c_d.T_ITEM_TXT + str(num)
-        elif c_d.TYPE_ORDER in type:
+        elif c_d.TAG_DEVICE_SELECTOR_TYPE_SERIE in type:
             res = c_d.T_ORDER_TXT + str(num)
 
         return res
@@ -475,7 +490,7 @@ class WebGenerator:
 
     def __gen_device_page(self, model, dep_name, dev_name):
         logger.info("start gen pages for device: {:s}".format(dev_name))
-        page = HtmlGen(c_d.DEVICE_PATH, WebGenerator.__get_device_file_name(dev_name))
+        page = HtmlGen(dir_man.g_dir_man.output_device_dir, WebGenerator.__get_device_file_name(dev_name))
 
         dev_str = "{:s} \"{:s}\" [{:s}]".format(c_d.HISTORY_TXT,
                                                 model.get_tr_dev(dev_name),
@@ -505,20 +520,20 @@ class WebGenerator:
 
         logger.info("finish gen pages for device: {:s}".format(dev_name))
 
-    def __gen_history_page(self, model, dep, dev_name, item_num, type, items):
-        logger.info("start gen item page: {:s}".format(str(item_num)))
+    def __gen_history_page(self, model, dep, dev_name, device_selector_id, type, items):
+        logger.info("start gen item page: {:s}".format(str(device_selector_id)))
 
-        item_file_name = WebGenerator.__get_item_file_name(dev_name, item_num)
-        item_dir_name = WebGenerator.__get_item_dir_name(dev_name, item_num)
+        item_file_name = WebGenerator.__get_item_file_name(dev_name, device_selector_id)
+        item_dir_name = WebGenerator.__get_item_dir_name(dev_name, device_selector_id)
 
         dev_str = "{:s} \"{:s}\" - \"{:s}\" [{:s}]".format(c_d.HISTORY_TXT,
                                                            model.get_tr_dev(dev_name),
-                                                           WebGenerator.__get_num_by_type(type, item_num),
+                                                           WebGenerator.__get_num_by_type(type, device_selector_id),
                                                            self.__cur_timestamp)
         dep_str = "{:s} {:s}".format(c_d.DEPART_TXT,
                                      str(dep.name))
 
-        page = HtmlGen(os.path.join(c_d.ORDERS_PATH, item_dir_name), item_file_name)
+        page = HtmlGen(os.path.join(dir_man.g_dir_man.output_orders_dir, item_dir_name), item_file_name)
 
         WebGenerator.__gen_page_head(page, dev_str, c_d.LEVEL_UP * 3)
         WebGenerator.__gen_content_start(page)
@@ -536,7 +551,15 @@ class WebGenerator:
 
         page.close()
 
-        logger.info("finish gen item page: {:s}".format(str(item_num)))
+        logger.info("finish gen item page: {:s}".format(str(device_selector_id)))
+
+    @staticmethod
+    def __gen_soft_type_typyle(soft_type, domain):
+        domain_title = domain.strip(".")
+        if domain_title:
+            return "{:s} : {:s}".format(soft_type, domain_title)
+        else:
+            return soft_type
 
     @staticmethod
     def __gen_items_content(page, dep, items):
@@ -563,15 +586,15 @@ class WebGenerator:
             soft_type_class = h_d.A_CLASS.format(type_class_id
                                                  + " " + c_d.CL_TEXT_CENTER
                                                  + " " + c_d.CL_BORDER)
-            repo_obj = dep.repos[item.repo_i][REPO_OBJECT]
+            repo_obj = dep.repos[item.repo_index][REPO_OBJECT]
             WebGenerator.__gen_item_soft_type(page,
-                                              repo_obj.soft_type,
+                                              WebGenerator.__gen_soft_type_typyle(repo_obj.soft_type, item.solution_domain),
                                               soft_type_class)
 
             # tag date and commit hash
             WebGenerator.__gen_common_columns(page,
                                               repo_obj,
-                                              dep.commits[item.cm_i],
+                                              dep.commits[item.commit_index],
                                               item,
                                               type_class_id)
 
@@ -579,83 +602,111 @@ class WebGenerator:
 
     def __gen_device_content(self, file, model, dep_name, dev_name):
         dep = model.departments[dep_name]
-        dev_items = [item for item in dep.items if item.dev_name == dev_name]
+        dev_items = [item for item in dep.items if item.device_class == dev_name]
 
         type_class_id = 0
-        for type in c_d.TYPES_L:
-            typed_items = [item for item in dev_items if item.item_type == type]
+        for type in c_d.TAG_DEVICE_SELECTORS:
+            for tag_class in c_d.TAG_CLASSES:
+                tag_class_index = c_d.TAG_CLASSES.index(tag_class)
+                tag_class_i10n = c_d.TAG_CLASSES_I10N[tag_class_index]
 
-            unic_nums = sorted([key for key in dict.fromkeys([item.item_num for item in typed_items]).keys()],
-                               reverse=False)
+                typed_items = [item for item in dev_items if item.device_selector_type == type and item.tag_class == tag_class]
 
-            for num in unic_nums:
-                first_s_t = True
-                nummed_items = [item for item in typed_items if item.item_num == num]
+                unic_nums = sorted([key for key in dict.fromkeys([item.device_selector_id for item in typed_items]).keys()],
+                                   reverse=False)
 
-                soft_type_by_num = []
-                for n_item in nummed_items:
-                    s_type = dep.repos[n_item.repo_i][REPO_OBJECT].soft_type
-                    if s_type not in soft_type_by_num:
-                        soft_type_by_num.append(s_type)
+                for num in unic_nums:
+                    first_s_t = True
+                    nummed_items = [item for item in typed_items if item.device_selector_id == num]
 
-                for soft_t in dep.soft_types:
-                    s_typed_items = [item for item in nummed_items if dep.repos[item.repo_i][REPO_OBJECT].soft_type == soft_t]
+                    soft_type_by_num = []
+                    for n_item in nummed_items:
+                        s_type = dep.repos[n_item.repo_index][REPO_OBJECT].soft_type
+                        if s_type not in soft_type_by_num:
+                            soft_type_by_num.append(s_type)
 
-                    if not s_typed_items:
-                        continue
+                    for soft_t in dep.soft_types:
+                        s_typed_items = [item for item in nummed_items if dep.repos[item.repo_index][REPO_OBJECT].soft_type == soft_t]
 
-                    ld_item = max(s_typed_items, key=lambda item: item.tag_date)
+                        if not s_typed_items:
+                            continue
 
-                    type_class_id_str = c_d.CL_TD_INC.format(str(type_class_id))
+                        pre_ld_item = max(s_typed_items, key=lambda item: item.tag_date)
+                        if pre_ld_item.device_selector_type != c_d.TAG_DEVICE_SELECTOR_TYPE_ALL:
+                            domains = [pre_ld_item.solution_domain]
+                        else:
+                            for n_item in nummed_items:
+                                new_domain = n_item.solution_domain
+                                if new_domain not in domains:
+                                    domains.append(new_domain)
+                            domains = sorted(domains)
 
-                    file.w_o_tag(h_d.T_TR,
-                                 h_d.A_CLASS.format(str(type_class_id)) +
-                                 h_d.A_ON_MOUSE_OVER.format(c_d.CALC_METRICS_FUNC) +
-                                 h_d.A_ON_MOUSE_OUT.format(c_d.CALC_DEF_METR_FUNC))
+                        for domain in domains:
 
-                    # order num
-                    if first_s_t:
-                        first_s_t = False
-                        order_link_attrs = (WebGenerator.__get_num_by_type(ld_item.item_type, ld_item.item_num),
-                                            os.path.join(c_d.ORDERS_DIR,
-                                                         WebGenerator.__get_item_dir_name(dev_name, ld_item.item_num),
-                                                         WebGenerator.__get_item_file_name(dev_name, ld_item.item_num)),
-                                            h_d.A_TITLE.format(c_d.CNT_TXT + str(len(nummed_items))))
+                            d_typed_items = [item for item in s_typed_items if
+                                             item.solution_domain == domain]
 
-                        WebGenerator.__gen_order_num(file,
-                                                     h_d.A_CLASS.format(type_class_id_str
-                                                                        + " " + c_d.CL_TD_NUM
-                                                                        + " " + c_d.CL_BORDER)
-                                                     + h_d.A_ROWSPAN.format(str(len(soft_type_by_num))),
-                                                     [order_link_attrs])
+                            if not d_typed_items:
+                                continue
 
-                    # order soft type
-                    soft_type_class = h_d.A_CLASS.format(type_class_id_str
-                                                         + " " + c_d.CL_TEXT_CENTER
-                                                         + " " + c_d.CL_BORDER)
-                    WebGenerator.__gen_item_soft_type(file,
-                                                      soft_t,
-                                                      soft_type_class)
+                            ld_item = max(d_typed_items, key=lambda item: item.tag_date)
 
-                    # tag date and commit hash
-                    repo = dep.repos[ld_item.repo_i][REPO_OBJECT]
-                    commit = dep.commits[ld_item.cm_i]
-                    WebGenerator.__gen_common_columns(file,
-                                                      repo,
-                                                      commit,
-                                                      ld_item,
-                                                      type_class_id_str)
-                    file.w_c_tag(h_d.T_TR)
+                            type_class_id_str = c_d.CL_TD_INC.format(str(type_class_id))
 
-                # generate page for item
-                self.__gen_history_page(model,
-                                        dep,
-                                        dev_name,
-                                        num,
-                                        type,
-                                        nummed_items)
+                            file.w_o_tag(h_d.T_TR,
+                                         h_d.A_CLASS.format(str(type_class_id)) +
+                                         h_d.A_ON_MOUSE_OVER.format(c_d.CALC_METRICS_FUNC) +
+                                         h_d.A_ON_MOUSE_OUT.format(c_d.CALC_DEF_METR_FUNC))
 
-            type_class_id += 1
+                            # order num
+                            if first_s_t:
+                                first_s_t = False
+                                title = WebGenerator.__get_num_by_type(ld_item.device_selector_type, ld_item.device_selector_id)
+                                if ld_item.device_selector_type == c_d.TAG_DEVICE_SELECTOR_TYPE_ALL:
+                                    title = tag_class_i10n + title
+
+                                order_link_attrs = (title,
+                                                    WebGenerator.join_path(
+                                                        c_d.OUTPUT_DEVICE_ORDERS_REL_DIR,
+                                                        WebGenerator.__get_item_dir_name(dev_name, ld_item.device_selector_id),
+                                                        WebGenerator.__get_item_file_name(dev_name, ld_item.device_selector_id)),
+                                                    h_d.A_TITLE.format(c_d.CNT_TXT + str(len(nummed_items))))
+
+                                WebGenerator.__gen_order_num(file,
+                                                             h_d.A_CLASS.format(type_class_id_str
+                                                                                + " " + c_d.CL_TD_NUM
+                                                                                + " " + c_d.CL_BORDER)
+                                                             + h_d.A_ROWSPAN.format(str(len(soft_type_by_num)*len(domains))),
+                                                             [order_link_attrs])
+
+                            # order soft type
+                            soft_type_class = h_d.A_CLASS.format(type_class_id_str
+                                                             + " " + c_d.CL_TEXT_CENTER
+                                                             + " " + c_d.CL_BORDER)
+
+                            WebGenerator.__gen_item_soft_type(file,
+                                                              WebGenerator.__gen_soft_type_typyle(soft_t, domain),
+                                                              soft_type_class)
+
+                            # tag date and commit hash
+                            repo = dep.repos[ld_item.repo_index][REPO_OBJECT]
+                            commit = dep.commits[ld_item.commit_index]
+                            WebGenerator.__gen_common_columns(file,
+                                                          repo,
+                                                          commit,
+                                                          ld_item,
+                                                          type_class_id_str)
+                            file.w_c_tag(h_d.T_TR)
+
+                    # generate page for item
+                    self.__gen_history_page(model,
+                                            dep,
+                                            dev_name,
+                                            num,
+                                            type,
+                                            nummed_items)
+
+                type_class_id += 1
 
     @staticmethod
     def form_dist_link(commit, repo):
@@ -703,7 +754,7 @@ class WebGenerator:
                                        + " " + c_d.CL_TD_VER
                                        + " " + c_d.CL_BORDER)
 
-        if item.item_type is c_d.TYPE_ALL:
+        if item.device_selector_type is c_d.TAG_DEVICE_SELECTOR_TYPE_ALL:
             ftp_link_c = (c_d.REDIST_TXT,
                           WebGenerator.form_dist_link(commit, repo),
                           h_d.A_TITLE.format(c_d.LINK_FTP_TXT)
@@ -839,7 +890,7 @@ class WebGenerator:
 
     @staticmethod
     def __get_item_dir_name(name, num):
-        return "{:s}_{:s}/".format(name, str(num))
+        return "{:s}_{:s}".format(name, str(num))
 
     @staticmethod
     def __get_device_file_name(name):
@@ -860,7 +911,7 @@ class WebGenerator:
         self.__set_current_timestamp()
 
         if not partly_update:
-            WebGenerator.__clear_out_dir(g_v.OUT_PATH)
+            WebGenerator.__clear_out_dir(dir_man.g_dir_man.output_dir)
             WebGenerator.__gen_read_metrics_help_page()
 
         self.__gen_index(model)

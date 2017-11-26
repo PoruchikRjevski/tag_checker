@@ -2,6 +2,8 @@ import subprocess
 import threading
 import logging
 
+import sys
+
 import common_defs as c_d
 import global_vars as g_v
 from time_profiler.time_checker import *
@@ -19,7 +21,14 @@ def run_cmd(command):
     logger.info("cmd: {:s}".format(command))
 
     cmd_run_t = start()
-    proc = subprocess.Popen(['{:s}\n'.format(command)],
+
+    if sys.platform == "win32":
+        params = '{:s} \n'.format(command).split(" ")
+        params = [param for param in params if param]
+    else:
+        params = '{:s}\n'.format(command)
+
+    proc = subprocess.Popen(params,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE,
                             shell=True)
@@ -30,8 +39,14 @@ def run_cmd(command):
                                                                      str(threading.get_ident()),
                                                                      command))
 
-    u_out = out.decode(c_d.DOC_CODE).strip()
-    u_err = err.decode(c_d.DOC_CODE).strip()
+    u_out = out.decode(c_d.DOC_ENCODING).strip()
+    try:
+        u_err = err.decode(c_d.DOC_ENCODING).strip()
+    except:
+        try:
+            u_err = err.decode("cp866").strip()
+        except:
+            u_err = ":("
 
     logger.info("out: {:s}".format(u_out))
 

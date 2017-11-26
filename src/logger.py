@@ -4,7 +4,7 @@ import datetime
 
 import common_defs as c_d
 import global_vars as g_v
-
+from config_manager import dir_man
 
 __all__ = ['init_logging', 'log_func_name']
 
@@ -31,13 +31,7 @@ def log_func_name(t_logger):
 
 
 def gen_path(name):
-    path = ""
-    if g_v.CUR_PLATFORM == c_d.LINUX_P:
-        path = c_d.LIN_LOG_P_DEF
-    elif g_v.CUR_PLATFORM == c_d.WINDOWS_P:
-        path = os.path.join(os.getcwd(), c_d.WIN_LOG_P_DEF)
-
-    path = os.path.join(path, "{:s}_{:s}".format(name, datetime.datetime.now().strftime(c_d.TYPICAL_TIMESTAMP)))
+    path = os.path.join(dir_man.g_dir_man.logger_dir, "{:s}_{:s}".format(name, datetime.datetime.now().strftime(c_d.TYPICAL_TIMESTAMP)))
 
     if not os.path.exists(path):
         os.makedirs(path, 0o777, True)

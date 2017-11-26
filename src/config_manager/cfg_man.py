@@ -5,6 +5,7 @@ import logging
 
 import common_defs as c_d
 import global_vars as g_v
+from config_manager import dir_man
 from tag_model import *
 from cmd_executor.cmd_executor import *
 from logger import log_func_name
@@ -45,18 +46,11 @@ class CfgLoader:
 
     def __gen_paths(self):
         self.__config_def_path = ""
-
-        if g_v.CUR_PLATFORM == c_d.LINUX_P:
-            self.__config_def_path = os.path.join(c_d.LIN_CFG_P, c_d.CFG_F_NAME)
-        elif g_v.CUR_PLATFORM == c_d.WINDOWS_P:
-            self.__config_def_path = os.path.join(c_d.WIN_CFG_P, c_d.CFG_F_NAME)
+        self.__config_def_path = dir_man.g_dir_man.config_file_path
 
     @staticmethod
     def __set_default_out_path():
-        if g_v.CUR_PLATFORM == c_d.LINUX_P:
-            g_v.OUT_PATH = c_d.LIN_OUT_P_DEF
-        elif g_v.CUR_PLATFORM == c_d.WINDOWS_P:
-            g_v.OUT_PATH = c_d.WIN_OUT_P_DEF
+        dir_man.g_dir_man.reconfigure()
 
     def __try_load(self, block, item, default_value):
         if self.__cfg.has_option(block, item):
@@ -66,7 +60,26 @@ class CfgLoader:
 
     @log_func_name(logger)
     def __load_config_block(self, block):
-        g_v.OUT_PATH = self.__try_load(block, c_d.OUT_P, g_v.OUT_PATH)
+        dir_man.g_dir_man.def_root_dir = self.__try_load(block, c_d.CFG_ROOT_DIR_P,
+                                                           dir_man.g_dir_man.def_root_dir)
+        dir_man.g_dir_man.def_bin_dir = self.__try_load(block, c_d.CFG_BIN_DIR_P,
+                                                           dir_man.g_dir_man.def_bin_dir)
+        dir_man.g_dir_man.def_config_dir = self.__try_load(block, c_d.CFG_CONFIG_DIR_P,
+                                                           dir_man.g_dir_man.def_config_dir)
+        dir_man.g_dir_man.def_data_dir = self.__try_load(block, c_d.CFG_DATA_DIR_P,
+                                                           dir_man.g_dir_man.def_data_dir)
+        dir_man.g_dir_man.def_logger_dir = self.__try_load(block, c_d.CFG_LOGGER_DIR_P,
+                                                           dir_man.g_dir_man.def_logger_dir)
+        dir_man.g_dir_man.def_output_dir = self.__try_load(block, c_d.CFG_OUTPUT_DIR_OLD_P,
+                                                           dir_man.g_dir_man.def_output_dir)
+        dir_man.g_dir_man.def_output_dir = self.__try_load(block, c_d.CFG_OUTPUT_DIR_P,
+                                                           dir_man.g_dir_man.def_output_dir)
+
+        if not os.path.isabs(dir_man.g_dir_man.def_root_dir):
+            dir_man.g_dir_man.def_root_dir = os.path.join(dir_man.g_dir_man.config_dir, dir_man.g_dir_man.def_root_dir)
+
+        dir_man.g_dir_man.reconfigure(dir_man.g_dir_man.def_root_dir)
+
         g_v.DIST_LINK_PREFIX = self.__try_load(block, c_d.SECT_DIST_LINK_PREFIX, g_v.DIST_LINK_PREFIX)
         g_v.DIST_LINK_PATTERN = self.__try_load(block, c_d.SECT_DIST_LINK_PATTERN, g_v.DIST_LINK_PATTERN)
 
@@ -151,7 +164,7 @@ class CfgLoader:
                 else:
                     pre_link = repo_name
 
-                repo_obj.link = prefix + pre_link
+                repo_obj.link = os.path.join(prefix, pre_link)
                 repo_obj.name = pre_link
                 
                 if not sw_archive_module_id:
@@ -178,7 +191,7 @@ class CfgLoader:
             model.departments[block] = dep
 
     def __write_cfg(self):
-        with open(self.__config_def_path, 'w') as config_file:
+        with open(self.__config_def_path, 'w', encoding=c_d.DOC_ENCODING) as config_file:
             self.__cfg.write(config_file)
 
     @staticmethod
@@ -201,7 +214,7 @@ class CfgLoader:
             return c_d.EXIT_CFNE
 
         self.__cfg = configparser.ConfigParser()
-        self.__cfg.read(self.__config_def_path)
+        self.__cfg.read(self.__config_def_path, encoding=c_d.DOC_ENCODING)
 
         return None
 
@@ -209,7 +222,7 @@ class CfgLoader:
     def __rewrite_update_file(cfg_parser, repos):
         cfg_parser[c_d.SECTION_UPD][c_d.OPTION_UPD] = repos
 
-        with open(c_d.UPDATE_TABLE_PATH, 'w') as file:
+        with open(dir_man.g_dir_man.git_update_table_file_path, 'w', encoding=c_d.DOC_ENCODING) as file:
             cfg_parser.write(file)
 
             file.flush()
@@ -221,7 +234,7 @@ class CfgLoader:
     def get_list_of_updates():
         cfg_parser = configparser.ConfigParser()
 
-        cfg_parser.read(c_d.UPDATE_TABLE_PATH)
+        cfg_parser.read(dir_man.g_dir_man.git_update_table_file_path)
 
         repos = None
 
@@ -246,7 +259,7 @@ class CfgLoader:
         logger.info("try add repo {:s} to updates.ini".format(str(repo_name)))
         cfg_parser = configparser.ConfigParser()
 
-        cfg_parser.read(c_d.UPDATE_TABLE_PATH)
+        cfg_parser.read(dir_man.g_dir_man.git_update_table_file_path)
 
         repos = None
 
@@ -274,7 +287,7 @@ class CfgLoader:
         logger.info("try del repo {:s} from updates.ini".format(str(repo_name)))
         cfg_parser = configparser.ConfigParser()
 
-        cfg_parser.read(c_d.UPDATE_TABLE_PATH)
+        cfg_parser.read(dir_man.g_dir_man.git_update_table_file_path)
 
         repos = None
 
@@ -361,7 +374,7 @@ class CfgLoader:
                                                                 dep))
         _, repo = self.__separate_repo_and_soft_type(repo)
 
-        hooks_path = os.path.join(c_d.GIT_HOOKS_PATH, c_d.POST_RX_HOOK_NAME)
+        hooks_path = os.path.join(dir_man.g_dir_man.git_hooks_dir, c_d.POST_RX_HOOK_NAME)
 
         repo_path = self.__get_repo_path(dep, repo)
         repo_hooks_dir_path = os.path.join(repo_path, c_d.HOOKS_PATH)
@@ -380,7 +393,7 @@ class CfgLoader:
 
     @staticmethod
     def setup_hooks(tag_model):
-        hook_path = os.path.join(c_d.GIT_HOOKS_PATH, c_d.POST_RX_HOOK_NAME)
+        hook_path = os.path.join(dir_man.g_dir_man.git_hooks_dir, c_d.POST_RX_HOOK_NAME)
 
         for dep_name, dep_obj in tag_model.departments.items():
             for repo in dep_obj.repos:
