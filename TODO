@@ -1,10 +1,15 @@
 -< TODO >-----------------------------------------------------------------------------------------------------------------------------------------
 
 - solution versions DOMAINS. See [doc/SIH-00003.domains.md]
+- form to add info about installed software. See [doc/SIH-00004.tag_create_form.md]
+- domains: fix metric calculations
+? domains: list of releases page "for all" - do separate for each domain (page, not lines)
 
 -< NEED TO RECHECK >------------------------------------------------------------------------------------------------------------------------------
 
 + add "metric" column after version column. See [doc/SIH-00004.metric.md]
++ domains: list of releases in table footer "for all" - do separate for each domain line
++ domains: per device lines - hide prev version domains lines
 
 -< SEEMS DONE >-----------------------------------------------------------------------------------------------------------------------------------
 
