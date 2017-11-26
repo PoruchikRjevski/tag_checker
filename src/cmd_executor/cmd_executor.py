@@ -19,7 +19,8 @@ def run_cmd(command):
     logger.info("cmd: {:s}".format(command))
 
     cmd_run_t = start()
-    proc = subprocess.Popen(['{:s}\n'.format(command)],
+    params = '{:s}\n'.format(command).split(" ");
+    proc = subprocess.Popen(params,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE,
                             shell=True)
@@ -31,7 +32,13 @@ def run_cmd(command):
                                                                      command))
 
     u_out = out.decode(c_d.DOC_CODE).strip()
-    u_err = err.decode(c_d.DOC_CODE).strip()
+    try:
+        u_err = err.decode(c_d.DOC_CODE).strip()
+    except:
+        try:
+            u_err = err.decode("cp866").strip()
+        except:
+            u_err = ":("
 
     logger.info("out: {:s}".format(u_out))
 

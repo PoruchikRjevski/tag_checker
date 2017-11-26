@@ -227,7 +227,7 @@ TAG_DEVICE_SELECTORS = [TAG_DEVICE_SELECTOR_TYPE_ITEM, TAG_DEVICE_SELECTOR_TYPE_
 
 # PLATFORMS ---------------------------------------------------------
 SOLUTION            = "tag_checker"
-WINDOWS_P           = "windows"
+WINDOWS_P           = "win32"
 LINUX_P             = "linux"
 
 # CMD WRAP ----------------------------------------------------------

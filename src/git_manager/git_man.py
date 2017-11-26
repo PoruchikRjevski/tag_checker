@@ -479,6 +479,8 @@ class GitMan:
         commits_out = []
 
         cm_tags_info = GitMan.__get_commit_info_for_all_tags().split("\n")
+        for i in range(len(cm_tags_info)):
+            cm_tags_info[i] = cm_tags_info[i].strip('"')
         cm_tags_info_true = [cm_tag_info for cm_tag_info in cm_tags_info if cm_tag_info.split("&|")[0].strip('"') in unic_hashes]
 
         for cm_tag_info in cm_tags_info_true:
