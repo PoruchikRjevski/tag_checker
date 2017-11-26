@@ -188,7 +188,7 @@ SECT_DIST_LINK_PATTERN = "dist_link_pattern"
 SECT_DIST_LINK_PREFIX = "dist_link_prefix"
 SECT_PAIRS          = "pairs"
 
-CFG_OUTPUT_DIR_OLD_P = "out"
+CFG_OUTPUT_DIR_OLD_P = "out"       # deprecated
 CFG_OUTPUT_DIR_P    = "out_dir"
 CFG_ROOT_DIR_P      = "root_dir"
 CFG_BIN_DIR_P       = "bin_dir"
