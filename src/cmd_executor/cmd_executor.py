@@ -2,6 +2,8 @@ import subprocess
 import threading
 import logging
 
+import os
+
 import common_defs as c_d
 import global_vars as g_v
 from time_profiler.time_checker import *
@@ -19,8 +21,12 @@ def run_cmd(command):
     logger.info("cmd: {:s}".format(command))
 
     cmd_run_t = start()
-    params = '{:s} \n'.format(command).split(" ")
-    params = [param for param in params if param]
+
+    if os.platform == "win32":
+        params = '{:s} \n'.format(command).split(" ")
+        params = [param for param in params if param]
+    else:
+        params = '{:s}\n'.format(command)
 
     proc = subprocess.Popen(params,
                             stdout=subprocess.PIPE,
