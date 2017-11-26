@@ -4,6 +4,7 @@
 - form to add info about installed software. See [doc/SIH-00004.tag_create_form.md]
 - domains: fix metric calculations
 ? domains: list of releases page "for all" - do separate for each domain (page, not lines)
+- installer without UI (can be run in batch mode). Prev install.sh was able to do so.
 
 -< NEED TO RECHECK >------------------------------------------------------------------------------------------------------------------------------
 
