@@ -34,9 +34,9 @@ Main parts:
     - load mapped names of devices from tag_checker_translate
     - for even part [xxx] create dict and go to repo for check tags
 - tag model(TagModel)
-    - agregate all info about tags, repos, commits etc
+    - aggregate all info about tags, repos, commits etc
 - checker(GitMan)
-    - got throw repos, update, get tags, parce it's put info to model
+    - got throw repos, update, get tags, parse it's put info to model
 - web configurator(WebGen)
     - create web page's:
         - main - last changes for all departments, devices and types(ITEM, ORDER, ALL)

@@ -13,7 +13,7 @@ from tag_model import *
 from time_profiler.time_checker import *
 from logger import log_func_name
 
-# parce state machine environment
+# parse state machine environment
 W_START, W_DEV, W_OFFSET, W_ITEM, W_DATE, W_DOMEN, W_BREAK = range(7)
 P_PROD, P_DEV, P_ITEM, P_DATE, P_PLATFORM = range(5)
 # true tag seq: P_PROD/P_DEV/P_ITEM(?)/P_DATE/P_PLATFORM(?)
@@ -527,7 +527,7 @@ class GitMan:
 
         items_out = []
 
-        # parce tags and gen items
+        # parse tags and gen items
         work_t = start()
         items_out = self.__gen_items(tags_list, repo_i)
         stop(work_t)

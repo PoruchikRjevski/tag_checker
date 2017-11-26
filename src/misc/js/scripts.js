@@ -27,7 +27,7 @@ function highlight(hash) {
     }
 }
 
-// parce hash from url
+// parse hash from url
 function getHashFromUrl(url) {
     var splitted = url.split(';');
 
