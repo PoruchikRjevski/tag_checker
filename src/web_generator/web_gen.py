@@ -3,6 +3,7 @@ import logging
 import datetime
 from collections import OrderedDict
 
+from config_manager import dir_man
 from web_generator.html_gen import HtmlGen
 
 import common_defs as c_d
@@ -42,7 +43,7 @@ class WebGenerator:
     @log_func_name(logger)
     def __gen_index(self, model):
         logger.info("start gen index")
-        index = HtmlGen(g_v.OUT_PATH, c_d.INDEX_F_NAME)
+        index = HtmlGen(dir_man.g_dir_man.output_dir, c_d.INDEX_F_NAME)
 
         WebGenerator.__gen_page_head(index, c_d.M_HEAD_TXT, "", h_d.A_CLASS.format(c_d.CL_BACK_CIRLE))
 
@@ -60,7 +61,7 @@ class WebGenerator:
     @staticmethod
     @log_func_name(logger)
     def __gen_read_metrics_help_page():
-        help_p = HtmlGen(g_v.OUT_PATH, c_d.HELP_METR_F_NAME)
+        help_p = HtmlGen(dir_man.g_dir_man.output_dir, c_d.HELP_METR_F_NAME)
 
         WebGenerator.__gen_page_head(help_p, c_d.READ_METR_TXT, "", h_d.A_CLASS.format(c_d.CL_BACK_CIRLE))
 
@@ -140,7 +141,7 @@ class WebGenerator:
 
     @log_func_name(logger)
     def __gen_pages(self, model):
-        main = HtmlGen(g_v.OUT_PATH, c_d.MAIN_F_NAME)
+        main = HtmlGen(dir_man.g_dir_man.output_dir, c_d.MAIN_F_NAME)
 
         WebGenerator.__gen_page_head(main, c_d.M_HEAD_TXT, "")
 
@@ -392,7 +393,7 @@ class WebGenerator:
 
                 # device name
                 dev_link_attrs = (model.get_tr_dev(dev_name),
-                                  c_d.DEVICE_PATH + WebGenerator.__get_device_file_name(dev_name),
+                                  dir_man.g_dir_man.output_device_dir + WebGenerator.__get_device_file_name(dev_name),
                                   h_d.A_TITLE.format(c_d.TO_DEV_TXT))
                 WebGenerator.__gen_device_name(file,
                                                h_d.A_ROWSPAN.format(c_d.BTM_ROWS)
@@ -421,11 +422,11 @@ class WebGenerator:
     def __get_num_by_type(type, num):
         res = ""
 
-        if c_d.TYPE_ALL in type:
+        if c_d.TAG_DEVICE_SELECTOR_TYPE_ALL in type:
             res = c_d.T_FOR_ALL_TXT
-        elif c_d.TYPE_ITEM in type:
+        elif c_d.TAG_DEVICE_SELECTOR_TYPE_ITEM in type:
             res = c_d.T_ITEM_TXT + str(num)
-        elif c_d.TYPE_ORDER in type:
+        elif c_d.TAG_DEVICE_SELECTOR_TYPE_SERIE in type:
             res = c_d.T_ORDER_TXT + str(num)
 
         return res
@@ -475,7 +476,7 @@ class WebGenerator:
 
     def __gen_device_page(self, model, dep_name, dev_name):
         logger.info("start gen pages for device: {:s}".format(dev_name))
-        page = HtmlGen(c_d.DEVICE_PATH, WebGenerator.__get_device_file_name(dev_name))
+        page = HtmlGen(dir_man.g_dir_man.output_device_dir, WebGenerator.__get_device_file_name(dev_name))
 
         dev_str = "{:s} \"{:s}\" [{:s}]".format(c_d.HISTORY_TXT,
                                                 model.get_tr_dev(dev_name),
@@ -518,7 +519,7 @@ class WebGenerator:
         dep_str = "{:s} {:s}".format(c_d.DEPART_TXT,
                                      str(dep.name))
 
-        page = HtmlGen(os.path.join(c_d.ORDERS_PATH, item_dir_name), item_file_name)
+        page = HtmlGen(os.path.join(dir_man.g_dir_man.output_orders_dir, item_dir_name), item_file_name)
 
         WebGenerator.__gen_page_head(page, dev_str, c_d.LEVEL_UP * 3)
         WebGenerator.__gen_content_start(page)
@@ -582,7 +583,7 @@ class WebGenerator:
         dev_items = [item for item in dep.items if item.dev_name == dev_name]
 
         type_class_id = 0
-        for type in c_d.TYPES_L:
+        for type in c_d.TAG_DEVICE_SELECTORS:
             typed_items = [item for item in dev_items if item.item_type == type]
 
             unic_nums = sorted([key for key in dict.fromkeys([item.item_num for item in typed_items]).keys()],
@@ -617,7 +618,7 @@ class WebGenerator:
                     if first_s_t:
                         first_s_t = False
                         order_link_attrs = (WebGenerator.__get_num_by_type(ld_item.item_type, ld_item.item_num),
-                                            os.path.join(c_d.ORDERS_DIR,
+                                            os.path.join(c_d.OUTPUT_DEVICE_ORDERS_REL_DIR,
                                                          WebGenerator.__get_item_dir_name(dev_name, ld_item.item_num),
                                                          WebGenerator.__get_item_file_name(dev_name, ld_item.item_num)),
                                             h_d.A_TITLE.format(c_d.CNT_TXT + str(len(nummed_items))))
@@ -703,7 +704,7 @@ class WebGenerator:
                                        + " " + c_d.CL_TD_VER
                                        + " " + c_d.CL_BORDER)
 
-        if item.item_type is c_d.TYPE_ALL:
+        if item.item_type is c_d.TAG_DEVICE_SELECTOR_TYPE_ALL:
             ftp_link_c = (c_d.REDIST_TXT,
                           WebGenerator.form_dist_link(commit, repo),
                           h_d.A_TITLE.format(c_d.LINK_FTP_TXT)
@@ -860,7 +861,7 @@ class WebGenerator:
         self.__set_current_timestamp()
 
         if not partly_update:
-            WebGenerator.__clear_out_dir(g_v.OUT_PATH)
+            WebGenerator.__clear_out_dir(dir_man.g_dir_man.output_dir)
             WebGenerator.__gen_read_metrics_help_page()
 
         self.__gen_index(model)

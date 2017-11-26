@@ -4,12 +4,8 @@ MULTITH             = False         # global flag for exec by multithreading
 DEBUG               = False
 TIMEOUTS            = False
 
-OUT_PATH            = ""
-
 DIST_LINK_PREFIX    = "ftp://172.16.20.64/bourevestnik.spb.ru/software/archive/modules/"
 DIST_LINK_PATTERN   = "${dist_prefix}${sw_module_group_id}${sw_module_id}.mod/${sw_module_version_id}.ver"
-
-CUR_PLATFORM        = None
 
 CUR_PATH            = ""
 

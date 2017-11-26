@@ -3,6 +3,7 @@ import logging
 
 import global_vars as g_v
 import common_defs as c_d
+from config_manager import dir_man
 from web_generator import html_defs as h_d
 
 __all__ = ['HtmlGen']
@@ -13,7 +14,7 @@ logger = logging.getLogger("{:s}.HtmlGen".format(c_d.SOLUTION))
 
 class HtmlGen:
     def __init__(self, path, name):
-        dir_p = g_v.OUT_PATH
+        dir_p = dir_man.g_dir_man.output_dir
 
         if not os.path.isabs(path):
             dir_p = os.path.join(dir_p, path)
