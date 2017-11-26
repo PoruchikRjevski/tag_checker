@@ -554,6 +554,14 @@ class WebGenerator:
         logger.info("finish gen item page: {:s}".format(str(device_selector_id)))
 
     @staticmethod
+    def __gen_soft_type_typyle(soft_type, domain):
+        domain_title = domain.strip(".")
+        if domain_title:
+            return "{:s} : {:s}".format(soft_type, domain_title)
+        else:
+            return soft_type
+
+    @staticmethod
     def __gen_items_content(page, dep, items):
         type_class_id = c_d.CL_TD_1
 
@@ -580,7 +588,7 @@ class WebGenerator:
                                                  + " " + c_d.CL_BORDER)
             repo_obj = dep.repos[item.repo_index][REPO_OBJECT]
             WebGenerator.__gen_item_soft_type(page,
-                                              repo_obj.soft_type,
+                                              WebGenerator.__gen_soft_type_typyle(repo_obj.soft_type, item.solution_domain),
                                               soft_type_class)
 
             # tag date and commit hash
@@ -623,52 +631,72 @@ class WebGenerator:
                         if not s_typed_items:
                             continue
 
-                        ld_item = max(s_typed_items, key=lambda item: item.tag_date)
+                        pre_ld_item = max(s_typed_items, key=lambda item: item.tag_date)
+                        if pre_ld_item.device_selector_type != c_d.TAG_DEVICE_SELECTOR_TYPE_ALL:
+                            domains = [pre_ld_item.solution_domain]
+                        else:
+                            for n_item in nummed_items:
+                                new_domain = n_item.solution_domain
+                                if new_domain not in domains:
+                                    domains.append(new_domain)
+                            domains = sorted(domains)
 
-                        type_class_id_str = c_d.CL_TD_INC.format(str(type_class_id))
+                        for domain in domains:
 
-                        file.w_o_tag(h_d.T_TR,
-                                     h_d.A_CLASS.format(str(type_class_id)) +
-                                     h_d.A_ON_MOUSE_OVER.format(c_d.CALC_METRICS_FUNC) +
-                                     h_d.A_ON_MOUSE_OUT.format(c_d.CALC_DEF_METR_FUNC))
+                            d_typed_items = [item for item in s_typed_items if
+                                             item.solution_domain == domain]
 
-                        # order num
-                        if first_s_t:
-                            first_s_t = False
-                            title = WebGenerator.__get_num_by_type(ld_item.device_selector_type, ld_item.device_selector_id)
-                            if ld_item.device_selector_type == c_d.TAG_DEVICE_SELECTOR_TYPE_ALL:
-                                title = tag_class_i10n + title
+                            if not d_typed_items:
+                                continue
 
-                            order_link_attrs = (title,
-                                                c_d.OUTPUT_DEVICE_ORDERS_REL_DIR + "/" +
-                                                WebGenerator.__get_item_dir_name(dev_name, ld_item.device_selector_id) + "/" +
-                                                WebGenerator.__get_item_file_name(dev_name, ld_item.device_selector_id),
-                                                h_d.A_TITLE.format(c_d.CNT_TXT + str(len(nummed_items))))
+                            ld_item = max(d_typed_items, key=lambda item: item.tag_date)
 
-                            WebGenerator.__gen_order_num(file,
-                                                         h_d.A_CLASS.format(type_class_id_str
-                                                                            + " " + c_d.CL_TD_NUM
-                                                                            + " " + c_d.CL_BORDER)
-                                                         + h_d.A_ROWSPAN.format(str(len(soft_type_by_num))),
-                                                         [order_link_attrs])
+                            type_class_id_str = c_d.CL_TD_INC.format(str(type_class_id))
 
-                        # order soft type
-                        soft_type_class = h_d.A_CLASS.format(type_class_id_str
+                            file.w_o_tag(h_d.T_TR,
+                                         h_d.A_CLASS.format(str(type_class_id)) +
+                                         h_d.A_ON_MOUSE_OVER.format(c_d.CALC_METRICS_FUNC) +
+                                         h_d.A_ON_MOUSE_OUT.format(c_d.CALC_DEF_METR_FUNC))
+
+                            # order num
+                            if first_s_t:
+                                first_s_t = False
+                                title = WebGenerator.__get_num_by_type(ld_item.device_selector_type, ld_item.device_selector_id)
+                                if ld_item.device_selector_type == c_d.TAG_DEVICE_SELECTOR_TYPE_ALL:
+                                    title = tag_class_i10n + title
+
+                                order_link_attrs = (title,
+                                                    WebGenerator.join_path(
+                                                        c_d.OUTPUT_DEVICE_ORDERS_REL_DIR,
+                                                        WebGenerator.__get_item_dir_name(dev_name, ld_item.device_selector_id),
+                                                        WebGenerator.__get_item_file_name(dev_name, ld_item.device_selector_id)),
+                                                    h_d.A_TITLE.format(c_d.CNT_TXT + str(len(nummed_items))))
+
+                                WebGenerator.__gen_order_num(file,
+                                                             h_d.A_CLASS.format(type_class_id_str
+                                                                                + " " + c_d.CL_TD_NUM
+                                                                                + " " + c_d.CL_BORDER)
+                                                             + h_d.A_ROWSPAN.format(str(len(soft_type_by_num)*len(domains))),
+                                                             [order_link_attrs])
+
+                            # order soft type
+                            soft_type_class = h_d.A_CLASS.format(type_class_id_str
                                                              + " " + c_d.CL_TEXT_CENTER
                                                              + " " + c_d.CL_BORDER)
-                        WebGenerator.__gen_item_soft_type(file,
-                                                          soft_t,
-                                                          soft_type_class)
 
-                        # tag date and commit hash
-                        repo = dep.repos[ld_item.repo_index][REPO_OBJECT]
-                        commit = dep.commits[ld_item.commit_index]
-                        WebGenerator.__gen_common_columns(file,
+                            WebGenerator.__gen_item_soft_type(file,
+                                                              WebGenerator.__gen_soft_type_typyle(soft_t, domain),
+                                                              soft_type_class)
+
+                            # tag date and commit hash
+                            repo = dep.repos[ld_item.repo_index][REPO_OBJECT]
+                            commit = dep.commits[ld_item.commit_index]
+                            WebGenerator.__gen_common_columns(file,
                                                           repo,
                                                           commit,
                                                           ld_item,
                                                           type_class_id_str)
-                        file.w_c_tag(h_d.T_TR)
+                            file.w_c_tag(h_d.T_TR)
 
                     # generate page for item
                     self.__gen_history_page(model,

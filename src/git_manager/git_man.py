@@ -147,12 +147,12 @@ class GitMan:
                 state[0] = W_BREAK
             else:
                 state[0] = W_DOMAIN
-                item_out.solution_domain = "/"
+                item_out.solution_domain = ""
                 item_out.tag_date_obj = GitMan.__get_tag_datetime_object(item_out.tag_date)
                 item_out.tag_date_ord = item_out.tag_date_obj.toordinal()
         # W_DOMAIN
         elif state[0] == W_DOMAIN:
-            item_out.solution_domain = item_out.solution_domain + "/" + tag_part
+            item_out.solution_domain = item_out.solution_domain + "." + tag_part
             logger.info("solution domain: {:s}".format(item_out.solution_domain))
 
         # end
