@@ -222,7 +222,7 @@ class CfgLoader:
     def __rewrite_update_file(cfg_parser, repos):
         cfg_parser[c_d.SECTION_UPD][c_d.OPTION_UPD] = repos
 
-        with open(dir_man.g_dir_man.git_update_table_file_path, 'w', encoding=c_d.DOC_ENCODING) as file:
+        with open(dir_man.g_dir_man.update_table_file_path, 'w', encoding=c_d.DOC_ENCODING) as file:
             cfg_parser.write(file)
 
             file.flush()
