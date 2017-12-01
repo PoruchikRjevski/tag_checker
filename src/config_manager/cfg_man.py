@@ -234,7 +234,7 @@ class CfgLoader:
     def get_list_of_updates():
         cfg_parser = configparser.ConfigParser()
 
-        cfg_parser.read(dir_man.g_dir_man.git_update_table_file_path)
+        cfg_parser.read(dir_man.g_dir_man.update_table_file_path)
 
         repos = None
 
