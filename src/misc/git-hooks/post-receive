@@ -61,7 +61,7 @@ def add_repo_to_update_table(repo_name):
 
     cfg_parser[SECTION_UPD][OPTION_UPD] = repos
 
-    with open(UPDATE_TABLE_PATH, 'w', "utf-8") as file:
+    with open(UPDATE_TABLE_PATH, 'w', encoding="utf-8") as file:
         cfg_parser.write(file)
 
         file.flush()
