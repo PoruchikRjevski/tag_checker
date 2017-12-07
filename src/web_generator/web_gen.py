@@ -620,10 +620,18 @@ class WebGenerator:
                     nummed_items = [item for item in typed_items if item.device_selector_id == num]
 
                     soft_type_by_num = []
+                    sd_types = []
                     for n_item in nummed_items:
                         s_type = dep.repos[n_item.repo_index][REPO_OBJECT].soft_type
+                        
                         if s_type not in soft_type_by_num:
                             soft_type_by_num.append(s_type)
+                            
+                        d_type = n_item.solution_domain
+                        sd_type = s_type + ":" + d_type
+                        if sd_type not in sd_types:
+                            sd_types.append(sd_type)
+                            
 
                     for soft_t in dep.soft_types:
                         s_typed_items = [item for item in nummed_items if dep.repos[item.repo_index][REPO_OBJECT].soft_type == soft_t]
@@ -632,7 +640,8 @@ class WebGenerator:
                             continue
 
                         pre_ld_item = max(s_typed_items, key=lambda item: item.tag_date)
-                        if pre_ld_item.device_selector_type != c_d.TAG_DEVICE_SELECTOR_TYPE_ALL:
+                        is_concrete_device_item = pre_ld_item.device_selector_type != c_d.TAG_DEVICE_SELECTOR_TYPE_ALL
+                        if is_concrete_device_item:
                             domains = [pre_ld_item.solution_domain]
                         else:
                             for n_item in nummed_items:
@@ -672,11 +681,16 @@ class WebGenerator:
                                                         WebGenerator.__get_item_file_name(dev_name, ld_item.device_selector_id)),
                                                     h_d.A_TITLE.format(c_d.CNT_TXT + str(len(nummed_items))))
 
+                                if is_concrete_device_item:
+                                    rows_span = len(soft_type_by_num)
+                                else:
+                                    rows_span = len(sd_types)
+                                
                                 WebGenerator.__gen_order_num(file,
                                                              h_d.A_CLASS.format(type_class_id_str
                                                                                 + " " + c_d.CL_TD_NUM
                                                                                 + " " + c_d.CL_BORDER)
-                                                             + h_d.A_ROWSPAN.format(str(len(soft_type_by_num)*len(domains))),
+                                                             + h_d.A_ROWSPAN.format(str(rows_span)),
                                                              [order_link_attrs])
 
                             # order soft type
