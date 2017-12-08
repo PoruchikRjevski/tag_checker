@@ -486,8 +486,7 @@ class GitMan:
         cm_tags_info_true = [cm_tag_info for cm_tag_info in cm_tags_info if cm_tag_info.split("&|")[0].strip('"') in unic_hashes]
 
         for cm_tag_info in cm_tags_info_true:
-            if g_v.DEBUG:
-                logger.info("Gen commit for: {:s}".format(cm_tag_info))
+            logger.info("Gen commit for: {:s}".format(cm_tag_info))
 
             separated = cm_tag_info.split("&|")
             raw_hash = separated[0] if len(separated) >= 1 else ""

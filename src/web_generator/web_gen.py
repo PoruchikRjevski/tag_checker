@@ -520,10 +520,10 @@ class WebGenerator:
 
         logger.info("finish gen pages for device: {:s}".format(dev_name))
 
-    def __gen_history_page(self, model, dep, dev_name, device_selector_id, type, items):
+    def __gen_history_page(self, model, dep, dev_name, device_selector_id, type, tag_class, items):
         logger.info("start gen item page: {:s}".format(str(device_selector_id)))
 
-        item_file_name = WebGenerator.__get_item_file_name(dev_name, device_selector_id)
+        item_file_name = WebGenerator.__get_item_file_name(dev_name, device_selector_id, tag_class)
         item_dir_name = WebGenerator.__get_item_dir_name(dev_name, device_selector_id)
 
         dev_str = "{:s} \"{:s}\" - \"{:s}\" [{:s}]".format(c_d.HISTORY_TXT,
@@ -631,7 +631,6 @@ class WebGenerator:
                         sd_type = s_type + ":" + d_type
                         if sd_type not in sd_types:
                             sd_types.append(sd_type)
-                            
 
                     for soft_t in dep.soft_types:
                         s_typed_items = [item for item in nummed_items if dep.repos[item.repo_index][REPO_OBJECT].soft_type == soft_t]
@@ -678,7 +677,7 @@ class WebGenerator:
                                                     WebGenerator.join_path(
                                                         c_d.OUTPUT_DEVICE_ORDERS_REL_DIR,
                                                         WebGenerator.__get_item_dir_name(dev_name, ld_item.device_selector_id),
-                                                        WebGenerator.__get_item_file_name(dev_name, ld_item.device_selector_id)),
+                                                        WebGenerator.__get_item_file_name(dev_name, ld_item.device_selector_id, tag_class)),
                                                     h_d.A_TITLE.format(c_d.CNT_TXT + str(len(nummed_items))))
 
                                 if is_concrete_device_item:
@@ -718,6 +717,7 @@ class WebGenerator:
                                             dev_name,
                                             num,
                                             type,
+                                            tag_class,
                                             nummed_items)
 
                 type_class_id += 1
@@ -899,8 +899,8 @@ class WebGenerator:
         gen.w_c_tag(h_d.T_TR)
 
     @staticmethod
-    def __get_item_file_name(name, num):
-        return "{:s}_{:s}{:s}".format(name, str(num), c_d.HTML_EXT)
+    def __get_item_file_name(name, num, tag_class):
+        return "{:s}_{:s}_{:s}{:s}".format(name, str(num), tag_class, c_d.HTML_EXT)
 
     @staticmethod
     def __get_item_dir_name(name, num):
