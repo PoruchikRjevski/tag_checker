@@ -720,7 +720,7 @@ class WebGenerator:
                                             tag_class,
                                             nummed_items)
 
-                type_class_id += 1
+            type_class_id += 1
 
     @staticmethod
     def form_dist_link(commit, repo):
