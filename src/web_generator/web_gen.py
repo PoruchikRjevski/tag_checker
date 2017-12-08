@@ -50,7 +50,7 @@ class WebGenerator:
         WebGenerator.__gen_page_head(index, c_d.M_HEAD_TXT, "", h_d.A_CLASS.format(c_d.CL_BACK_CIRLE))
 
         WebGenerator.__gen_content_start(index)
-        WebGenerator.__gen_iframe(index)
+        WebGenerator.__gen_iframe(index, self.__cur_datetimestamp_ordinal)
         WebGenerator.__gen_script(index, WebGenerator.join_path(c_d.JS_DIR, c_d.SCRIPTS_F_NAME))
         WebGenerator.__gen_content_end(index)
 
@@ -211,13 +211,14 @@ class WebGenerator:
         gen.w_c_tag(h_d.T_DIV)
 
     @staticmethod
-    def __gen_iframe(gen):
+    def __gen_iframe(gen, cur_datetimestamp_ordinal):
+        link = "{:s}?d={:s}".format(c_d.MAIN_F_NAME, str(cur_datetimestamp_ordinal))
         gen.w_tag(h_d.T_IFRAME,
                   c_d.FRAME_NOT,
                   h_d.A_ID.format(c_d.FRAME_ID)
                   + h_d.A_NAME.format(c_d.FRAME_ID)
                   + h_d.A_CLASS.format(c_d.CL_IFRAME)
-                  + h_d.A_SRC.format(c_d.MAIN_F_NAME))
+                  + h_d.A_SRC.format(link))
 
     @staticmethod
     def __gen_script(gen, script):
