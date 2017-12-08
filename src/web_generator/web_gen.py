@@ -24,7 +24,8 @@ class WebGenerator:
     def __init__(self):
         logger.info("init")
 
-        self.__cur_timestamp = None
+        self.__cur_timestamp_str = None
+        self.__cur_timestamp_ordinal = None
 
     @staticmethod
     @log_func_name(logger)
@@ -256,7 +257,7 @@ class WebGenerator:
         updated_devices_txt = c_d.UPDATED_DEVS_TXT.format(WebGenerator.__get_updated_devices_str(model))
 
         gen.w_tag(h_d.T_P,
-                  c_d.LAST_UPD_TXT + self.__cur_timestamp,
+                  c_d.LAST_UPD_TXT + self.__cur_timestamp_str,
                   h_d.A_CLASS.format(c_d.CL_FOOT_INFO)
                   + h_d.A_TITLE.format(c_d.REPOS_NUM_TXT.format(str(g_v.REPOS_NUM)) + "\n"
                                        + c_d.TAGS_NUM_TXT.format(str(g_v.TAGS_NUM)) + "\n"
@@ -406,8 +407,11 @@ class WebGenerator:
                     WebGenerator.__gen_department(file, dep_name, str(len(dep_obj.devices)))
 
                 # device name
+                link_path = WebGenerator.join_path(c_d.OUTPUT_DEVICE_REL_DIR, WebGenerator.__get_device_file_name(dev_name))
+                link_path = "{:s}?d={:s}".format(link_path, str(self.__cur_timestamp_ordinal))
+
                 dev_link_attrs = (model.get_tr_dev(dev_name),
-                                  WebGenerator.join_path(c_d.OUTPUT_DEVICE_REL_DIR, WebGenerator.__get_device_file_name(dev_name)),
+                                  link_path,
                                   h_d.A_TITLE.format(c_d.TO_DEV_TXT))
                 WebGenerator.__gen_device_name(file,
                                                h_d.A_ROWSPAN.format(c_d.BTM_ROWS)
@@ -494,7 +498,7 @@ class WebGenerator:
 
         dev_str = "{:s} \"{:s}\" [{:s}]".format(c_d.HISTORY_TXT,
                                                 model.get_tr_dev(dev_name),
-                                                self.__cur_timestamp)
+                                                self.__cur_timestamp_str)
         dep_str = "{:s} {:s}".format(c_d.DEPART_TXT,
                                      str(dep_name))
 
@@ -529,7 +533,7 @@ class WebGenerator:
         dev_str = "{:s} \"{:s}\" - \"{:s}\" [{:s}]".format(c_d.HISTORY_TXT,
                                                            model.get_tr_dev(dev_name),
                                                            WebGenerator.__get_num_by_type(type, device_selector_id),
-                                                           self.__cur_timestamp)
+                                                           self.__cur_timestamp_str)
         dep_str = "{:s} {:s}".format(c_d.DEPART_TXT,
                                      str(dep.name))
 
@@ -542,7 +546,7 @@ class WebGenerator:
         WebGenerator.__gen_items_table_head(page,
                                     [dev_str, dep_str])
 
-        WebGenerator.__gen_items_content(page, dep, items)
+        WebGenerator.__gen_items_content(page, dep, items, self.__cur_timestamp_ordinal)
 
         WebGenerator.__gen_table_foot(page)
         WebGenerator.__gen_back_link(page)
@@ -562,7 +566,7 @@ class WebGenerator:
             return soft_type
 
     @staticmethod
-    def __gen_items_content(page, dep, items):
+    def __gen_items_content(page, dep, items, cur_datetimestamp):
         type_class_id = c_d.CL_TD_1
 
         first = True
@@ -596,7 +600,8 @@ class WebGenerator:
                                               repo_obj,
                                               dep.commits[item.commit_index],
                                               item,
-                                              type_class_id)
+                                              type_class_id,
+                                              cur_datetimestamp)
 
             page.w_c_tag(h_d.T_TR)
 
@@ -673,11 +678,13 @@ class WebGenerator:
                                 if ld_item.device_selector_type == c_d.TAG_DEVICE_SELECTOR_TYPE_ALL:
                                     title = tag_class_i10n + title
 
+                                link_path = WebGenerator.join_path(c_d.OUTPUT_DEVICE_ORDERS_REL_DIR,
+                                                                   WebGenerator.__get_item_dir_name(dev_name, ld_item.device_selector_id),
+                                                                   WebGenerator.__get_item_file_name(dev_name, ld_item.device_selector_id, tag_class))
+                                link_path = "{:s}?d={:s}".format(link_path, str(self.__cur_timestamp_ordinal))
+
                                 order_link_attrs = (title,
-                                                    WebGenerator.join_path(
-                                                        c_d.OUTPUT_DEVICE_ORDERS_REL_DIR,
-                                                        WebGenerator.__get_item_dir_name(dev_name, ld_item.device_selector_id),
-                                                        WebGenerator.__get_item_file_name(dev_name, ld_item.device_selector_id, tag_class)),
+                                                    link_path,
                                                     h_d.A_TITLE.format(c_d.CNT_TXT + str(len(nummed_items))))
 
                                 if is_concrete_device_item:
@@ -705,10 +712,11 @@ class WebGenerator:
                             repo = dep.repos[ld_item.repo_index][REPO_OBJECT]
                             commit = dep.commits[ld_item.commit_index]
                             WebGenerator.__gen_common_columns(file,
-                                                          repo,
-                                                          commit,
-                                                          ld_item,
-                                                          type_class_id_str)
+                                                              repo,
+                                                              commit,
+                                                              ld_item,
+                                                              type_class_id_str,
+                                                              self.__cur_timestamp_ordinal)
                             file.w_c_tag(h_d.T_TR)
 
                     # generate page for item
@@ -736,7 +744,7 @@ class WebGenerator:
         return link
 
     @staticmethod
-    def __gen_common_columns(file, repo, commit, item, type_class_id):
+    def __gen_common_columns(file, repo, commit, item, type_class_id, cur_datetimestamp):
         column_class = h_d.A_CLASS.format(type_class_id
                                           + " " + c_d.CL_TEXT_LEFT
                                           + " " + c_d.CL_BORDER)
@@ -758,7 +766,8 @@ class WebGenerator:
 
         repo_link_c = (commit.hash + " " + commit.date,
                        c_d.LINK_TO_REPO.format(repo.name, c_d.GW_SHORTLOG,
-                                               commit.hash, str(commit.p_hash)),
+                                               commit.hash, str(commit.p_hash),
+                                               str(cur_datetimestamp)),
                        h_d.A_TITLE.format(WebGenerator.__get_title_for_commit(repo.link, commit.auth,
                                                                               commit.date, commit.msg)))
 
@@ -918,7 +927,10 @@ class WebGenerator:
                + c_d.COMM_MSG_SH_TXT.format(commMsg)
 
     def __set_current_timestamp(self):
-        self.__cur_timestamp = datetime.datetime.now().strftime(c_d.TYPICAL_TIMESTAMP)
+        cur_time = datetime.datetime.now()
+
+        self.__cur_timestamp_str = cur_time.strftime(c_d.TYPICAL_TIMESTAMP)
+        self.__cur_timestamp_ordinal = cur_time.toordinal()
 
     @log_func_name(logger)
     def generate_web(self, model, partly_update):

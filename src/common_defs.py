@@ -108,10 +108,11 @@ FRAME_BAD_NAME      = "BAD_FRAME_NAME"
 # links
 LINK_TO_SRC_REPO    = "http://172.16.20.64/swver_hist/gitweb/?p=opensource/device_tag_visualiser.git;a={:s};ch={:s};h={:s}"
 
-LINK_TO_REPO        = "http://172.16.20.64/swver_hist/gitweb/?p=bourevest/{:s};a={:s};ch={:s};h={:s}"   # :0 - repo name
-                                                                                                        # :1 - out type
-                                                                                                        # :2 - commit hash for select
-                                                                                                        # :3 - hash of parrent commit
+LINK_TO_REPO        = "http://172.16.20.64/swver_hist/gitweb/?p=bourevest/{:s};a={:s};ch={:s};h={:s};d={:s}"    # :0 - repo name
+                                                                                                                # :1 - out type
+                                                                                                                # :2 - commit hash for select
+                                                                                                                # :3 - hash of parrent commit
+                                                                                                                # :4 - update date - for invalidate cache
 GW_SHORTLOG         = "shortlog"
 GW_COMMIT           = "commit"
 
