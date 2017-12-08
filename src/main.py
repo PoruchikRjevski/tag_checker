@@ -238,8 +238,9 @@ def full_update(updates_list = None):
     tag_model = TagModel()
     git_man = GitMan()
     cfg_loader = CfgLoader(updates_list)
+
     if updates_list:
-        cfg_loader.partly_update = True
+        cfg_loader.partly_update = False # todo return True and fix the problem
 
     update(cfg_loader, git_man, tag_model)
 
