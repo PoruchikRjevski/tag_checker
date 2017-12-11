@@ -532,10 +532,17 @@ class WebGenerator:
         item_file_name = WebGenerator.__get_item_file_name(dev_name, device_selector_id, tag_class)
         item_dir_name = WebGenerator.__get_item_dir_name(dev_name, device_selector_id)
 
-        dev_str = "{:s} \"{:s}\" - \"{:s}\" [{:s}]".format(c_d.HISTORY_TXT,
-                                                           model.get_tr_dev(dev_name),
-                                                           WebGenerator.__get_num_by_type(type, device_selector_id),
-                                                           self.__cur_datetimestamp_str)
+        tag_class_str_ru = ""
+        if tag_class is c_d.TAG_CLASSES[0]:
+            tag_class_str_ru = c_d.TAG_CLASSES_I10N[0]
+        elif tag_class is c_d.TAG_CLASSES[1]:
+            tag_class_str_ru = c_d.TAG_CLASSES_I10N[1]
+
+        dev_str = "{:s} \"{:s}\" - \"{:s}\"{:s} [{:s}]".format(c_d.HISTORY_TXT,
+                                                               model.get_tr_dev(dev_name),
+                                                               WebGenerator.__get_num_by_type(type, device_selector_id),
+                                                               (" {:s}".format(tag_class_str_ru) if tag_class_str_ru else ""),
+                                                               self.__cur_datetimestamp_str)
         dep_str = "{:s} {:s}".format(c_d.DEPART_TXT,
                                      str(dep.name))
 
@@ -546,7 +553,7 @@ class WebGenerator:
         WebGenerator.__gen_table_head(page)
 
         WebGenerator.__gen_items_table_head(page,
-                                    [dev_str, dep_str])
+                                            [dev_str, dep_str])
 
         WebGenerator.__gen_items_content(page, dep, items, self.__cur_datetimestamp_ordinal)
 
